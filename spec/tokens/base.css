@@ -1,0 +1,122 @@
+/* Vaani Labs · base layer. Hand-written; load after tokens.css. Global rules only, no components.
+   Evidence: F-VIS-008 (font fallback), F-A11Y-006/-007 (focus), F-A11Y-022 (motion), F-A11Y-023 (targets),
+   spec/00-design-direction.md §8 (forced colours, focus vs selection). */
+
+/* ---------- Fonts ----------
+   Hanken Grotesk has no rupee sign (U+20B9) and Google's subsets drop the arrows U+2190/U+2192.
+   "Vaani Rupee" is a self-hosted one-glyph subset of Noto Sans (OFL), variable wght 400-600:
+     pyftsubset NotoSans[wdth,wght].ttf --unicodes=U+20B9 --flavor=woff2 --output-file=vaani-rupee.woff2
+   Without it, the rupee falls through to Noto Sans Devanagari, whose Google subset lists U+20B9, and every page
+   that shows money would download the whole Devanagari file. Arrows in copy use Lucide icons, not glyphs. */
+@font-face {
+  font-family: "Vaani Rupee";
+  src: url("/fonts/vaani-rupee.woff2") format("woff2");
+  font-weight: 400 600;
+  font-display: swap;
+  unicode-range: U+20B9;
+}
+/* Metric-matched fallback for pages not using next/font (next/font generates its own).
+   Measured: Hanken is 1.1% wider than Arial for UI copy; ascent 1.00 em, descent 0.30 em. */
+@font-face {
+  font-family: "Hanken Grotesk Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 101.1%;
+  ascent-override: 98.9%;
+  descent-override: 29.7%;
+  line-gap-override: 0%;
+}
+
+/* ---------- Document ---------- */
+/* Never set `font` on html: the shorthand sets the root size and re-bases every rem token (02-components-data-nav §0.6).
+   The root stays at the browser default (1rem = 16 px, and it follows the user's font-size setting); body carries the style. */
+html {
+  font-size: 100%;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;          /* a missing weight shows as missing, not as fake bold */
+  scrollbar-gutter: stable;      /* F-VIS-034: no layout shift when a scrollbar appears */
+}
+body { margin: 0; font: var(--type-body-14); letter-spacing: var(--type-body-14-tracking); background: var(--bg); color: var(--text); min-height: 100dvh; }
+::selection { background: var(--text-selection); color: var(--text); }
+[hidden] { display: none !important; }
+
+/* Numbers that change or are compared. Hanken's figures are already fixed-width, but the fallbacks' may not be.
+   Note: the `font` shorthand resets font-variant-numeric, so set this after any `font:` declaration. */
+.num, time, [data-numeric] { font-variant-numeric: tabular-nums; }
+
+/* Mono is only for ids, {{variables}}, code, API keys and keycaps. Phone numbers, timers, timecodes and durations
+   are Hanken with tabular-nums (Hanken's figures are already fixed-width, so mono adds nothing but width and weight). */
+code, kbd, samp, pre { font-family: var(--font-mono); font-size: var(--type-mono-13-size); font-variant-numeric: tabular-nums; }
+
+/* Fields: 16 px on touch so iOS never zooms on focus (the touch density sets --field-font). */
+input, select, textarea, button { font: inherit; }
+input, select, textarea { font-size: var(--field-font); }
+::placeholder { color: var(--text-3); opacity: 1; }
+
+a { color: var(--accent-text); text-underline-offset: 3px; }
+a:hover { color: var(--link-hover); }
+
+/* ---------- Indic scripts ----------
+   Never track Indic text (it breaks the headline stroke and conjuncts). Reading surfaces (turn rows, Assistant
+   replies) switch to --type-read-15-deva for Devanagari. Hinglish is tagged hi-Latn and stays Latin. */
+:is([lang="hi"], [lang="mr"], [lang="ne"], [lang="sa"], [lang="ta"], [lang="te"], [lang="bn"], [lang="gu"], [lang="kn"], [lang="ml"], [lang="pa"], [lang="or"]) {
+  letter-spacing: 0;
+}
+
+/* ---------- Focus ----------
+   Focus is always an outline (it survives forced colours; box-shadow does not). Selection is a separate
+   treatment (accent-soft fill + accent-mark border or bar); when both apply, both show. */
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+/* Rows and list items inside scroll containers draw the outline inside so it is never clipped. */
+:is(tr, [role="row"], [role="option"], [role="treeitem"], [role="gridcell"]):focus-visible { outline-offset: var(--focus-offset-inset); }
+
+/* ---------- Motion ----------
+   Loops are bounded (01-foundations §11): the focal CallHeader's live dot pulses --live-pulse-cycles (3) times per
+   entry into Live; spinners and the indeterminate bar loop only while a user-started request is in flight.
+   Under reduced motion (the media query, or the in-app preference data-motion="reduce") tokens already zero every
+   entrance offset and loop duration; this stops any remaining keyframe loop (the live pulse, meters, spinners,
+   the test trace). Opacity transitions stay: they are state, not movement. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+/* ---------- Forced colours (Windows contrast themes) ----------
+   Contract for components: state marks (live dot, ringing dot, connected socket, legend swatch) carry data-mark,
+   and a free socket or port carries data-mark="hollow"; selected things carry aria-selected / aria-current /
+   data-selected. Focus and selection must never look alike (01-foundations §13, F-A11Y-007):
+   - focus is a 2 px Highlight OUTLINE all round, with its offset;
+   - selection and the current page are a 4 px Highlight BAR on the inline-start edge, never an outline or a ring.
+     Rows put the bar on their first cell (a <tr> border is ignored when borders are separated).
+   A SelectedItem fill was rejected: Chromium draws a Canvas backplate behind forced text, which hides
+   SelectedItemText, and any component background rule would override the fill.
+   !important is deliberate here and only here: this block is the accessibility layer, and component rules that
+   draw their own borders or mark fills are more specific. VR-02 snapshots focused, selected and both (06 §21.1). */
+@media (forced-colors: active) {
+  :focus-visible { outline: var(--focus-width) solid Highlight; outline-offset: var(--focus-offset); }
+  :is([aria-selected="true"], [aria-current="page"], [aria-current="true"], [data-selected]):not(tr, [role="row"]) {
+    border-inline-start: 4px solid Highlight !important;
+  }
+  :is(tr, [role="row"]):is([aria-selected="true"], [aria-current="page"], [aria-current="true"], [data-selected]) > :first-child {
+    border-inline-start: 4px solid Highlight !important;
+  }
+  [data-mark] { forced-color-adjust: none; background-color: CanvasText !important; border-color: CanvasText !important; }
+  [data-mark="hollow"] { background-color: Canvas !important; border: 2px solid CanvasText !important; }
+  :is(button, [role="button"], input, select, textarea) { border-color: ButtonBorder; }
+  [data-baseline] { border-top: 1px solid CanvasText; }
+  [data-edge] { stroke: CanvasText; }
+}

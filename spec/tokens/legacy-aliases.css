@@ -1,0 +1,52 @@
+/* Vaani Labs · legacy alias layer. Load after tokens.css for ONE release, then delete this file,
+   the 36 keyframes and every glass, grid, noise and glow utility (spec/00-design-direction.md §8).
+   Maps all 32 variables of today's app theme (audit/raw/design-system.md §3.1) onto the new tokens so
+   pages keep rendering while they are migrated. Each mapping is the closest *role*, not the closest colour.
+   Lint during the release: any new use of a name DEFINED in this file is an error (names only mentioned in comments,
+   such as --text-muted, --surface and --sentiment-*, are canonical tokens and stay allowed). */
+:root,
+[data-theme] {
+  /* neutrals */
+  --background: var(--bg);
+  --foreground: var(--text);
+  --text-primary: var(--text);
+  --text-secondary: var(--text-2);
+  /* --text-muted is NOT redefined here: tokens.css already declares it as a role alias of --text-3
+     (#5F6878 / #8C94A2). That one change fixes the failing #7A8397 everywhere (F-A11Y-008). */
+  /* --surface keeps its name and role; tokens.css sets the new value. */
+  --surface-light: var(--surface-2);
+  --surface-hover: var(--surface-3);
+  --border-color: var(--border);
+  --border-light: var(--border-strong);   /* the old name was darker than --border-color (F-VIS-036) */
+
+  /* brand: "saffron" rendered blue in light and violet in dark (F-VIS-004). Both become Neel. */
+  --saffron: var(--accent);
+  --saffron-dim: var(--accent-hover);
+  --saffron-glow: transparent;            /* glows are retired */
+  --saffron-glow-strong: transparent;
+  --saffron-glow-subtle: var(--accent-soft);
+
+  /* "peacock" teal/cyan is retired as an accent. Review each use: most were actions (Import CSV, Test Call)
+     and become secondary buttons; KPI numerals become --text. */
+  --peacock: var(--accent-text);
+  --peacock-dim: var(--accent-hover);
+  --peacock-glow: transparent;
+  --peacock-glow-strong: transparent;
+  --peacock-glow-subtle: var(--accent-soft);
+
+  /* --sentiment-positive / -neutral / -negative are NOT redefined here: tokens.css already declares them with the
+     validated CVD-safe values (green-500, graphite-400/500, red-700/red-650). Same names, new values; they are
+     canonical, so the legacy-name lint does not apply to them. Redefining them here would override the validated
+     chart palette for the whole migration release (this file loads after tokens.css with equal specificity). */
+
+  /* retired effects resolve to solid, flat values (F-VIS-022) */
+  --glass-bg: var(--surface);
+  --glass-bg-strong: var(--surface);
+  --glass-bg-subtle: var(--surface-2);
+  --code-bg: var(--surface-2);
+  --code-border: var(--border);
+  --grid-line-color: transparent;
+  --dot-grid-color: transparent;
+  --noise-opacity: 0;
+  --scrollbar-thumb-hover: var(--control);
+}
