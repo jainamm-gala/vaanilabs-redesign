@@ -1,0 +1,245 @@
+/* =====================================================================================================
+   Vaani Labs prototype · base.css — global rules only, no components. Load after tokens.css, before components.css.
+   Source: spec/tokens/base.css (kept verbatim where it applies), extended for the static prototype with:
+     A. reset (box-sizing, margins, lists with a class)        D. layout primitives  (.l-*)
+     B. fonts for file:// (Google Fonts, rupee via Noto Sans)   E. utilities          (.u-*)
+     C. typography roles (.type-*)
+   Evidence: F-VIS-008 (font fallback), F-A11Y-006/-007 (focus), F-A11Y-022 (motion), F-A11Y-023 (targets),
+   spec/00-design-direction.md §8 (forced colours, focus vs selection), 02-components-core §1.10 (border-box).
+   Tokens only: no hex, no rgb(), no raw sizes. Literal widths appear only inside @media conditions.
+   ===================================================================================================== */
+
+/* ---------- B. Fonts ----------
+   The product self-hosts "Vaani Rupee" (a one-glyph Noto Sans subset, base.css in the spec). A prototype opened from
+   file:// cannot load /fonts/…, so the rupee comes from Google Fonts' Noto Sans subset (text=₹) instead, which every
+   page links in <head>. --font-rupee is the hook the --font-sans stack already reads. */
+:root { --font-rupee: "Noto Sans"; }
+/* Metric-matched fallback so a slow font never shifts layout (measured: Hanken is 1.1 % wider than Arial). */
+@font-face {
+  font-family: "Hanken Grotesk Fallback";
+  src: local("Arial"), local("Helvetica Neue"), local("Helvetica");
+  size-adjust: 101.1%;
+  ascent-override: 98.9%;
+  descent-override: 29.7%;
+  line-gap-override: 0%;
+}
+
+/* ---------- A. Reset ---------- */
+*, *::before, *::after { box-sizing: border-box; }
+h1, h2, h3, h4, h5, h6, p, figure, blockquote, dl, dd, fieldset { margin: 0; }
+fieldset { padding: 0; border: 0; min-width: 0; }
+legend { padding: 0; }
+ul[class], ol[class] { margin: 0; padding: 0; list-style: none; }
+img, video, canvas { display: block; max-width: 100%; }
+button { cursor: pointer; }
+button:disabled, [aria-disabled="true"] { cursor: not-allowed; }
+table { border-collapse: separate; border-spacing: 0; }
+summary { cursor: pointer; }
+hr { height: 0; margin: 0; border: 0; border-top: var(--bw-hairline) solid var(--border); }
+
+/* ---------- Document ---------- */
+/* Never set `font` on html: the shorthand sets the root size and re-bases every rem token (02-components-data-nav §0.6).
+   The root stays at the browser default (1rem = 16 px, and it follows the user's font-size setting); body carries the style. */
+html {
+  font-size: 100%;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  font-synthesis: none;          /* a missing weight shows as missing, not as fake bold */
+  scrollbar-gutter: stable;      /* F-VIS-034: no layout shift when a scrollbar appears */
+}
+/* App-shell documents never scroll at ≥1024 (main is the scroller), so the reserved gutter is dropped there
+   (02-assistant reconciliation: scrollbar-gutter applies only to documents that scroll). */
+@media (min-width: 1024px) and (min-height: 600px) { html:has(.app) { scrollbar-gutter: auto; } }
+/* Fixed-frame workbenches never scroll the document either: the Flow Designer (focus shell) from 768 up, where its
+   Review, Compact and Full modes are 100dvh frames, and any page that marks its body data-frame="fixed". Without this
+   a 15 px empty strip shows at the right edge of the TopBar and header (FD-R1-23). */
+@media (min-width: 768px) { html:has(body[data-shell="focus"]) { scrollbar-gutter: auto; } }
+html:has(body[data-frame="fixed"]) { scrollbar-gutter: auto; }
+body { margin: 0; font: var(--type-body-14); letter-spacing: var(--type-body-14-tracking); background: var(--bg); color: var(--text); min-height: 100dvh; }
+::selection { background: var(--text-selection); color: var(--text); }
+[hidden] { display: none !important; }
+
+/* Numbers that change or are compared. Hanken's figures are already fixed-width, but the fallbacks' may not be.
+   Note: the `font` shorthand resets font-variant-numeric, so set this after any `font:` declaration. */
+.num, time, [data-numeric] { font-variant-numeric: tabular-nums; }
+
+/* Mono is only for ids, {{variables}}, code, API keys and keycaps. Phone numbers, timers, timecodes and durations
+   are Hanken with tabular-nums (Hanken's figures are already fixed-width, so mono adds nothing but width and weight). */
+code, kbd, samp, pre { font-family: var(--font-mono); font-size: var(--type-mono-13-size); font-variant-numeric: tabular-nums; }
+
+/* Fields: 16 px on touch so iOS never zooms on focus (the touch density sets --field-font). */
+input, select, textarea, button { font: inherit; color: inherit; }
+input, select, textarea { font-size: var(--field-font); }
+::placeholder { color: var(--text-3); opacity: 1; }
+/* Autofill keeps our fill (02-components-core §1.8): the inset shadow is the documented workaround, not decoration. */
+input:autofill { box-shadow: 0 0 0 100vmax var(--surface) inset; -webkit-text-fill-color: var(--text); }
+
+a { color: var(--accent-text); text-underline-offset: calc(var(--space-2) + var(--space-1)); }
+a:hover { color: var(--link-hover); }
+
+/* ---------- Indic scripts ----------
+   Never track Indic text (it breaks the headline stroke and conjuncts). Reading surfaces (turn rows, Assistant
+   replies) switch to --type-read-15-deva for Devanagari. Hinglish is tagged hi-Latn and stays Latin. */
+:is([lang="hi"], [lang="mr"], [lang="ne"], [lang="sa"], [lang="ta"], [lang="te"], [lang="bn"], [lang="gu"], [lang="kn"], [lang="ml"], [lang="pa"], [lang="or"]) {
+  letter-spacing: 0;
+}
+
+/* ---------- Focus ----------
+   Focus is always an outline (it survives forced colours; box-shadow does not). Selection is a separate
+   treatment (accent-soft fill + accent-mark border or bar); when both apply, both show. */
+:focus-visible {
+  outline: var(--focus-width) solid var(--focus);
+  outline-offset: var(--focus-offset);
+}
+/* Rows and list items inside scroll containers draw the outline inside so it is never clipped. */
+:is(tr, [role="row"], [role="option"], [role="treeitem"], [role="gridcell"]):focus-visible { outline-offset: var(--focus-offset-inset); }
+/* Programmatic focus targets (main, the H1, sheet titles) are not controls and draw no ring (06-accessibility §6.4).
+   This is the only allowed outline removal, and the lint allowlist names it. */
+[data-focus-target]:focus, [data-focus-target]:focus-visible { outline: none; }
+
+/* ---------- Motion ----------
+   Loops are bounded (01-foundations §11): the focal CallHeader's live dot pulses --live-pulse-cycles (3) times per
+   entry into Live; spinners and the indeterminate bar loop only while a user-started request is in flight.
+   Under reduced motion (the media query, or the in-app preference data-motion="reduce") tokens already zero every
+   entrance offset and loop duration; this stops any remaining keyframe loop. Opacity transitions stay. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="reduce"] *, :root[data-motion="reduce"] *::before, :root[data-motion="reduce"] *::after {
+  animation-duration: 1ms !important;
+  animation-iteration-count: 1 !important;
+  scroll-behavior: auto !important;
+}
+
+/* ---------- Forced colours (Windows contrast themes) ----------
+   Focus is a 2 px Highlight OUTLINE; selection and the current page are a 4 px Highlight BAR on the inline-start
+   edge (rows: on the first cell). !important is deliberate here and only here: this block is the accessibility layer. */
+@media (forced-colors: active) {
+  :focus-visible { outline: var(--focus-width) solid Highlight; outline-offset: var(--focus-offset); }
+  :is([aria-selected="true"], [aria-current="page"], [aria-current="true"], [data-selected]):not(tr, [role="row"]) {
+    border-inline-start: var(--space-4) solid Highlight !important;
+  }
+  :is(tr, [role="row"]):is([aria-selected="true"], [aria-current="page"], [aria-current="true"], [data-selected]) > :first-child {
+    border-inline-start: var(--space-4) solid Highlight !important;
+  }
+  [data-mark] { forced-color-adjust: none; background-color: CanvasText !important; border-color: CanvasText !important; }
+  [data-mark="hollow"] { background-color: Canvas !important; border: var(--bw-strong) solid CanvasText !important; }
+  :is(button, [role="button"], input, select, textarea) { border-color: ButtonBorder; }
+  [data-baseline] { border-top: var(--bw-hairline) solid CanvasText; }
+  [data-edge] { stroke: CanvasText; }
+}
+
+/* ---------- C. Typography roles ----------
+   One class per type token (01-foundations §2.3). Headings carry no default style: pick the role.
+   Negative tracking only at 20 px and above. */
+.type-display-56 { font: var(--type-display-56); letter-spacing: var(--type-display-56-tracking); text-wrap: balance; }
+.type-display-40 { font: var(--type-display-40); letter-spacing: var(--type-display-40-tracking); text-wrap: balance; }
+.type-title-24 { font: var(--type-title-24); letter-spacing: var(--type-title-24-tracking); text-wrap: balance; }
+.type-title-20 { font: var(--type-title-20); letter-spacing: var(--type-title-20-tracking); }
+.type-title-16 { font: var(--type-title-16); }
+.type-title-14 { font: var(--type-title-14); }
+.type-lead-16 { font: var(--type-lead-16); }
+.type-body-16 { font: var(--type-body-16); }
+.type-read-15 { font: var(--type-read-15); }
+.type-read-15:lang(hi), .type-read-15:lang(mr) { font: var(--type-read-15-deva); }
+.type-body-14 { font: var(--type-body-14); }
+.type-label-13 { font: var(--type-label-13); }
+.type-data-13 { font: var(--type-data-13); }
+.type-label-12 { font: var(--type-label-12); }
+.type-meta-12 { font: var(--type-meta-12); }
+.type-num-28 { font: var(--type-num-28); letter-spacing: var(--type-num-28-tracking); font-variant-numeric: tabular-nums; }
+.type-num-20 { font: var(--type-num-20); letter-spacing: var(--type-num-20-tracking); font-variant-numeric: tabular-nums; }
+.type-mono-13 { font: var(--type-mono-13); }
+.type-mono-12 { font: var(--type-mono-12); }
+.prose { max-width: var(--size-measure); font: var(--type-body-14); color: var(--text-2); text-wrap: pretty; }
+.prose > * + * { margin-top: var(--space-8); }
+
+/* ---------- D. Layout primitives (.l-*) ----------
+   Page layout only; a primitive never paints (no fill, border or shadow). Gaps are spacing tokens. */
+.l-stack { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+.l-stack--2xs { gap: var(--space-2); }
+.l-stack--xs { gap: var(--space-4); }
+.l-stack--sm { gap: var(--space-8); }
+.l-stack--md { gap: var(--space-12); }
+.l-stack--lg { gap: var(--space-24); }
+.l-stack--xl { gap: var(--space-40); }
+.l-cluster { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); min-width: 0; }
+.l-cluster--xs { gap: var(--space-4); }
+.l-cluster--md { gap: var(--space-12); }
+.l-cluster--lg { gap: var(--space-24); }
+.l-cluster--nowrap { flex-wrap: nowrap; }
+.l-split { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); min-width: 0; }
+.l-split--start { align-items: flex-start; }
+.l-spacer { flex: 1 1 auto; }
+.l-center { display: grid; place-items: center; }
+/* Containers (01-foundations §5): data surfaces fluid; overview pages 1280; forms 720; auth 400. */
+.l-container { width: 100%; max-width: calc(var(--size-container-page) + 2 * var(--page-margin)); margin-inline: auto; padding-inline: var(--page-margin); }
+.l-container--form { max-width: calc(var(--size-container-form) + 2 * var(--page-margin)); }
+.l-container--narrow { max-width: calc(var(--size-container-narrow) + 2 * var(--page-margin)); }
+.l-container--flush { padding-inline: 0; }
+/* Page padding for overview and form pages (the data page archetype runs flush). */
+.l-page { padding-block: var(--space-24) var(--space-40); }
+/* Grids: equal columns that collapse by breakpoint (12 / 8 / 4 column grid, --grid-gutter). */
+.l-grid { display: grid; gap: var(--grid-gutter); grid-template-columns: repeat(var(--l-cols, 12), minmax(0, 1fr)); }
+.l-grid-2, .l-grid-3, .l-grid-4 { display: grid; gap: var(--grid-gutter); grid-template-columns: repeat(var(--l-cols), minmax(0, 1fr)); }
+.l-grid-2 { --l-cols: 2; }
+.l-grid-3 { --l-cols: 3; }
+.l-grid-4 { --l-cols: 4; }
+.l-grid-auto { display: grid; gap: var(--space-12); grid-template-columns: repeat(auto-fit, minmax(min(var(--size-stat-min), 100%), 1fr)); }
+.l-span-2 { grid-column: span 2; }
+.l-span-full { grid-column: 1 / -1; }
+@media (max-width: 1279.98px) { .l-grid-4 { --l-cols: 2; } .l-grid-3 { --l-cols: 2; } }
+@media (max-width: 767.98px) { .l-grid-2, .l-grid-3, .l-grid-4 { --l-cols: 1; } .l-span-2 { grid-column: auto; } }
+/* Main column + aside (Home: 720 + 320, gap 40; the aside drops under the column below 1280). */
+.l-with-aside { display: grid; grid-template-columns: minmax(0, var(--size-container-form)) var(--size-inspector); gap: var(--space-40); align-items: start; }
+@media (max-width: 1279.98px) { .l-with-aside { grid-template-columns: minmax(0, 1fr); gap: var(--space-24); } }
+/* Two short fields that are one idea share a row at ≥ 560 px of container (02-components-core §8.1). */
+.l-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-field-gap); }
+@container (max-width: 559.98px) { .l-pair { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 767.98px) { .l-pair { grid-template-columns: minmax(0, 1fr); } }
+.l-cq { container-type: inline-size; }
+
+/* ---------- E. Utilities (.u-*) ---------- */
+.u-num { font-variant-numeric: tabular-nums; }
+.u-mono { font-family: var(--font-mono); }
+.u-nowrap { white-space: nowrap; }
+.u-truncate { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.u-wrap-anywhere { overflow-wrap: anywhere; }
+.u-fg { color: var(--text); }
+.u-fg-2 { color: var(--text-2); }
+.u-fg-3 { color: var(--text-3); }
+.u-fg-success { color: var(--success-text); }
+.u-fg-warning { color: var(--warning-text); }
+.u-fg-danger { color: var(--danger-text); }
+.u-fg-accent { color: var(--accent-text); }
+.u-medium { font-weight: var(--fw-medium); }
+.u-semibold { font-weight: var(--fw-semibold); }
+.u-bg { background: var(--bg); }
+.u-surface { background: var(--surface); }
+.u-surface-2 { background: var(--surface-2); }
+.u-block { display: block; }
+.u-grow { flex: 1 1 auto; min-width: 0; }
+.u-shrink-0 { flex-shrink: 0; }
+.u-ml-auto { margin-inline-start: auto; }
+.u-mt-4 { margin-top: var(--space-4); }
+.u-mt-8 { margin-top: var(--space-8); }
+.u-mt-16 { margin-top: var(--space-16); }
+.u-mt-24 { margin-top: var(--space-24); }
+.u-mt-40 { margin-top: var(--space-40); }
+/* Responsive visibility. Nothing is removed at a breakpoint without a replacement (05-responsive §0 rule 2). */
+@media (max-width: 767.98px) { .u-hide-phone { display: none !important; } }
+@media (min-width: 768px) { .u-only-phone { display: none !important; } }
+@media (max-width: 1023.98px) { .u-hide-below-lg { display: none !important; } }
+@media (min-width: 1024px) { .u-only-below-lg { display: none !important; } }
+@media (max-width: 1279.98px) { .u-hide-below-xl { display: none !important; } }
+@media (min-width: 1280px) { .u-only-below-xl { display: none !important; } }
+/* Keyboard hints never render on touch (05-responsive §0 rule 8) or when single-key shortcuts are off. */
+@media (hover: none), (pointer: coarse) { .u-hide-touch { display: none !important; } }
+:root[data-shortcuts="off"] [data-single-key] { display: none !important; }

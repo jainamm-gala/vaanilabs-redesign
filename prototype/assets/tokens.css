@@ -1,0 +1,924 @@
+/* Vaani Labs design tokens. GENERATED from tokens.json by build-tokens.mjs. Do not edit by hand. */
+/* Load order: tokens.css, then base.css (global rules), then the app. Themes: set data-theme="light|dark" on <html>
+   before first paint (pre-hydration script); the prefers-color-scheme block is the no-JS fallback only. */
+
+:root {
+  /* primitives: colour */
+  --graphite-0: #FFFFFF;
+  --graphite-25: #F6F7F9;
+  --graphite-50: #F1F3F6;
+  --graphite-100: #E8EBF0;
+  --graphite-150: #E3E6EC;
+  --graphite-200: #C9CED8;
+  --graphite-250: #B3BAC6;
+  --graphite-300: #A3AAB7;
+  --graphite-350: #8C94A2;
+  --graphite-400: #7E8695;
+  --graphite-500: #6A7281;
+  --graphite-550: #5F6878;
+  --graphite-600: #434B5B;
+  --graphite-650: #3A4250;
+  --graphite-700: #333A45;
+  --graphite-750: #262B33;
+  --graphite-800: #222730;
+  --graphite-850: #1A1E24;
+  --graphite-900: #14171C;
+  --graphite-950: #101318;
+  --graphite-1000: #0D0F13;
+  --ink: #121722;
+  --neel-50: #EDF3FC;
+  --neel-75: #E5EDFA;
+  --neel-100: #DAE6F8;
+  --neel-200: #BFD3F3;
+  --neel-300: #A7C3F1;
+  --neel-400: #8DB2EE;
+  --neel-550: #356AC4;
+  --neel-600: #2F62C0;
+  --neel-700: #1F4A94;
+  --neel-800: #183C7A;
+  --neel-900: #143368;
+  --neel-925: #1C2739;
+  --neel-950: #192231;
+  --neel-ink: #0F203D;
+  --green-50: #E7F5EC;
+  --green-100: #CDEBD8;
+  --green-200: #A3DDB7;
+  --green-300: #6FD39A;
+  --green-400: #4CC47F;
+  --green-500: #34A165;
+  --green-550: #13923F;
+  --green-600: #15803D;
+  --green-700: #11703F;
+  --green-800: #0E5530;
+  --green-900: #123A24;
+  --green-950: #16271E;
+  --amber-50: #FDF3E1;
+  --amber-100: #FBE6C0;
+  --amber-200: #F8D38F;
+  --amber-300: #F5B544;
+  --amber-400: #E29A21;
+  --amber-500: #C8740F;
+  --amber-600: #B45309;
+  --amber-700: #8A4B00;
+  --amber-800: #6B3A00;
+  --amber-900: #4A2A08;
+  --amber-950: #2C2312;
+  --red-50: #FDECEA;
+  --red-100: #FBD5D1;
+  --red-200: #F7B2AB;
+  --red-300: #F28B82;
+  --red-400: #E5584D;
+  --red-500: #D63A2F;
+  --red-600: #C0271C;
+  --red-650: #B03F37;
+  --red-700: #B42318;
+  --red-800: #8E1B13;
+  --red-900: #5C1A15;
+  --red-950: #2E1A1A;
+  --teal-500: #23A090;
+  --teal-600: #008A7A;
+  --ochre-500: #BC8A2E;
+  --ochre-600: #B7791F;
+  --rose-500: #DD6593;
+  --rose-600: #C23F6E;
+  /* type */
+  --font-sans: var(--font-hanken, "Hanken Grotesk"), var(--font-rupee, "Vaani Rupee"), var(--font-noto-deva, "Noto Sans Devanagari"), "Noto Sans Tamil", "Noto Sans Telugu", "Noto Sans Bengali", "Noto Sans Gujarati", "Noto Sans Kannada", "Noto Sans Malayalam", "Noto Sans Gurmukhi", "Noto Sans Oriya", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: var(--font-jetbrains, "JetBrains Mono"), ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --type-display-56-size: 3.5rem;
+  --type-display-56-lh: 3.75rem;
+  --type-display-56-weight: 600;
+  --type-display-56-tracking: -0.03em;
+  --type-display-56: var(--type-display-56-weight) var(--type-display-56-size)/var(--type-display-56-lh) var(--font-sans);
+  --type-display-40-size: 2.5rem;
+  --type-display-40-lh: 3rem;
+  --type-display-40-weight: 600;
+  --type-display-40-tracking: -0.025em;
+  --type-display-40: var(--type-display-40-weight) var(--type-display-40-size)/var(--type-display-40-lh) var(--font-sans);
+  --type-title-24-size: 1.5rem;
+  --type-title-24-lh: 2rem;
+  --type-title-24-weight: 600;
+  --type-title-24-tracking: -0.015em;
+  --type-title-24: var(--type-title-24-weight) var(--type-title-24-size)/var(--type-title-24-lh) var(--font-sans);
+  --type-title-20-size: 1.25rem;
+  --type-title-20-lh: 1.75rem;
+  --type-title-20-weight: 600;
+  --type-title-20-tracking: -0.01em;
+  --type-title-20: var(--type-title-20-weight) var(--type-title-20-size)/var(--type-title-20-lh) var(--font-sans);
+  --type-title-16-size: 1rem;
+  --type-title-16-lh: 1.5rem;
+  --type-title-16-weight: 600;
+  --type-title-16-tracking: 0em;
+  --type-title-16: var(--type-title-16-weight) var(--type-title-16-size)/var(--type-title-16-lh) var(--font-sans);
+  --type-title-14-size: 0.875rem;
+  --type-title-14-lh: 1.25rem;
+  --type-title-14-weight: 600;
+  --type-title-14-tracking: 0em;
+  --type-title-14: var(--type-title-14-weight) var(--type-title-14-size)/var(--type-title-14-lh) var(--font-sans);
+  --type-num-28-size: 1.75rem;
+  --type-num-28-lh: 2rem;
+  --type-num-28-weight: 500;
+  --type-num-28-tracking: -0.02em;
+  --type-num-28: var(--type-num-28-weight) var(--type-num-28-size)/var(--type-num-28-lh) var(--font-sans);
+  --type-num-20-size: 1.25rem;
+  --type-num-20-lh: 1.75rem;
+  --type-num-20-weight: 500;
+  --type-num-20-tracking: -0.01em;
+  --type-num-20: var(--type-num-20-weight) var(--type-num-20-size)/var(--type-num-20-lh) var(--font-sans);
+  --type-lead-16-size: 1rem;
+  --type-lead-16-lh: 1.625rem;
+  --type-lead-16-weight: 400;
+  --type-lead-16-tracking: 0em;
+  --type-lead-16: var(--type-lead-16-weight) var(--type-lead-16-size)/var(--type-lead-16-lh) var(--font-sans);
+  --type-body-16-size: 1rem;
+  --type-body-16-lh: 1.5rem;
+  --type-body-16-weight: 400;
+  --type-body-16-tracking: 0em;
+  --type-body-16: var(--type-body-16-weight) var(--type-body-16-size)/var(--type-body-16-lh) var(--font-sans);
+  --type-read-15-size: 0.9375rem;
+  --type-read-15-lh: 1.5rem;
+  --type-read-15-weight: 400;
+  --type-read-15-tracking: 0em;
+  --type-read-15: var(--type-read-15-weight) var(--type-read-15-size)/var(--type-read-15-lh) var(--font-sans);
+  --type-read-15-deva-size: 0.9375rem;
+  --type-read-15-deva-lh: 1.625rem;
+  --type-read-15-deva-weight: 400;
+  --type-read-15-deva-tracking: 0em;
+  --type-read-15-deva: var(--type-read-15-deva-weight) var(--type-read-15-deva-size)/var(--type-read-15-deva-lh) var(--font-sans);
+  --type-body-14-size: 0.875rem;
+  --type-body-14-lh: 1.25rem;
+  --type-body-14-weight: 400;
+  --type-body-14-tracking: 0em;
+  --type-body-14: var(--type-body-14-weight) var(--type-body-14-size)/var(--type-body-14-lh) var(--font-sans);
+  --type-button-14-size: 0.875rem;
+  --type-button-14-lh: 1.25rem;
+  --type-button-14-weight: 500;
+  --type-button-14-tracking: 0em;
+  --type-button-14: var(--type-button-14-weight) var(--type-button-14-size)/var(--type-button-14-lh) var(--font-sans);
+  --type-label-13-size: 0.8125rem;
+  --type-label-13-lh: 1.25rem;
+  --type-label-13-weight: 500;
+  --type-label-13-tracking: 0em;
+  --type-label-13: var(--type-label-13-weight) var(--type-label-13-size)/var(--type-label-13-lh) var(--font-sans);
+  --type-data-13-size: 0.8125rem;
+  --type-data-13-lh: 1.25rem;
+  --type-data-13-weight: 400;
+  --type-data-13-tracking: 0em;
+  --type-data-13: var(--type-data-13-weight) var(--type-data-13-size)/var(--type-data-13-lh) var(--font-sans);
+  --type-meta-12-size: 0.75rem;
+  --type-meta-12-lh: 1rem;
+  --type-meta-12-weight: 400;
+  --type-meta-12-tracking: 0em;
+  --type-meta-12: var(--type-meta-12-weight) var(--type-meta-12-size)/var(--type-meta-12-lh) var(--font-sans);
+  --type-label-12-size: 0.75rem;
+  --type-label-12-lh: 1rem;
+  --type-label-12-weight: 500;
+  --type-label-12-tracking: 0em;
+  --type-label-12: var(--type-label-12-weight) var(--type-label-12-size)/var(--type-label-12-lh) var(--font-sans);
+  --type-phase-12-size: 0.75rem;
+  --type-phase-12-lh: 1rem;
+  --type-phase-12-weight: 600;
+  --type-phase-12-tracking: 0em;
+  --type-phase-12: var(--type-phase-12-weight) var(--type-phase-12-size)/var(--type-phase-12-lh) var(--font-sans);
+  /* deprecated: Since 1.1.0. The live timer is num-20 (Hanken, tabular). Lint rejects new uses; removed in 2.0.0. */
+  --type-mono-20-size: 1.25rem;
+  --type-mono-20-lh: 1.75rem;
+  --type-mono-20-weight: 500;
+  --type-mono-20-tracking: -0.02em;
+  --type-mono-20: var(--type-mono-20-weight) var(--type-mono-20-size)/var(--type-mono-20-lh) var(--font-mono);
+  --type-mono-13-size: 0.8125rem;
+  --type-mono-13-lh: 1.25rem;
+  --type-mono-13-weight: 400;
+  --type-mono-13-tracking: 0em;
+  --type-mono-13: var(--type-mono-13-weight) var(--type-mono-13-size)/var(--type-mono-13-lh) var(--font-mono);
+  --type-mono-12-size: 0.75rem;
+  --type-mono-12-lh: 1rem;
+  --type-mono-12-weight: 400;
+  --type-mono-12-tracking: 0em;
+  --type-mono-12: var(--type-mono-12-weight) var(--type-mono-12-size)/var(--type-mono-12-lh) var(--font-mono);
+  --type-display-48-size: 3rem;
+  --type-display-48-lh: 3.25rem;
+  --type-display-48-weight: 600;
+  --type-display-48-tracking: -0.03em;
+  --type-display-48: var(--type-display-48-weight) var(--type-display-48-size)/var(--type-display-48-lh) var(--font-sans);
+  /* space (4 px base) */
+  --space-0: 0px;
+  --space-1: 1px;
+  --space-2: 2px;
+  --space-4: 4px;
+  --space-6: 6px;
+  --space-8: 8px;
+  --space-10: 10px;
+  --space-12: 12px;
+  --space-16: 16px;
+  --space-20: 20px;
+  --space-24: 24px;
+  --space-28: 28px;
+  --space-32: 32px;
+  --space-40: 40px;
+  --space-48: 48px;
+  --space-56: 56px;
+  --space-64: 64px;
+  --space-80: 80px;
+  --space-96: 96px;
+  /* space roles */
+  --space-label-gap: 6px;
+  --space-inline-xs: 4px;
+  --space-inline-sm: 6px;
+  --space-inline-md: 8px;
+  --space-inline-lg: 12px;
+  --space-field-gap: 16px;
+  --space-group-gap: 24px;
+  --space-section-gap: 40px;
+  --space-panel-pad: 16px;
+  --space-panel-pad-lg: 20px;
+  --space-cell-px: 12px;
+  /* radius */
+  --radius-0: 0px;
+  --radius-2: 2px;
+  --radius-4: 4px;
+  --radius-6: 6px;
+  --radius-8: 8px;
+  --radius-12: 12px;
+  --radius-full: 9999px;
+  /* border widths and focus */
+  --bw-hairline: 1px;
+  --bw-strong: 2px;
+  --focus-width: 2px;
+  --focus-offset: 2px;
+  --focus-offset-node: 3px;
+  --focus-offset-inset: -2px;
+  /* layout sizes */
+  --size-sidebar: 232px;
+  --size-rail: 56px;
+  --size-settings-nav: 200px;
+  --size-topbar: 52px;
+  --size-bottombar: 56px;
+  --size-nav-sheet: 320px;
+  --size-header: 56px;
+  --size-baseline: 28px;
+  --size-view-tabs: 40px;
+  --size-toolbar: 48px;
+  --size-table-head: 32px;
+  --size-pager: 40px;
+  --size-flow-header: 48px;
+  --size-phase-ruler: 40px;
+  --size-tool-rail: 48px;
+  --size-problems-bar: 32px;
+  --size-inspector: 320px;
+  --size-inspector-max: 480px;
+  --size-left-panel: 280px;
+  --size-left-panel-tablet: 320px;
+  --size-sheet-record: 440px;
+  --size-sheet-detail: 560px;
+  --size-sheet-gate: 640px;
+  --size-popover-gate: 400px;
+  --size-dialog-sm: 400px;
+  --size-dialog-md: 560px;
+  --size-dialog-lg: 720px;
+  --size-menu-min: 180px;
+  --size-menu-max: 320px;
+  --size-tooltip-max: 280px;
+  --size-toast: 400px;
+  --size-cockpit-calls: 240px;
+  --size-cockpit-card: 400px;
+  --size-container-narrow: 400px;
+  --size-container-form: 720px;
+  --size-container-page: 1280px;
+  --size-measure: 68ch;
+  --size-glyph-tile: 24px;
+  --size-avatar: 28px;
+  --size-avatar-voice: 32px;
+  --size-live-dot: 8px;
+  --size-lang-mark: 18px;
+  --size-socket: 10px;
+  --size-socket-hit: 24px;
+  --size-socket-hit-coarse: 44px;
+  --size-hit-min: 24px;
+  --size-hit-touch: 44px;
+  --size-tag: 20px;
+  --size-chip: 24px;
+  --size-keycap: 20px;
+  /* breakpoints (reference for JS; media queries use literals) */
+  --bp-sm: 480px;
+  --bp-md: 768px;
+  --bp-lg: 1024px;
+  --bp-xl: 1280px;
+  --bp-2xl: 1440px;
+  /* z-index layers */
+  --z-base: 0;
+  --z-raised: 1;
+  --z-sticky: 10;
+  --z-chrome: 20;
+  --z-float: 25;
+  --z-overlay: 30;
+  --z-scrim: 40;
+  --z-modal: 50;
+  --z-popover: 60;
+  --z-toast: 70;
+  --z-tooltip: 80;
+  --z-skiplink: 90;
+  /* opacity (graphics only, never on an ancestor of text) */
+  --opacity-dim: 0.4;
+  --opacity-partial: 0.45;
+  --opacity-unreachable: 0.5;
+  --opacity-drag: 0.6;
+  /* motion */
+  --dur-0: 0ms;
+  --dur-fast: 90ms;
+  --dur-base: 140ms;
+  --dur-slow: 200ms;
+  --dur-trace: 480ms;
+  --dur-pulse: 1600ms;
+  --dur-spin: 800ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* behavioural timing */
+  --timing-tooltip-delay: 300ms;
+  --timing-skeleton-delay: 200ms;
+  --timing-validate-debounce: 300ms;
+  --timing-announce-throttle: 2000ms;
+  --timing-toast: 6000ms;
+  --timing-skeleton-min: 400ms;
+  --timing-state-announce: 500ms;
+  --timing-call-stale: 60000ms;
+  --timing-refit-debounce: 150ms;
+  /* entrance offsets */
+  --shift-popover: 4px;
+  --shift-dialog: 8px;
+  --shift-toast: 8px;
+  --shift-sheet: 100%;
+  /* icons */
+  --icon-xs: 12px;
+  --icon-sm: 14px;
+  --icon-md: 16px;
+  --icon-lg: 20px;
+  --icon-xl: 24px;
+  --icon-stroke: 1.5px;
+  /* component.flow: Flow Designer (04-flow-designer/01 §20.2, 02 §20, 05-responsive §19). The left panel widths are --size-left-panel and --size-left-panel-tablet in the size group. */
+  --size-node-trigger: 208px;
+  --size-node-logic: 256px;
+  --size-node-action: 240px;
+  --size-node-outcome: 240px;
+  --size-answer-row: 28px;
+  --size-minimap-w: 176px;
+  --size-minimap-h: 112px;
+  --size-frame-header: 32px;
+  --size-note: 220px;
+  --size-test-panel: 280px;
+  --size-compare-bar: 40px;
+  --grid-snap: 16px;
+  --layout-rank-gap: 128px;
+  --layout-node-gap: 24px;
+  --edge-width: 1.5px;
+  --edge-width-active: 2px;
+  --edge-dash: 5 4;
+  --edge-radius: 8px;
+  /* component.data: Data display (02-components-data-nav §0.5, 03-pages/04 §5). */
+  --size-chart-sm: 160px;
+  --size-chart-md: 200px;
+  --size-chart-lg: 240px;
+  --size-sparkline-h: 32px;
+  --size-stat-min: 200px;
+  --size-search: 280px;
+  --size-turn-gutter: 56px;
+  --size-view-summary: 32px;
+  --size-scrollrow-fade: 24px;
+  /* component.form: Field widths (02-components-core §1.3). Pages use these names; core no longer declares them. */
+  --field-w-short: 180px;
+  --field-w-medium: 320px;
+  --popover-w-list: 400px;
+  /* component.overlay: Overlays (02-components-overlay-feedback §8). */
+  --size-palette-list: calc(var(--row-h) * 9);
+  /* component.shell: Pages (03-pages/01 §7.14, 03-pages/08 §18). */
+  --size-softphone: 400px;
+  --size-auth-panel: 464px;
+  --section-pad-y: 80px;
+  /* component.live: Live call motion (07-motion MD3). */
+  --live-pulse-cycles: 3;
+}
+
+/* Light theme (default) */
+:root,
+[data-theme="light"] {
+  --bg: var(--graphite-25);
+  --surface: var(--graphite-0);
+  --surface-2: var(--graphite-50);
+  --surface-3: var(--graphite-100);
+  --surface-raised: var(--graphite-0);
+  --surface-overlay: var(--graphite-0);
+  --surface-inverse: var(--ink);
+  --border: var(--graphite-150);
+  --border-strong: var(--graphite-200);
+  --border-overlay: var(--graphite-200);
+  --control: var(--graphite-400);
+  --text: var(--ink);
+  --text-2: var(--graphite-600);
+  --text-3: var(--graphite-550);
+  --text-dis: var(--graphite-300);
+  --text-inverse: var(--graphite-0);
+  --text-inverse-2: var(--graphite-200);
+  --accent: var(--neel-700);
+  --accent-hover: var(--neel-800);
+  --accent-press: var(--neel-900);
+  --on-accent: var(--graphite-0);
+  --accent-text: var(--neel-700);
+  --accent-soft: var(--neel-50);
+  --accent-soft-hover: var(--neel-75);
+  --accent-soft-text: var(--neel-800);
+  --accent-mark: var(--neel-700);
+  --link-hover: var(--neel-800);
+  --focus: var(--neel-700);
+  --focus-inverse: var(--neel-400);
+  --text-selection: var(--neel-100);
+  --success: var(--green-600);
+  --success-text: var(--green-700);
+  --success-soft: var(--green-50);
+  --success-border: var(--green-600);
+  --on-success: var(--graphite-0);
+  --warning: var(--amber-600);
+  --warning-text: var(--amber-700);
+  --warning-soft: var(--amber-50);
+  --warning-border: var(--amber-600);
+  --on-warning: var(--graphite-0);
+  --danger: var(--red-600);
+  --danger-text: var(--red-700);
+  --danger-soft: var(--red-50);
+  --danger-border: var(--red-600);
+  --on-danger: var(--graphite-0);
+  --live: var(--green-550);
+  --bl-bg: var(--neel-ink);
+  --bl-text: var(--graphite-200);
+  --bl-strong: var(--graphite-0);
+  --bl-sep: var(--neel-800);
+  --bl-line: var(--neel-ink);
+  --bl-warn: var(--amber-300);
+  --bl-focus: var(--neel-400);
+  --canvas: var(--graphite-25);
+  --canvas-dot: rgba(18, 23, 34, 0.12);
+  --edge: var(--graphite-400);
+  --edge-active: var(--neel-700);
+  --ink-tile: var(--ink);
+  --ink-tile-fg: var(--graphite-0);
+  --mark-bg: var(--neel-ink);
+  --mark-fg: var(--graphite-0);
+  --scrim: rgba(18, 23, 34, 0.40);
+  --chart-1: var(--graphite-700);
+  --chart-2: var(--teal-600);
+  --chart-3: var(--ochre-600);
+  --chart-4: var(--rose-600);
+  --chart-other: var(--graphite-350);
+  --chart-grid: var(--graphite-150);
+  --chart-axis: var(--graphite-200);
+  --seq-1: #6DC3B9;
+  --seq-2: #3CABA0;
+  --seq-3: #228F86;
+  --seq-4: #23716A;
+  --seq-5: #035750;
+  --seq-1-fg: var(--ink);
+  --seq-2-fg: var(--ink);
+  --seq-3-fg: var(--ink);
+  --seq-4-fg: var(--graphite-0);
+  --seq-5-fg: var(--graphite-0);
+  --sentiment-positive: var(--green-500);
+  --sentiment-neutral: var(--graphite-400);
+  --sentiment-mixed: var(--graphite-600);
+  --sentiment-negative: var(--red-700);
+  --frame-neel: #EAEDF4;
+  --frame-neel-border: #B8C7E1;
+  --frame-teal: #E7F0F1;
+  --frame-teal-border: #ACD6D3;
+  --frame-ochre: #F2EFEC;
+  --frame-ochre-border: #E3D1B8;
+  --frame-rose: #F3ECF1;
+  --frame-rose-border: #E6C0CF;
+  --frame-slate: #EDEEF1;
+  --frame-slate-border: #C9CCD2;
+  --talk-agent: var(--ink);
+  --talk-caller: var(--graphite-400);
+  /* component colours (component.*) */
+  --nav-hover-bg: var(--surface-3);
+  --nav-active-bg: var(--surface);
+  --nav-active-border: var(--border);
+  --danger-hover: var(--red-700);
+  --qr-fg: var(--ink);
+  --qr-bg: var(--graphite-0);
+  --edge-hover: var(--text-2);
+  /* elevation */
+  --e0: 0px 0px 0px 0px #00000000;
+  --e1: 0px 1px 2px 0px rgba(18, 23, 34, 0.06);
+  --e2: 0px 1px 2px 0px rgba(18, 23, 34, 0.06), 0px 6px 16px -4px rgba(18, 23, 34, 0.12);
+  --e3: 0px 2px 4px 0px rgba(18, 23, 34, 0.06), 0px 20px 40px -12px rgba(18, 23, 34, 0.24);
+  color-scheme: light;
+}
+
+/* Dark theme */
+[data-theme="dark"] {
+  --bg: var(--graphite-1000);
+  --surface: var(--graphite-900);
+  --surface-2: var(--graphite-850);
+  --surface-3: var(--graphite-800);
+  --surface-raised: var(--graphite-900);
+  --surface-overlay: var(--graphite-900);
+  --surface-inverse: var(--graphite-100);
+  --border: var(--graphite-750);
+  --border-strong: var(--graphite-700);
+  --border-overlay: var(--graphite-650);
+  --control: var(--graphite-500);
+  --text: var(--graphite-100);
+  --text-2: var(--graphite-250);
+  --text-3: var(--graphite-350);
+  --text-dis: var(--graphite-550);
+  --text-inverse: var(--ink);
+  --text-inverse-2: var(--graphite-600);
+  --accent: var(--neel-600);
+  --accent-hover: var(--neel-550);
+  --accent-press: var(--neel-700);
+  --on-accent: var(--graphite-0);
+  --accent-text: var(--neel-400);
+  --accent-soft: var(--neel-950);
+  --accent-soft-hover: var(--neel-925);
+  --accent-soft-text: var(--neel-300);
+  --accent-mark: var(--neel-400);
+  --link-hover: var(--neel-300);
+  --focus: var(--neel-400);
+  --focus-inverse: var(--neel-700);
+  --text-selection: var(--neel-900);
+  --success: var(--green-400);
+  --success-text: var(--green-300);
+  --success-soft: var(--green-950);
+  --success-border: var(--green-400);
+  --on-success: var(--ink);
+  --warning: var(--amber-300);
+  --warning-text: var(--amber-300);
+  --warning-soft: var(--amber-950);
+  --warning-border: var(--amber-300);
+  --on-warning: var(--ink);
+  --danger: var(--red-300);
+  --danger-text: var(--red-300);
+  --danger-soft: var(--red-950);
+  --danger-border: var(--red-300);
+  --on-danger: var(--ink);
+  --live: var(--green-400);
+  --bl-bg: var(--neel-ink);
+  --bl-text: var(--graphite-250);
+  --bl-strong: var(--graphite-100);
+  --bl-sep: var(--neel-800);
+  --bl-line: var(--graphite-650);
+  --bl-warn: var(--amber-300);
+  --bl-focus: var(--neel-400);
+  --canvas: var(--graphite-950);
+  --canvas-dot: rgba(232, 235, 240, 0.08);
+  --edge: var(--graphite-400);
+  --edge-active: var(--neel-400);
+  --ink-tile: var(--graphite-100);
+  --ink-tile-fg: var(--ink);
+  --mark-bg: var(--neel-ink);
+  --mark-fg: var(--graphite-0);
+  --scrim: rgba(0, 0, 0, 0.56);
+  --chart-1: var(--graphite-250);
+  --chart-2: var(--teal-500);
+  --chart-3: var(--ochre-500);
+  --chart-4: var(--rose-500);
+  --chart-other: var(--graphite-550);
+  --chart-grid: var(--graphite-750);
+  --chart-axis: var(--graphite-700);
+  --seq-1: #0E635B;
+  --seq-2: #098077;
+  --seq-3: #30A197;
+  --seq-4: #6BC1B7;
+  --seq-5: #B0DFD9;
+  --seq-1-fg: var(--graphite-0);
+  --seq-2-fg: var(--graphite-0);
+  --seq-3-fg: var(--ink);
+  --seq-4-fg: var(--ink);
+  --seq-5-fg: var(--ink);
+  --sentiment-positive: var(--green-500);
+  --sentiment-neutral: var(--graphite-500);
+  --sentiment-mixed: var(--graphite-250);
+  --sentiment-negative: var(--red-650);
+  --frame-neel: #161E2B;
+  --frame-neel-border: #253859;
+  --frame-teal: #122124;
+  --frame-teal-border: #174442;
+  --frame-ochre: #211F1A;
+  --frame-ochre-border: #4C3D20;
+  --frame-rose: #251B24;
+  --frame-rose-border: #583043;
+  --frame-slate: #1C2026;
+  --frame-slate-border: #3B4048;
+  --talk-agent: var(--graphite-100);
+  --talk-caller: var(--graphite-500);
+  /* component colours (component.*) */
+  --nav-hover-bg: var(--surface-2);
+  --nav-active-bg: var(--surface-3);
+  --nav-active-border: var(--border-strong);
+  --danger-hover: var(--red-200);
+  --qr-fg: var(--ink);
+  --qr-bg: var(--graphite-0);
+  --edge-hover: var(--text-2);
+  /* elevation: ring-free shadows; overlays carry --border-overlay */
+  --e0: 0px 0px 0px 0px #00000000;
+  --e1: 0px 0px 0px 0px #00000000;
+  --e2: 0px 8px 20px -8px rgba(0, 0, 0, 0.60);
+  --e3: 0px 24px 48px -16px rgba(0, 0, 0, 0.70);
+  color-scheme: dark;
+}
+
+/* No-JS fallback: follow the OS until the pre-hydration script sets data-theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: var(--graphite-1000);
+    --surface: var(--graphite-900);
+    --surface-2: var(--graphite-850);
+    --surface-3: var(--graphite-800);
+    --surface-raised: var(--graphite-900);
+    --surface-overlay: var(--graphite-900);
+    --surface-inverse: var(--graphite-100);
+    --border: var(--graphite-750);
+    --border-strong: var(--graphite-700);
+    --border-overlay: var(--graphite-650);
+    --control: var(--graphite-500);
+    --text: var(--graphite-100);
+    --text-2: var(--graphite-250);
+    --text-3: var(--graphite-350);
+    --text-dis: var(--graphite-550);
+    --text-inverse: var(--ink);
+    --text-inverse-2: var(--graphite-600);
+    --accent: var(--neel-600);
+    --accent-hover: var(--neel-550);
+    --accent-press: var(--neel-700);
+    --on-accent: var(--graphite-0);
+    --accent-text: var(--neel-400);
+    --accent-soft: var(--neel-950);
+    --accent-soft-hover: var(--neel-925);
+    --accent-soft-text: var(--neel-300);
+    --accent-mark: var(--neel-400);
+    --link-hover: var(--neel-300);
+    --focus: var(--neel-400);
+    --focus-inverse: var(--neel-700);
+    --text-selection: var(--neel-900);
+    --success: var(--green-400);
+    --success-text: var(--green-300);
+    --success-soft: var(--green-950);
+    --success-border: var(--green-400);
+    --on-success: var(--ink);
+    --warning: var(--amber-300);
+    --warning-text: var(--amber-300);
+    --warning-soft: var(--amber-950);
+    --warning-border: var(--amber-300);
+    --on-warning: var(--ink);
+    --danger: var(--red-300);
+    --danger-text: var(--red-300);
+    --danger-soft: var(--red-950);
+    --danger-border: var(--red-300);
+    --on-danger: var(--ink);
+    --live: var(--green-400);
+    --bl-bg: var(--neel-ink);
+    --bl-text: var(--graphite-250);
+    --bl-strong: var(--graphite-100);
+    --bl-sep: var(--neel-800);
+    --bl-line: var(--graphite-650);
+    --bl-warn: var(--amber-300);
+    --bl-focus: var(--neel-400);
+    --canvas: var(--graphite-950);
+    --canvas-dot: rgba(232, 235, 240, 0.08);
+    --edge: var(--graphite-400);
+    --edge-active: var(--neel-400);
+    --ink-tile: var(--graphite-100);
+    --ink-tile-fg: var(--ink);
+    --mark-bg: var(--neel-ink);
+    --mark-fg: var(--graphite-0);
+    --scrim: rgba(0, 0, 0, 0.56);
+    --chart-1: var(--graphite-250);
+    --chart-2: var(--teal-500);
+    --chart-3: var(--ochre-500);
+    --chart-4: var(--rose-500);
+    --chart-other: var(--graphite-550);
+    --chart-grid: var(--graphite-750);
+    --chart-axis: var(--graphite-700);
+    --seq-1: #0E635B;
+    --seq-2: #098077;
+    --seq-3: #30A197;
+    --seq-4: #6BC1B7;
+    --seq-5: #B0DFD9;
+    --seq-1-fg: var(--graphite-0);
+    --seq-2-fg: var(--graphite-0);
+    --seq-3-fg: var(--ink);
+    --seq-4-fg: var(--ink);
+    --seq-5-fg: var(--ink);
+    --sentiment-positive: var(--green-500);
+    --sentiment-neutral: var(--graphite-500);
+    --sentiment-mixed: var(--graphite-250);
+    --sentiment-negative: var(--red-650);
+    --frame-neel: #161E2B;
+    --frame-neel-border: #253859;
+    --frame-teal: #122124;
+    --frame-teal-border: #174442;
+    --frame-ochre: #211F1A;
+    --frame-ochre-border: #4C3D20;
+    --frame-rose: #251B24;
+    --frame-rose-border: #583043;
+    --frame-slate: #1C2026;
+    --frame-slate-border: #3B4048;
+    --talk-agent: var(--graphite-100);
+    --talk-caller: var(--graphite-500);
+    /* component colours (component.*) */
+    --nav-hover-bg: var(--surface-2);
+    --nav-active-bg: var(--surface-3);
+    --nav-active-border: var(--border-strong);
+    --danger-hover: var(--red-200);
+    --qr-fg: var(--ink);
+    --qr-bg: var(--graphite-0);
+    --edge-hover: var(--text-2);
+    --e0: 0px 0px 0px 0px #00000000;
+    --e1: 0px 0px 0px 0px #00000000;
+    --e2: 0px 8px 20px -8px rgba(0, 0, 0, 0.60);
+    --e3: 0px 24px 48px -16px rgba(0, 0, 0, 0.70);
+    color-scheme: dark;
+  }
+}
+
+/* Role aliases. Re-declared on every scope that can change theme or surface, because a custom property
+   that references another is resolved where it is declared, not where it is used. */
+:root,
+[data-theme],
+[data-surface] {
+  --info: var(--text-2);
+  --info-text: var(--text-2);
+  --info-soft: var(--surface-2);
+  --info-border: var(--border-strong);
+  --chart-neutral: var(--chart-1);
+  --bg-subtle: var(--surface-2);
+  --bg-muted: var(--surface-3);
+  --text-subtle: var(--text-2);
+  --text-muted: var(--text-3);
+  --text-disabled: var(--text-dis);
+  --text-placeholder: var(--text-3);
+  --focus-ring: var(--focus);
+  --accent-subtle: var(--accent-soft);
+  --accent-subtle-fg: var(--accent-soft-text);
+  --accent-fg: var(--accent-text);
+  --link: var(--accent-text);
+  --success-fg: var(--success-text);
+  --success-bg: var(--success-soft);
+  --warning-fg: var(--warning-text);
+  --warning-bg: var(--warning-soft);
+  --danger-fg: var(--danger-text);
+  --danger-bg: var(--danger-soft);
+  --info-fg: var(--info-text);
+  --info-bg: var(--info-soft);
+  --selection-bg: var(--accent-soft);
+  --selection-border: var(--accent-mark);
+  --row-hover: var(--surface-2);
+  --row-selected: var(--accent-soft);
+  --row-selected-hover: var(--accent-soft-hover);
+  --row-selected-bar: var(--accent-mark);
+  --skeleton: var(--surface-3);
+  --seq-empty: var(--surface-2);
+  --chart-label: var(--text-3);
+  --socket: var(--edge);
+  --socket-border: var(--control);
+  --call-idle-fg: var(--text-2);
+  --call-idle-bg: var(--surface-2);
+  --call-idle-mark: var(--control);
+  --call-dialling-fg: var(--warning-text);
+  --call-dialling-bg: var(--warning-soft);
+  --call-dialling-mark: var(--warning);
+  --call-ringing-fg: var(--warning-text);
+  --call-ringing-bg: var(--warning-soft);
+  --call-ringing-mark: var(--warning);
+  --call-live-fg: var(--success-text);
+  --call-live-bg: var(--success-soft);
+  --call-live-mark: var(--live);
+  --call-hold-fg: var(--warning-text);
+  --call-hold-bg: var(--warning-soft);
+  --call-hold-mark: var(--warning);
+  --call-wrapup-fg: var(--text-2);
+  --call-wrapup-bg: var(--surface-2);
+  --call-wrapup-mark: var(--text-2);
+  --call-ended-fg: var(--text-2);
+  --call-ended-bg: var(--surface-2);
+  --call-ended-mark: var(--control);
+  --call-failed-fg: var(--danger-text);
+  --call-failed-bg: var(--danger-soft);
+  --call-failed-mark: var(--danger);
+  --chart-highlight: var(--accent-mark);
+  --diff-added-bg: var(--success-soft);
+  --diff-added-fg: var(--success-text);
+  --diff-removed-bg: var(--danger-soft);
+  --diff-removed-fg: var(--danger-text);
+  --diff-changed-bg: var(--surface-3);
+  --diff-changed-bar: var(--text);
+  --variable-bg: var(--surface-3);
+  --variable-fg: var(--text);
+}
+
+/* Content placed on an inverse plane (toasts, tooltips) */
+[data-surface="inverse"] {
+  --text: var(--text-inverse);
+  --text-2: var(--text-inverse-2);
+  --text-3: var(--text-inverse-2);
+  --accent-text: var(--text-inverse);
+  --focus: var(--focus-inverse);
+}
+
+/* Density: data surfaces only. Forms, dialogs and the inspector set data-density="standard". */
+:root,
+[data-density="standard"] {
+  --row-h: 40px;
+  --control-h: 32px;
+  --control-h-sm: 28px;
+  --cell-px: 12px;
+  --tag-h: 20px;
+  --field-font: 0.875rem;
+}
+[data-density="compact"] {
+  --row-h: 32px;
+  --control-h: 28px;
+  --control-h-sm: 24px;
+  --cell-px: 8px;
+  --tag-h: 20px;
+  --field-font: 0.875rem;
+}
+@media (pointer: coarse), (max-width: 767.98px) {
+  :root,
+  [data-density] {
+    --row-h: 48px;
+    --control-h: 44px;
+    --control-h-sm: 36px;
+    --cell-px: 16px;
+    --tag-h: 24px;
+    --field-font: 1rem;
+  }
+}
+
+/* Page grid and responsive type */
+:root {
+  --page-margin: 24px;
+  --grid-gutter: 24px;
+  --grid-columns: 12;
+}
+@media (max-width: 1023.98px) {
+  :root {
+    --grid-gutter: 16px;
+    --grid-columns: 8;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  :root {
+    --type-display-56-size: 3rem;
+    --type-display-56-lh: 3.25rem;
+    --type-display-56: var(--type-display-56-weight) var(--type-display-56-size)/var(--type-display-56-lh) var(--font-sans);
+    --section-pad-y: 64px;
+  }
+}
+@media (max-width: 767.98px) {
+  :root {
+    --page-margin: 16px;
+    --grid-gutter: 12px;
+    --grid-columns: 4;
+    --type-display-56-size: 2.5rem;
+    --type-display-56-lh: 2.75rem;
+    --type-display-56: var(--type-display-56-weight) var(--type-display-56-size)/var(--type-display-56-lh) var(--font-sans);
+    --type-display-40-size: 2rem;
+    --type-display-40-lh: 2.5rem;
+    --type-display-40: var(--type-display-40-weight) var(--type-display-40-size)/var(--type-display-40-lh) var(--font-sans);
+    --type-title-24-size: 1.25rem;
+    --type-title-24-lh: 1.75rem;
+    --type-title-24: var(--type-title-24-weight) var(--type-title-24-size)/var(--type-title-24-lh) var(--font-sans);
+    --section-pad-y: 48px;
+  }
+}
+/* Short viewports: the Baseline folds into a header chip (spec/00-design-direction.md §6.1) */
+@media (max-height: 720px) {
+  :root {
+    --size-baseline: 0px;
+  }
+}
+
+/* Reduced motion: no movement, no loops; opacity fades and instant state changes remain */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --shift-popover: 0px;
+    --shift-dialog: 0px;
+    --shift-toast: 0px;
+    --shift-sheet: 0%;
+    --dur-trace: 0ms;
+    --dur-pulse: 0ms;
+    --dur-spin: 0ms;
+    --live-pulse-cycles: 0;
+  }
+}
+/* The in-app Motion preference (Account menu: Match system / Reduce motion) applies the same values */
+:root[data-motion="reduce"] {
+  --shift-popover: 0px;
+  --shift-dialog: 0px;
+  --shift-toast: 0px;
+  --shift-sheet: 0%;
+  --dur-trace: 0ms;
+  --dur-pulse: 0ms;
+  --dur-spin: 0ms;
+  --live-pulse-cycles: 0;
+}

@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<!-- TITLE: "[record · ]Label · Vaani Labs" from the nav label (03-pages/00 §4.4). Never type a different destination name. -->
+<title>Leads · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: canonical page skeleton (app shell, page header, main, Baseline, toasts).">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<!-- Fonts (01-foundations §2): Hanken Grotesk, JetBrains Mono, Noto Sans Devanagari; the rupee from a one-glyph Noto Sans subset;
+     the language-mark glyphs of the other Indic scripts as a text subset. -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<!-- The three shared stylesheets, in this order. Never edit them from a page. -->
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<!-- PAGE CSS HERE (layout only): <link rel="stylesheet" href="pages/leads.css"> -->
+<!-- Scripts: all deferred, in this order. shell.js renders the chrome from the one nav config. -->
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- PAGE JS HERE: <script src="pages/leads.js" defer></script> -->
+</head>
+<!-- data-page: the NAV id of this destination (home · cockpit · assistant · rep-console · meetings · personal-agents · flows ·
+     knowledge · leads · call-reports · analytics · billing · settings). It sets the current item everywhere.
+     Optional: data-shell="focus" (Flow Designer: rail at ≥1024, no Baseline) · data-baseline="activity|oncall|rep|…" (named
+     Baseline state) · data-back-href / data-back-label (phone TopBar Back link on record and sub-pages) · data-topbar-title. -->
+<body data-page="leads">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <!-- Navigation: filled by shell.js. Only one of these is displayed per breakpoint, so there is one Main landmark. -->
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <!-- main: add .app-main--frame for data pages and workbenches (one child .app-scroll owns the scroll);
+         add .app-main--bg for overview pages (cards on the page background). -->
+    <main id="main" class="app-main" tabindex="-1" data-focus-target>
+      <!-- PageHeader (data-nav §2): one H1 = the nav label, one meta line of computed facts, ≤ 3 actions, ≤ 1 primary (last).
+           Below 1024 the H1 moves into the TopBar title by itself; mark secondary actions .ph-fold and repeat them in the ⋯ menu (.ph-more). -->
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title">Leads</h1>
+          <span class="ph-meta">1,284 leads · synced 11:24&nbsp;am</span>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn--tertiary ph-fold" type="button"><i data-icon="download"></i>Export</button>
+          <button class="btn ph-fold" type="button"><i data-icon="upload"></i>Import…</button>
+          <button class="ibtn ph-more" type="button" aria-label="More actions" aria-haspopup="menu" aria-controls="page-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+          <button class="btn btn--primary" type="button"><i data-icon="plus"></i>New lead</button>
+        </div>
+      </div>
+      <div class="menu" id="page-more-menu" role="menu" aria-label="More actions" hidden>
+        <button class="menu-item" role="menuitem" type="button"><i data-icon="download"></i><span class="menu-text"><span>Export</span></span></button>
+        <button class="menu-item" role="menuitem" type="button"><i data-icon="upload"></i><span class="menu-text"><span>Import…</span></span></button>
+      </div>
+
+      <!-- ================================ PAGE CONTENT HERE ================================
+           Order below the header, only when they apply: one page Notice · ViewTabs · Toolbar · the work.
+           Use the archetype from 05-responsive §3.2: data page (flush table), overview (.l-container.l-page on .app-main--bg),
+           form (.l-container--form), workbench (columns that scroll on their own at ≥ 1024). -->
+      <section class="l-container l-page" aria-labelledby="tpl-slot">
+        <div class="card">
+          <div class="empty empty--page">
+            <i data-icon="list"></i>
+            <h2 class="empty-title" id="tpl-slot">Page content here</h2>
+            <p>Replace this section with the page body. The shell, the Baseline, toasts, the command palette (Ctrl K) and the keyboard shortcuts sheet (?) come from the shared files.</p>
+            <div class="empty-actions">
+              <button class="btn" type="button" data-vaani-action="palette">Search or jump</button>
+              <button class="btn btn--tertiary" type="button" data-vaani-action="shortcuts">Keyboard shortcuts</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- ================================ /PAGE CONTENT ================================ -->
+    </main>
+    <!-- Baseline (03-pages/00 §5): filled by shell.js from the one copy module; hidden below 1024 and in focus mode; folds into a chip at ≤ 720 px tall. -->
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<!-- Toasts, the polite announcer and the portal for dialogs, sheets, menus and the palette. Keep at the end of body. -->
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+<!-- PAGE OVERLAYS HERE: dialogs (.dlg hidden), sheets (.sheet hidden), popovers (.pop hidden), gates (.gate hidden). -->
+</body>
+</html>
