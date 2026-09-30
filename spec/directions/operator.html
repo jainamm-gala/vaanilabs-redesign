@@ -1,0 +1,1119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Switchboard: operator direction</title>
+<meta name="description" content="Vaani Labs redesign direction: precision operator console. Tokens, components and three reference screens.">
+<meta name="theme-color" content="#F6F7F9" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D0F13" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Devanagari:wght@400;500;600&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ============ TOKENS: Switchboard ============ */
+:root{
+  color-scheme: light;
+  --font-sans:"IBM Plex Sans","IBM Plex Sans Devanagari",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --font-deva:"IBM Plex Sans Devanagari","IBM Plex Sans",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  /* neutrals: graphite, cool */
+  --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#F1F3F6; --surface-3:#E8EBF0;
+  --border:#E3E6EC; --border-strong:#C9CED8; --control:#858D9C;
+  --text:#121722; --text-2:#434B5B; --text-3:#5F6878; --text-disabled:#A3AAB7;
+  /* accent: Neel (cobalt-indigo, hue ~229) */
+  --accent:#2C4BD1; --accent-hover:#2440B8; --accent-press:#1F37A0;
+  --accent-soft:#EEF1FD; --accent-text:#2C4BD1; --accent-soft-text:#2440B8; --on-accent:#FFFFFF; --focus:#2C4BD1;
+  /* semantic (state only) */
+  --success:#15803D; --success-text:#11703F; --success-soft:#E7F5EC; --live:#16A34A;
+  --warning:#B45309; --warning-text:#8A4B00; --warning-soft:#FDF3E1;
+  --danger:#C0271C; --danger-text:#B42318; --danger-soft:#FDECEA;
+  /* status line */
+  --sl-bg:#121722; --sl-text:#C9CED8; --sl-strong:#FFFFFF; --sl-div:#2A303C;
+  /* canvas */
+  --canvas:#F6F7F9; --canvas-dot:rgba(18,23,34,.13); --edge:#858D9C;
+  /* elevation (light only) */
+  --e1:0 1px 2px rgba(18,23,34,.06);
+  --e2:0 1px 2px rgba(18,23,34,.06),0 6px 16px -4px rgba(18,23,34,.12);
+  --e3:0 2px 4px rgba(18,23,34,.06),0 20px 40px -12px rgba(18,23,34,.24);
+  /* shape, motion */
+  --r4:4px; --r6:6px; --r8:8px; --r12:12px;
+  --dur-1:90ms; --dur-2:140ms; --dur-3:200ms; --ease:cubic-bezier(.2,0,0,1);
+  /* density (standard) */
+  --row:40px; --ctl:32px; --cell-x:12px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    color-scheme: dark;
+    --bg:#0D0F13; --surface:#14171C; --surface-2:#1A1E24; --surface-3:#222730;
+    --border:#262B33; --border-strong:#333A45; --control:#666E7D;
+    --text:#E9ECF1; --text-2:#B3BAC6; --text-3:#8C94A2; --text-disabled:#5C6370;
+    --accent:#3F5CE8; --accent-hover:#4A66F0; --accent-press:#3551D6;
+    --accent-soft:#1B2340; --accent-text:#8FA3FF; --accent-soft-text:#A9B8FF; --on-accent:#FFFFFF; --focus:#8FA3FF;
+    --success:#3FA96A; --success-text:#6FD39A; --success-soft:#16271E; --live:#4CC47F;
+    --warning:#E8A33A; --warning-text:#F5B544; --warning-soft:#2C2312;
+    --danger:#E0564B; --danger-text:#F28B82; --danger-soft:#2E1A1A;
+    --sl-bg:#1A1E24; --sl-text:#B3BAC6; --sl-strong:#E9ECF1; --sl-div:#2B313B;
+    --canvas:#101318; --canvas-dot:rgba(233,236,241,.10); --edge:#666E7D;
+    --e1:none; --e2:0 0 0 1px #333A45; --e3:0 0 0 1px #333A45,0 24px 48px -12px rgba(0,0,0,.6);
+  }
+}
+/* ============ BASE ============ */
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--text);font:400 14px/20px var(--font-sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+svg.i.s14{width:14px;height:14px} svg.i.s20{width:20px;height:20px}
+.mono{font-family:var(--font-mono);font-size:12px;letter-spacing:0}
+.mono13{font-family:var(--font-mono);font-size:13px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--text-3)} .sec{color:var(--text-2)}
+.caps{font:600 11px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--text-2)}
+.deva{font-family:var(--font-deva);line-height:1.7}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ============ PAGE (specimen) ============ */
+.page{max-width:1440px;margin:0 auto;padding:0 48px 96px}
+.topbar{display:flex;align-items:center;justify-content:space-between;height:56px;border-bottom:1px solid var(--border);margin-bottom:40px;font-size:13px;color:var(--text-2)}
+.topbar b{font-weight:600;color:var(--text)}
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:48px;margin-bottom:56px}
+.hero h1{font:600 40px/48px var(--font-sans);letter-spacing:-.025em;text-wrap:balance}
+.hero .ess{font-size:17px;line-height:26px;color:var(--text-2);margin-top:12px;max-width:34ch;text-wrap:pretty}
+.hero .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:20px}
+.pr{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--border)}
+.pr div{padding:12px 16px 14px 0;border-bottom:1px solid var(--border)}
+.pr div:nth-child(odd){padding-right:24px}
+.pr b{display:block;font:600 14px/20px var(--font-sans)}
+.pr span{display:block;font-size:13px;line-height:19px;color:var(--text-2);margin-top:2px}
+.pr i{font-style:normal;font-family:var(--font-mono);font-size:11px;color:var(--text-3);margin-right:8px}
+section.s{margin-top:72px}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:24px;margin-bottom:20px;padding-bottom:12px;border-bottom:1px solid var(--border)}
+.sh h2{font:600 20px/28px var(--font-sans);letter-spacing:-.01em}
+.sh p{font-size:13px;color:var(--text-2);max-width:72ch;text-align:right}
+.note{font-size:12px;line-height:16px;color:var(--text-3);margin-top:10px}
+.note b{color:var(--text-2);font-weight:500}
+.wrap-x{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px}
+.only-m{display:none}
+
+/* ============ COMPONENTS ============ */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:var(--ctl);padding:0 12px;border-radius:var(--r6);font:500 13px/1 var(--font-sans);border:1px solid transparent;white-space:nowrap;transition:background-color var(--dur-2) var(--ease),border-color var(--dur-2) var(--ease),color var(--dur-2) var(--ease)}
+.btn.sm{height:28px;padding:0 10px} .btn.lg{height:40px;padding:0 16px;font-size:14px} .btn.touch{height:44px;padding:0 18px;font-size:15px}
+.btn.icon{width:var(--ctl);padding:0} .btn.sm.icon{width:28px}
+.b-primary{background:var(--accent);color:var(--on-accent)}
+.b-primary:hover,.b-primary.is-hover{background:var(--accent-hover)}
+.b-primary.is-press{background:var(--accent-press)}
+.b-secondary{background:var(--surface);border-color:var(--border-strong);color:var(--text);box-shadow:var(--e1)}
+.b-secondary:hover,.b-secondary.is-hover{background:var(--surface-2)}
+.b-secondary.is-press{background:var(--surface-3);box-shadow:none}
+.b-ghost{color:var(--text-2)}
+.b-ghost:hover,.b-ghost.is-hover{background:var(--surface-2);color:var(--text)}
+.b-ghost.is-press{background:var(--surface-3);color:var(--text)}
+.b-danger{background:var(--surface);border-color:var(--border-strong);color:var(--danger-text)}
+.b-danger:hover,.b-danger.is-hover{background:var(--danger-soft);border-color:var(--danger)}
+.b-danger.is-press{background:var(--danger-soft);border-color:var(--danger-text)}
+.b-danger-solid{background:var(--danger);color:#fff}
+.btn.is-focus{outline:2px solid var(--focus);outline-offset:2px}
+.btn[disabled],.btn.is-disabled{background:var(--surface-2);border-color:var(--border);color:var(--text-disabled);box-shadow:none;cursor:not-allowed}
+.b-ghost[disabled]{background:none;border-color:transparent}
+.spin{width:14px;height:14px;border-radius:50%;border:1.5px solid currentColor;border-right-color:transparent;opacity:.9}
+.kbd{display:inline-flex;align-items:center;justify-content:center;min-width:18px;height:18px;padding:0 4px;border-radius:var(--r4);border:1px solid var(--border-strong);border-bottom-width:2px;background:var(--surface);font:500 11px/1 var(--font-mono);color:var(--text-2)}
+.b-primary .kbd{background:rgba(255,255,255,.16);border-color:rgba(255,255,255,.28);color:#fff}
+.tag{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 6px;border-radius:var(--r4);font:500 12px/16px var(--font-sans);background:var(--surface-2);color:var(--text-2);border:1px solid var(--border);white-space:nowrap}
+.tag svg.i{width:12px;height:12px}
+.t-success{background:var(--success-soft);color:var(--success-text);border-color:transparent}
+.t-warning{background:var(--warning-soft);color:var(--warning-text);border-color:transparent}
+.t-danger{background:var(--danger-soft);color:var(--danger-text);border-color:transparent}
+.t-accent{background:var(--accent-soft);color:var(--accent-soft-text);border-color:transparent}
+.t-quiet{background:transparent;color:var(--text-3)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor;flex:none}
+.dot.live{background:var(--live);box-shadow:0 0 0 0 var(--live)}
+.dot.pulse{animation:pulse 1.6s var(--ease) infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(22,163,74,.45)}70%{box-shadow:0 0 0 5px rgba(22,163,74,0)}100%{box-shadow:0 0 0 0 rgba(22,163,74,0)}}
+@media (prefers-reduced-motion: reduce){.dot.pulse{animation:none}*{transition-duration:0s!important}}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field label,.lbl{font:500 13px/18px var(--font-sans);color:var(--text)}
+.field .help{font-size:12px;line-height:16px;color:var(--text-3)}
+.field .err{font-size:12px;line-height:16px;color:var(--danger-text);display:flex;gap:4px;align-items:center}
+.input{display:flex;align-items:center;gap:8px;height:var(--ctl);padding:0 10px;border:1px solid var(--control);border-radius:var(--r6);background:var(--surface);font-size:14px;color:var(--text);min-width:0}
+.input .ph{color:var(--text-3)}
+.input.is-focus{border-color:var(--accent);outline:2px solid var(--focus);outline-offset:1px}
+.input.is-error{border-color:var(--danger)}
+.input.is-disabled{background:var(--surface-2);border-color:var(--border);color:var(--text-disabled)}
+.input .pre{font-family:var(--font-mono);font-size:13px;color:var(--text-2);padding-right:8px;border-right:1px solid var(--border);height:100%;display:flex;align-items:center}
+.input.area{height:auto;min-height:76px;align-items:flex-start;padding:8px 10px;line-height:20px;display:block}
+.var{display:inline-flex;align-items:center;height:18px;padding:0 4px;border-radius:var(--r4);background:var(--accent-soft);color:var(--accent-soft-text);font:500 12px/1 var(--font-mono)}
+.cb{width:16px;height:16px;border-radius:var(--r4);border:1px solid var(--control);background:var(--surface);display:inline-flex;align-items:center;justify-content:center;flex:none;color:#fff}
+.cb.on{background:var(--accent);border-color:var(--accent)}
+.cb.on::after{content:"";width:8px;height:4px;border-left:1.6px solid #fff;border-bottom:1.6px solid #fff;transform:translateY(-1px) rotate(-45deg)}
+.cb.mixed{background:var(--accent);border-color:var(--accent)} .cb.mixed::after{content:"";width:8px;height:1.6px;background:#fff}
+.cb.is-focus{outline:2px solid var(--focus);outline-offset:2px}
+.sw{width:28px;height:16px;border-radius:8px;background:var(--control);position:relative;flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform var(--dur-2) var(--ease)}
+.sw.on{background:var(--accent)} .sw.on::after{transform:translateX(12px)}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--border)}
+.tab{display:inline-flex;align-items:center;gap:6px;height:36px;font:500 13px/1 var(--font-sans);color:var(--text-2);border-bottom:2px solid transparent;margin-bottom:-1px;white-space:nowrap}
+.tab .c{font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.tab.on{color:var(--text);border-bottom-color:var(--accent)}
+.tab.on .c{color:var(--text-2)}
+.seg{display:inline-flex;padding:2px;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r6)}
+.seg span{display:inline-flex;align-items:center;gap:5px;height:24px;padding:0 9px;border-radius:var(--r4);font:500 12px/1 var(--font-sans);color:var(--text-2);white-space:nowrap}
+.seg span.on{background:var(--surface);color:var(--text);box-shadow:var(--e1);outline:1px solid var(--border)}
+.token{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 4px 0 8px;border-radius:var(--r6);border:1px solid var(--border-strong);background:var(--surface);font-size:12px;color:var(--text-2);white-space:nowrap}
+.token b{font-weight:500;color:var(--text)}
+.token svg{color:var(--text-3)}
+.tip{display:inline-flex;align-items:center;gap:8px;padding:5px 8px;border-radius:var(--r6);background:var(--text);color:var(--bg);font-size:12px;line-height:16px;box-shadow:var(--e2)}
+.tip .kbd{background:transparent;color:var(--bg);border-color:rgba(127,127,127,.5)}
+.av{width:24px;height:24px;border-radius:50%;background:var(--surface-3);color:var(--text-2);display:inline-flex;align-items:center;justify-content:center;font:600 10px/1 var(--font-sans);flex:none}
+.av.l{width:32px;height:32px;font-size:12px}
+
+/* ============ APP SHELL ============ */
+.frame{border:1px solid var(--border-strong);border-radius:var(--r12);overflow:hidden;background:var(--surface);box-shadow:var(--e2);position:relative}
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);grid-template-rows:minmax(0,1fr) 28px;height:688px}
+.shell.rail{grid-template-columns:56px minmax(0,1fr);height:600px}
+.side{background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:10px 10px 8px;gap:2px;min-height:0}
+.org{display:flex;align-items:center;gap:8px;height:36px;padding:0 6px;border-radius:var(--r6)}
+.mark{width:24px;height:24px;border-radius:var(--r6);background:var(--text);color:var(--bg);display:inline-flex;align-items:center;justify-content:center;flex:none}
+.mark svg{width:14px;height:14px;stroke:currentColor;stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.org b{font:600 13px/16px var(--font-sans);display:block}
+.org small{display:block;font-size:11px;line-height:14px;color:var(--text-3)}
+.cmd{display:flex;align-items:center;gap:8px;height:32px;margin:6px 0 8px;padding:0 6px 0 8px;border:1px solid var(--border);border-radius:var(--r6);background:var(--surface);color:var(--text-3);font-size:13px}
+.cmd .kbd{margin-left:auto}
+.grp{font:500 12px/16px var(--font-sans);color:var(--text-3);padding:12px 8px 4px}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:var(--r6);font:500 13px/1 var(--font-sans);color:var(--text-2);border:1px solid transparent;white-space:nowrap}
+.nav svg{color:var(--text-3)}
+.nav .n{margin-left:auto;font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.nav.on{background:var(--surface);color:var(--text);border-color:var(--border);box-shadow:var(--e1)}
+.nav.on svg{color:var(--accent-text)}
+.nav .live-n{margin-left:auto;display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--success-text)}
+.me{margin-top:auto;display:flex;align-items:center;gap:8px;height:40px;padding:0 6px;border-top:1px solid var(--border);padding-top:8px;font-size:13px}
+.me small{display:block;font-size:11px;color:var(--text-3);line-height:14px}
+.rail .side{padding:10px 8px;align-items:center}
+.rail .nav{width:36px;padding:0;justify-content:center}
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;position:relative}
+.pgh{display:flex;align-items:center;gap:12px;height:56px;padding:0 24px;border-bottom:1px solid var(--border);flex:none}
+.pgh h3{font:600 20px/28px var(--font-sans);letter-spacing:-.01em}
+.pgh .d{font-size:13px;color:var(--text-3)}
+.pgh .act{margin-left:auto;display:flex;gap:8px;align-items:center}
+.views{padding:0 24px;flex:none}
+.tools{display:flex;align-items:center;gap:8px;height:52px;padding:0 24px;flex:none}
+.tools .input{width:260px;height:32px}
+.tools .sp{flex:1}
+.statusline{grid-column:1/-1;display:flex;align-items:center;background:var(--sl-bg);color:var(--sl-text);font-size:12px;line-height:16px;padding:0 8px 0 12px;white-space:nowrap;overflow:hidden}
+.statusline .it{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 12px;border-right:1px solid var(--sl-div)}
+.statusline .it:first-child{padding-left:0}
+.statusline b{font-weight:500;color:var(--sl-strong)}
+.statusline .mono{font-size:12px;color:var(--sl-strong)}
+.statusline .r{margin-left:auto;border-right:0;border-left:1px solid var(--sl-div)}
+.statusline .kbd{background:transparent;border-color:var(--sl-div);color:var(--sl-text);height:16px}
+.statusline .warn{color:#F5B544}
+/* table */
+.tblwrap{flex:1;min-height:0;overflow:hidden;border-top:1px solid var(--border)}
+table.t{width:100%;border-collapse:separate;border-spacing:0;font-size:13px;line-height:18px}
+.t th{position:sticky;top:0;height:32px;padding:0 var(--cell-x);text-align:left;background:var(--surface);border-bottom:1px solid var(--border);font:600 11px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--text-2);white-space:nowrap}
+.t td{height:var(--row);padding:0 var(--cell-x);border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text)}
+.t th:first-child,.t td:first-child{padding-left:24px;width:48px}
+.t .r{text-align:right}
+.t td .mono13{color:var(--text-2)}
+.t tr.hov td{background:var(--surface-2)}
+.t tr.sel td{background:var(--accent-soft)}
+.t tr.sel td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+.t tr.kb{outline:2px solid var(--focus);outline-offset:-2px}
+.name{font-weight:500}
+.score{display:inline-flex;align-items:center;gap:8px;justify-content:flex-end}
+.bar{width:40px;height:4px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--text-2)}
+.rowact{display:inline-flex;gap:4px}
+.pager{display:flex;align-items:center;gap:8px;height:40px;padding:0 24px;border-top:1px solid var(--border);font-size:12px;color:var(--text-3);flex:none}
+.pager .sp{flex:1}
+.bulk{position:absolute;left:50%;bottom:52px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 6px 6px 14px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r8);box-shadow:var(--e3);white-space:nowrap}
+.bulk .c{font:500 13px/1 var(--font-sans);margin-right:6px}
+.bulk .div{width:1px;height:20px;background:var(--border);margin:0 4px}
+.pf{width:360px;flex:none;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r8);box-shadow:var(--e3)}
+.pf h4{font:600 14px/20px var(--font-sans);padding:12px 16px 2px}
+.pf .sub{font-size:12px;color:var(--text-3);padding:0 16px 8px}
+.pf dl{display:grid;grid-template-columns:104px 1fr;gap:0;border-top:1px solid var(--border)}
+.pf dt,.pf dd{padding:7px 0;border-bottom:1px solid var(--border);font-size:13px;line-height:18px}
+.pf dt{padding-left:16px;color:var(--text-3)}
+.pf dd{padding-right:16px;display:flex;gap:6px;align-items:center;justify-content:space-between}
+.pf .ft{display:flex;gap:8px;justify-content:flex-end;padding:10px 12px}
+.below{display:flex;gap:40px;align-items:flex-start;margin-top:24px}
+.below .anchor{font-size:12px;color:var(--text-3);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.keys{flex:1;min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 32px;align-content:start}
+.keys div{display:flex;align-items:center;justify-content:space-between;gap:12px;height:36px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text-2)}
+.keys div span:last-child{display:inline-flex;gap:4px}
+.keys .kh{grid-column:1/-1;font:600 14px/20px var(--font-sans);color:var(--text);height:auto;border:0;padding-bottom:8px}
+/* ============ FLOW DESIGNER ============ */
+.fd{display:grid;grid-template-columns:48px minmax(0,1fr) 320px;grid-template-rows:48px 40px minmax(0,1fr) 32px;height:744px}
+.fd-top{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:0 12px 0 16px;border-bottom:1px solid var(--border)}
+.crumb{font-size:13px;color:var(--text-3);display:flex;align-items:center;gap:6px}
+.crumb b{color:var(--text);font-weight:600;font-size:14px}
+.vsel{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px;border:1px solid var(--border-strong);border-radius:var(--r6);font-size:12px;color:var(--text-2);background:var(--surface)}
+.saved{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--text-3)}
+.fd-top .sp{flex:1}
+.spine{grid-column:2/3;display:flex;align-items:center;gap:0;padding:0 12px;border-bottom:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text-2)}
+.ph-i{display:inline-flex;align-items:center;gap:7px;height:24px;padding:0 10px;border-radius:var(--r4)}
+.ph-i b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.ph-i.on{background:var(--surface-2)}
+.spine .arr{color:var(--text-disabled);margin:0 2px}
+.spine .lg{margin-left:auto;display:flex;gap:14px;align-items:center;color:var(--text-3)}
+.lg i{display:inline-block;width:18px;border-top:1.5px solid var(--edge);vertical-align:middle;margin-right:5px}
+.lg i.d{border-top-style:dashed}
+/* phase glyphs (shape grammar) */
+.g{display:inline-block;flex:none;border:1.5px solid var(--text-2)}
+.g.tr{width:14px;height:10px;border-radius:5px 2px 2px 5px;background:var(--text-2)}
+.g.lo{width:9px;height:9px;transform:rotate(45deg);border-radius:1px;margin:0 2px}
+.g.ac{width:12px;height:10px;border-radius:2px}
+.g.ou{width:14px;height:10px;border-radius:2px 5px 5px 2px;border-right-width:3px}
+.fd-rail{grid-row:2/4;border-right:1px solid var(--border);background:var(--bg);display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0}
+.fd-rail .btn{color:var(--text-2)}
+.fd-rail hr{width:20px;border:0;border-top:1px solid var(--border);margin:4px 0}
+.cv{grid-column:2/3;position:relative;overflow:hidden;background-color:var(--canvas);background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1px);background-size:16px 16px;background-position:-4px -4px}
+.world{position:absolute;left:0;top:0;width:960px;height:600px}
+.world svg.edges{position:absolute;inset:0;width:960px;height:600px;overflow:visible}
+.edges path{fill:none;stroke:var(--edge);stroke-width:1.5}
+.edges path.fb{stroke-dasharray:4 4}
+.edges path.hl{stroke:var(--accent);stroke-width:2}
+.node{position:absolute;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r8);box-shadow:var(--e1);padding:9px 12px 10px}
+.node .hd{display:flex;align-items:center;gap:7px;height:16px}
+.node .hd .caps{font-size:11px;color:var(--text-3)}
+.node .tt{font:500 14px/20px var(--font-sans);margin-top:6px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node .bd{font-size:13px;line-height:18px;color:var(--text-2);margin-top:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.node .mt{font-size:12px;line-height:16px;color:var(--text-3);margin-top:4px;display:flex;gap:6px;align-items:center}
+.node.trig{border-radius:28px var(--r8) var(--r8) 28px;padding-left:20px}
+.node.out{border-radius:var(--r8) 28px 28px var(--r8);border-right:3px solid var(--text-2);padding-right:18px}
+.node.sel{outline:2px solid var(--accent);outline-offset:2px;box-shadow:var(--e2)}
+.node.warn{border-color:var(--warning)}
+.badge-n{position:absolute;top:-8px;right:10px;height:18px;min-width:18px;padding:0 5px;border-radius:var(--r4);background:var(--warning-soft);color:var(--warning-text);border:1px solid var(--warning);font:600 11px/16px var(--font-sans);display:inline-flex;gap:3px;align-items:center}
+.outs{position:absolute;left:0;right:0;top:100px;border-top:1px solid var(--border);padding:4px 0}
+.outs div{position:relative;display:flex;align-items:center;justify-content:space-between;height:26px;padding:0 20px 0 12px;font-size:12px;color:var(--text-2)}
+.outs div b{font-weight:500;color:var(--text)}
+.outs div.fbk b{color:var(--text-2);font-weight:500}
+.port{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--surface);border:1.5px solid var(--edge);z-index:2}
+.port.c{background:var(--edge)}
+.sel .port.o{border-color:var(--accent);background:var(--accent)}
+.outs .port{right:-6px;top:8px}
+.plus{position:absolute;width:20px;height:20px;border-radius:50%;background:var(--surface);border:1px solid var(--accent);color:var(--accent-text);display:flex;align-items:center;justify-content:center;box-shadow:var(--e2);z-index:3}
+.cv-ctl{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r6);box-shadow:var(--e1)}
+.cv-ctl .btn{border-radius:0;height:28px}
+.cv-ctl span.z{font:500 12px/28px var(--font-sans);padding:0 8px;border-left:1px solid var(--border);border-right:1px solid var(--border);font-variant-numeric:tabular-nums;color:var(--text-2)}
+.mini{position:absolute;right:12px;bottom:12px;width:148px;height:92px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r6);overflow:hidden;box-shadow:var(--e1)}
+.mini i{position:absolute;background:var(--border-strong);border-radius:1px}
+.mini .vp{position:absolute;border:1.5px solid var(--accent);border-radius:2px}
+.insp{grid-column:3/4;grid-row:2/5;border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0;background:var(--surface)}
+.insp-h{display:flex;align-items:center;gap:8px;height:48px;padding:0 8px 0 16px;flex:none}
+.insp-h b{font:600 14px/20px var(--font-sans)}
+.insp .tabs{padding:0 16px;gap:16px}
+.insp-b{padding:14px 16px;display:flex;flex-direction:column;gap:14px;overflow:hidden;flex:1}
+.ans{border:1px solid var(--border);border-radius:var(--r6)}
+.ans div{display:grid;grid-template-columns:16px 64px 1fr;gap:8px;align-items:center;min-height:32px;padding:6px 10px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text-3)}
+.ans div:last-child{border-bottom:0}
+.ans div b{font:500 13px/18px var(--font-sans);color:var(--text)}
+.ans .grip{color:var(--text-disabled)}
+.insp-f{border-top:1px solid var(--border);padding:10px 16px;font-size:12px;line-height:16px;color:var(--text-3);display:flex;gap:8px;align-items:flex-start;flex:none}
+.probs{grid-column:1/3;display:flex;align-items:center;gap:6px;padding:0 8px;border-top:1px solid var(--border);background:var(--surface);font-size:12px;color:var(--text-2)}
+.probs .sp{flex:1}
+/* ============ COCKPIT ============ */
+.ck{display:grid;grid-template-columns:392px minmax(0,1fr);gap:0;min-height:0;flex:1}
+.call{border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.call-h{display:flex;align-items:center;gap:10px;padding:14px 20px 12px}
+.timer{font:500 24px/28px var(--font-mono);letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.who{display:flex;gap:12px;align-items:center;padding:0 20px 14px;border-bottom:1px solid var(--border)}
+.who b{font:600 16px/22px var(--font-sans);display:block}
+.kv{display:grid;grid-template-columns:112px 1fr;padding:6px 20px;border-bottom:1px solid var(--border)}
+.kv dt,.kv dd{font-size:13px;line-height:18px;padding:5px 0}
+.kv dt{color:var(--text-3)}
+.kv dd{color:var(--text);display:flex;align-items:center;gap:6px;min-width:0}
+.kv dd a{color:var(--accent-text);text-decoration:none;border-bottom:1px solid currentColor}
+.meters{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:12px 20px;border-bottom:1px solid var(--border)}
+.meter .lbl{font-size:12px;color:var(--text-3);font-weight:400;display:flex;justify-content:space-between}
+.segs{display:flex;gap:2px;margin-top:6px}
+.segs i{flex:1;height:8px;border-radius:1px;background:var(--surface-3)}
+.segs i.f{background:var(--text-2)}
+.cap{padding:10px 20px 12px;border-bottom:1px solid var(--border)}
+.cap .row{display:flex;justify-content:space-between;align-items:center;font-size:13px;line-height:18px;padding:4px 0}
+.ctl{display:flex;gap:8px;padding:14px 20px;margin-top:auto;border-top:1px solid var(--border);background:var(--surface)}
+.tx{display:flex;flex-direction:column;min-height:0;position:relative}
+.tx-h{display:flex;align-items:center;gap:8px;height:48px;padding:0 12px 0 20px;border-bottom:1px solid var(--border);flex:none}
+.tx-h b{font:600 14px/20px var(--font-sans)}
+.turns{flex:1;overflow:hidden;padding:8px 0 64px}
+.turn{display:grid;grid-template-columns:64px minmax(0,1fr);padding:8px 24px 8px 0}
+.turn .tc{font:400 12px/22px var(--font-mono);color:var(--text-3);text-align:right;padding-right:14px;font-variant-numeric:tabular-nums}
+.turn .who2{display:flex;align-items:center;gap:6px;font-size:12px;line-height:22px;color:var(--text-3)}
+.turn .who2 b{font-weight:600;color:var(--text);font-size:13px}
+.turn .say{font-size:15px;line-height:24px;color:var(--text);max-width:68ch;margin-top:1px;text-wrap:pretty}
+.turn .say.deva{font-size:15px;line-height:26px}
+.turn.cust{background:var(--surface-2)}
+.turn.partial .say{color:var(--text-3)}
+.lang{font:500 11px/14px var(--font-mono);padding:1px 4px;border:1px solid var(--border-strong);border-radius:3px;color:var(--text-2)}
+.step{font:500 11px/14px var(--font-mono);padding:1px 5px;border-radius:3px;background:var(--accent-soft);color:var(--accent-soft-text)}
+.jump{position:absolute;left:50%;bottom:16px;transform:translateX(-50%)}
+/* ============ SPECIMEN BLOCKS ============ */
+.typ{width:100%;border-collapse:collapse}
+.typ td{padding:12px 16px 12px 0;border-bottom:1px solid var(--border);vertical-align:baseline}
+.typ td.k{width:120px;font:500 12px/16px var(--font-mono);color:var(--text-2)}
+.typ td.v{width:250px;font-size:12px;line-height:16px;color:var(--text-3)}
+.typ td.u{width:280px;font-size:12px;line-height:16px;color:var(--text-3)}
+.cols2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:32px}
+.sw-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.swc{border:1px solid var(--border);border-radius:var(--r8);overflow:hidden;background:var(--surface)}
+.swc .pair{display:grid;grid-template-columns:1fr 1fr;height:64px}
+.swc .pair div{display:flex;align-items:flex-end;padding:8px 10px;font:500 12px/16px var(--font-sans)}
+.swc .pair div span{font-family:var(--font-mono);font-size:11px}
+.swc .inf{padding:8px 10px 10px;font-size:12px;line-height:16px;border-top:1px solid var(--border)}
+.swc .inf b{font:500 12px/16px var(--font-mono);color:var(--text)}
+.swc .inf div{color:var(--text-3);display:flex;justify-content:space-between}
+.ramp{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));border:1px solid var(--border);border-radius:var(--r8);overflow:hidden}
+.ramp div{height:56px;padding:6px;overflow:hidden;font:500 10px/12px var(--font-mono);display:flex;flex-direction:column;justify-content:flex-end}
+.cgrid{display:grid;grid-template-columns:120px repeat(6,max-content);gap:12px 20px;align-items:center}
+.cgrid .h{font-size:12px;color:var(--text-3)}
+.cgrid .rl{font:500 13px/18px var(--font-sans);color:var(--text-2)}
+.panel{border:1px solid var(--border);border-radius:var(--r8);background:var(--surface);padding:20px}
+.stack{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.bp{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.bp .box{border:1px solid var(--border);border-radius:var(--r8);background:var(--surface);padding:14px}
+.bp .sk{height:120px;border:1px solid var(--border-strong);border-radius:6px;display:grid;overflow:hidden;margin:10px 0;background:var(--bg)}
+.bp .sk i{background:var(--surface);border:0 solid var(--border)}
+.bp h5{font:600 13px/18px var(--font-sans)} .bp p{font-size:12px;line-height:17px;color:var(--text-2)}
+.sig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sig .panel{min-width:0;padding:16px;display:flex;flex-direction:column;gap:12px}
+.sig h4{font:600 14px/20px var(--font-sans);display:flex;align-items:center;gap:8px}
+.sig h4 span{font:400 12px/16px var(--font-mono);color:var(--text-3)}
+.sig p{font-size:13px;line-height:19px;color:var(--text-2)}
+.sig .demo{background:var(--bg);border:1px solid var(--border);border-radius:var(--r6);padding:12px;min-height:118px;display:flex;flex-direction:column;justify-content:center;overflow:hidden;position:relative}
+.sig .demo .turn{padding:4px 8px 4px 0;grid-template-columns:52px minmax(0,1fr)}
+.sig .demo .turn .say{font-size:14px;line-height:20px}
+.sig .mininode{position:relative;width:208px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r8);box-shadow:var(--e1);margin:0 auto}
+.sig .mininode .h{display:flex;align-items:center;gap:7px;padding:8px 12px 6px;font:500 13px/18px var(--font-sans)}
+.sig .mininode .outs{position:static;border-top:1px solid var(--border)}
+.sig .mininode .port{right:-6px;top:8px}
+/* ============ RESPONSIVE ============ */
+@media (max-width:1279px){ .page{padding:0 32px 80px} .hero{grid-template-columns:1fr;gap:28px} .sw-grid{grid-template-columns:repeat(3,minmax(0,1fr))} .ramp{grid-template-columns:repeat(6,minmax(0,1fr))} }
+@media (max-width:1023px){ .bp{grid-template-columns:1fr 1fr} .cols2{grid-template-columns:minmax(0,1fr)} .sig{grid-template-columns:repeat(2,minmax(0,1fr))} }
+@media (max-width:767px){
+  .page{padding:0 16px 64px}
+  .hero h1{font-size:32px;line-height:40px}
+  .pr{grid-template-columns:1fr} .pr div:nth-child(odd){padding-right:0}
+  .sh{flex-direction:column;gap:4px} .sh p{text-align:left}
+  .only-d{display:none!important} .only-m{display:block}
+  .sw-grid{grid-template-columns:repeat(2,minmax(0,1fr))} .ramp{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .bp{grid-template-columns:1fr}
+  .typ td.v,.typ td.u{display:none} .typ td.k{width:84px} .typ td{overflow-wrap:anywhere} .typ td.disp{font-size:30px!important;line-height:36px!important}
+  .sig .statusline .warn{display:none}
+  section.s{margin-top:56px}
+  .sig{grid-template-columns:minmax(0,1fr)}
+  .swc .inf div{flex-direction:column}
+  .topbar{height:auto;padding:12px 0;flex-wrap:wrap;gap:8px;margin-bottom:28px}
+  .topbar .t-quiet{display:none}
+}
+/* mobile app frames */
+.mf{max-width:390px;margin:0 auto;border:1px solid var(--border-strong);border-radius:20px;overflow:hidden;background:var(--surface);box-shadow:var(--e2)}
+.mtop{display:flex;align-items:center;gap:8px;height:52px;padding:0 8px 0 16px;border-bottom:1px solid var(--border)}
+.mtop h3{font:600 17px/24px var(--font-sans)}
+.mtop .sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border:1px solid var(--border);border-radius:14px;font-size:12px;color:var(--text-2);background:var(--surface-2)}
+.mtabs{display:flex;gap:18px;padding:0 16px;border-bottom:1px solid var(--border);overflow:hidden;white-space:nowrap}
+.mrow{display:flex;flex-direction:column;gap:3px;padding:11px 16px;border-bottom:1px solid var(--border)}
+.mrow .a{display:flex;justify-content:space-between;align-items:center;font-size:15px;font-weight:500}
+.mrow .b{font-size:12px;color:var(--text-3);display:flex;gap:6px}
+.mbot{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);height:60px;background:var(--surface)}
+.mbot span{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11px;color:var(--text-3)}
+.mbot span.on{color:var(--text)} .mbot span.on svg{color:var(--accent-text)}
+.mbot svg.i{width:20px;height:20px}
+.oline{padding:4px 0 8px}
+.oline .gh{display:flex;align-items:center;gap:8px;padding:12px 16px 6px;font:600 11px/16px var(--font-sans);letter-spacing:.04em;text-transform:uppercase;color:var(--text-2)}
+.oline .st{display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 16px;border-bottom:1px solid var(--border);font-size:14px}
+.oline .st small{display:block;font-size:12px;color:var(--text-3)}
+.oline .st .tag{margin-left:auto}
+@media (max-width:1023px){.inputs-g{grid-template-columns:1fr 1fr!important}}
+@media (max-width:767px){.inputs-g{grid-template-columns:1fr!important}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<defs>
+<symbol id="search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+<symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+<symbol id="phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="phonein" viewBox="0 0 24 24"><path d="M16 2v6h6M22 2l-6 6"/><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="fwd" viewBox="0 0 24 24"><path d="M18 2l4 4-4 4M14 6h8"/><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="wa" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22z"/></symbol>
+<symbol id="flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+<symbol id="check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="chevr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="chevl" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="filter" viewBox="0 0 24 24"><path d="M3 5h18M6 12h12M10 19h4"/></symbol>
+<symbol id="down" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="up" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="pulse" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></symbol>
+<symbol id="bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect x="4" y="8" width="16" height="12" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+<symbol id="head" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="tasks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="flow" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/></symbol>
+<symbol id="book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M16 13H8M16 17H8M10 9H8"/></symbol>
+<symbol id="chart" viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+<symbol id="redo" viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7l3 2.7"/></symbol>
+<symbol id="fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="play" viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></symbol>
+<symbol id="alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+<symbol id="ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8.5 12 2.5 2.5 4.5-5"/></symbol>
+<symbol id="clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+<symbol id="cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="more" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></symbol>
+<symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+<symbol id="cols" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18M15 3v18"/></symbol>
+<symbol id="copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+<symbol id="hist" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 2.6-6.4L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></symbol>
+<symbol id="tidy" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><path d="M10 6.5h4M17.5 10v4"/></symbol>
+<symbol id="list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+<symbol id="dots" viewBox="0 0 24 24"><circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/></symbol>
+<symbol id="rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3a14 14 0 0 0 0 18 14 14 0 0 0 0-18M3 12h18"/></symbol>
+<symbol id="side" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 3v18"/></symbol>
+<symbol id="vmark" viewBox="0 0 24 24"><path d="M5 5l7 14 7-14"/></symbol>
+</defs>
+</svg>
+
+<div class="page">
+<header class="topbar">
+  <span><b>Vaani Labs</b> &nbsp;·&nbsp; Redesign direction</span>
+  <span class="stack"><span class="tag">Precision operator console</span><span class="tag t-quiet">Follows system light / dark</span></span>
+</header>
+
+<div class="hero">
+  <div>
+    <h1>Switchboard</h1>
+    <p class="ess">A calm operator’s console: dense where you scan, quiet where you decide, and never wrong about what is live.</p>
+    <div class="meta">
+      <span class="tag">IBM Plex Sans · Mono · Devanagari</span>
+      <span class="tag t-accent">Neel #2C4BD1</span>
+      <span class="tag">4 px grid · 40 / 32 px rows</span>
+    </div>
+  </div>
+  <div class="pr">
+    <div><b><i>P1</i>State is truth</b><span>Show only what the system can prove: “Draft · 3 changes”, “Live v7”, “Couldn’t save · Retry”.</span></div>
+    <div><b><i>P2</i>Colour means state, shape means type</b><span>Graphite chrome, one accent for operator intent; green, amber and red only for call and record state.</span></div>
+    <div><b><i>P3</i>Density is a setting</b><span>Standard 40 px or Compact 32 px rows, per user. Data text never below 13 px.</span></div>
+    <div><b><i>P4</i>Every action has an address</b><span>⌘K, a shortcut in every tooltip, visible focus everywhere, and no single key that bills.</span></div>
+    <div><b><i>P5</i>Cost before commit</b><span>Anything that dials, bills or publishes shows who, how many, which version and ₹ first.</span></div>
+    <div><b><i>P6</i>One frame, many screens</b><span>One sidebar, one 56 px header, one status line. Canvas and tables full-bleed; forms 720 px.</span></div>
+    <div><b><i>P7</i>Quiet chrome, loud data</b><span>No textures, glows or idle loops. The largest thing on a page is the work.</span></div>
+    <div><b><i>&nbsp;</i>Built on evidence</b><span>Each rule cites the audit (211 findings). The five critical issues are fixed first, not styled over.</span></div>
+  </div>
+</div>
+
+<div class="sig" aria-label="Signature elements">
+  <div class="panel">
+    <h4>Status line <span>01 · shell</span></h4>
+    <div class="demo" style="justify-content:flex-end">
+      <div style="font-size:12px;color:var(--text-3);margin-bottom:auto">…bottom edge of every desktop and laptop screen</div>
+      <div class="statusline" style="border-radius:6px;height:28px"><span class="it"><span class="dot live"></span>Live flow <b>Site-visit qualifier v7</b></span><span class="it warn" style="border-right:0"><svg class="i s14"><use href="#alert"/></svg>Wallet <b class="num" style="color:inherit">₹42.10</b></span></div>
+    </div>
+    <p>28 px, ink, computed facts only: live flow, number readiness, wallet, calls in progress, call timer. Replaces the full-width wallet banner and the hard-coded “SYS: ONLINE”.</p>
+  </div>
+  <div class="panel">
+    <h4>Timecode gutter <span>02 · voice</span></h4>
+    <div class="demo">
+      <div class="turn"><span class="tc">00:14</span><div><div class="who2"><b>Agent</b><span class="lang">EN</span><span class="step">Q1</span></div><p class="say">Would you like to visit the site this week?</p></div></div>
+      <div class="turn"><span class="tc">00:26</span><div><div class="who2"><b>Kavya</b><span class="lang">HI</span></div><p class="say deva" lang="hi" style="line-height:24px">शनिवार सुबह ठीक रहेगा।</p></div></div>
+    </div>
+    <p>Mono timecode in a fixed gutter, speaker, language tag and the flow step that spoke. The same row in Cockpit, Call reports, Rep console and flow Test.</p>
+  </div>
+  <div class="panel">
+    <h4>Port tabs <span>03 · flows</span></h4>
+    <div class="demo">
+      <div class="mininode"><div class="h"><i class="g lo"></i>Interested in a site visit?</div>
+        <div class="outs"><div><b>Yes</b><span>haan, zaroor</span><span class="port" style="border-color:var(--accent);background:var(--accent)"></span></div><div><b>Later</b><span>baad mein</span><span class="port c"></span></div><div class="fbk"><b>No reply</b><span>after 6 s</span><span class="port"></span></div></div>
+      </div>
+    </div>
+    <p>Every branch output is a named row with its own socket, carried onto the edge. Meaning never depends on handle position or colour.</p>
+  </div>
+</div>
+
+<section class="s" aria-labelledby="sa">
+  <div class="sh"><h2 id="sa">App shell and Leads</h2><p>Grouped sidebar with the active item raised like a switch key. One 56 px page header. Saved views, a real table, bulk actions that open a pre-flight check, and the status line underneath.</p></div>
+  <div class="only-d wrap-x"><div class="frame" style="min-width:1100px">
+  <div class="shell">
+    <nav class="side" aria-label="Primary">
+      <div class="org"><span class="mark"><svg viewBox="0 0 24 24"><use href="#vmark"/></svg></span><span><b>Sahyadri Homes</b><small>Workspace · Admin</small></span><svg class="i s14 muted" style="margin-left:auto"><use href="#chev"/></svg></div>
+      <div class="cmd"><svg class="i s14"><use href="#search"/></svg>Search or jump to…<span class="kbd">⌘K</span></div>
+      <div class="grp">Operate</div>
+      <a class="nav"><svg class="i"><use href="#pulse"/></svg>Cockpit<span class="live-n"><span class="dot live"></span>2 live</span></a>
+      <a class="nav"><svg class="i"><use href="#bot"/></svg>Assistant</a>
+      <a class="nav"><svg class="i"><use href="#head"/></svg>Rep console</a>
+      <a class="nav"><svg class="i"><use href="#video"/></svg>Meetings</a>
+      <a class="nav"><svg class="i"><use href="#tasks"/></svg>Personal agents</a>
+      <div class="grp">Build</div>
+      <a class="nav"><svg class="i"><use href="#flow"/></svg>Flows</a>
+      <a class="nav"><svg class="i"><use href="#book"/></svg>Knowledge</a>
+      <div class="grp">Data</div>
+      <a class="nav on" aria-current="page"><svg class="i"><use href="#users"/></svg>Leads</a>
+      <a class="nav"><svg class="i"><use href="#file"/></svg>Call reports</a>
+      <a class="nav"><svg class="i"><use href="#chart"/></svg>Analytics</a>
+      <div class="grp">Account</div>
+      <a class="nav"><svg class="i"><use href="#wallet"/></svg>Billing</a>
+      <a class="nav"><svg class="i"><use href="#sliders"/></svg>Settings</a>
+      <div class="me"><span class="av">RK</span><span>Ritika K.<small>Admin</small></span><button class="btn sm icon b-ghost" style="margin-left:auto" aria-label="Collapse sidebar ["><svg class="i"><use href="#side"/></svg></button></div>
+    </nav>
+    <main class="main">
+      <div class="pgh">
+        <h3>Leads</h3><span class="d num">1,284 leads · synced 11:24</span>
+        <div class="act">
+          <button class="btn b-ghost"><svg class="i"><use href="#down"/></svg>Export</button>
+          <button class="btn b-secondary"><svg class="i"><use href="#up"/></svg>Import…</button>
+          <button class="btn b-primary"><svg class="i"><use href="#plus"/></svg>New lead<span class="kbd">N</span></button>
+        </div>
+      </div>
+      <div class="views"><div class="tabs" role="tablist">
+        <span class="tab on" role="tab" aria-selected="true">All <span class="c">1,284</span></span>
+        <span class="tab" role="tab">New <span class="c">312</span></span>
+        <span class="tab" role="tab">Callbacks due <span class="c">18</span></span>
+        <span class="tab" role="tab">Interested <span class="c">96</span></span>
+        <span class="tab" role="tab">Not reached <span class="c">204</span></span>
+        <span class="tab" role="tab" style="color:var(--text-3)"><svg class="i s14"><use href="#plus"/></svg>Save view</span>
+      </div></div>
+      <div class="tools">
+        <div class="input"><svg class="i s14 muted"><use href="#search"/></svg><span class="ph">Search name, phone or city…</span><span class="kbd" style="margin-left:auto">/</span></div>
+        <button class="btn b-secondary sm"><svg class="i s14"><use href="#filter"/></svg>Filter</button>
+        <span class="token">Language <b>Hindi, English</b><svg class="i s14"><use href="#x"/></svg></span>
+        <span class="token">Source <b>Website</b><svg class="i s14"><use href="#x"/></svg></span>
+        <span class="sp"></span>
+        <button class="btn b-ghost sm"><svg class="i s14"><use href="#cols"/></svg>Columns</button>
+        <span class="seg" role="group" aria-label="Row density"><span class="on">Standard</span><span>Compact</span></span>
+      </div>
+      <div class="tblwrap">
+      <table class="t">
+        <thead><tr><th><span class="cb mixed" role="checkbox" aria-checked="mixed"></span></th><th>Lead</th><th>Phone</th><th>Status</th><th>Last call</th><th class="r">Interest</th><th>Lang</th><th>Flow</th><th style="width:96px"></th></tr></thead>
+        <tbody>
+        <tr class="sel"><td><span class="cb on"></span></td><td class="name">Kavya Raman</td><td><span class="mono13">+91 •••••• 4821</span></td><td><span class="tag t-success">Interested</span></td><td>Visit booked <span class="muted num">· Today 10:42</span></td><td class="r"><span class="score num">82<span class="bar"><i style="width:82%"></i></span></span></td><td><span class="lang">HI</span> <span class="lang">EN</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr class="sel"><td><span class="cb on"></span></td><td class="name">Siddharth Nair</td><td><span class="mono13">+91 •••••• 3307</span></td><td><span class="tag t-warning"><svg class="i"><use href="#clock"/></svg>Callback due</span></td><td>Asked to call later <span class="muted num">· Today 09:15</span></td><td class="r"><span class="score num">64<span class="bar"><i style="width:64%"></i></span></span></td><td><span class="lang">EN</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr><td><span class="cb"></span></td><td class="name">Farhan Qureshi</td><td><span class="mono13">+91 •••••• 9158</span></td><td><span class="tag">New</span></td><td><span class="muted">Not called yet</span></td><td class="r"><span class="muted">–</span></td><td><span class="lang">HI</span></td><td class="sec">Home-loan follow-up</td><td class="r"></td></tr>
+        <tr class="kb"><td><span class="cb"></span></td><td class="name">Ishita Bose</td><td><span class="mono13">+91 •••••• 6612</span></td><td><span class="tag">Contacted</span></td><td>No answer <span class="muted num">· Yesterday</span></td><td class="r"><span class="score num">41<span class="bar"><i style="width:41%"></i></span></span></td><td><span class="lang">BN</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr class="sel"><td><span class="cb on"></span></td><td class="name">Devika Pillai</td><td><span class="mono13">+91 •••••• 2045</span></td><td><span class="tag t-success">Interested</span></td><td>Visit booked <span class="muted num">· Yesterday</span></td><td class="r"><span class="score num">77<span class="bar"><i style="width:77%"></i></span></span></td><td><span class="lang">EN</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr><td><span class="cb"></span></td><td class="name">Harpreet Sandhu</td><td><span class="mono13">+91 •••••• 7730</span></td><td><span class="tag t-quiet" style="border-color:var(--border)">Not interested</span></td><td>Not interested <span class="muted num">· 2 days ago</span></td><td class="r"><span class="score num">12<span class="bar"><i style="width:12%"></i></span></span></td><td><span class="lang">HI</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr class="hov"><td><span class="cb"></span></td><td class="name">Tanvi Joshi</td><td><span class="mono13">+91 •••••• 1189</span></td><td><span class="tag">New</span></td><td><span class="muted">Not called yet</span></td><td class="r"><span class="muted">–</span></td><td><span class="lang">MR</span></td><td class="sec">Site-visit qualifier</td><td class="r"><span class="rowact"><button class="btn sm b-secondary" style="height:26px">Call…<span class="kbd" style="height:16px">C</span></button><button class="btn sm icon b-ghost" style="height:26px;width:26px" aria-label="More"><svg class="i"><use href="#more"/></svg></button></span></td></tr>
+        <tr><td><span class="cb"></span></td><td class="name">Rohan Bhatt</td><td><span class="mono13">+91 •••••• 5520</span></td><td><span class="tag t-warning"><svg class="i"><use href="#clock"/></svg>Callback due</span></td><td>Busy <span class="muted num">· 3 days ago</span></td><td class="r"><span class="score num">55<span class="bar"><i style="width:55%"></i></span></span></td><td><span class="lang">HI</span></td><td class="sec">Home-loan follow-up</td><td class="r"></td></tr>
+        <tr><td><span class="cb"></span></td><td class="name">Ananya Rao</td><td><span class="mono13">+91 •••••• 8841</span></td><td><span class="tag">Contacted</span></td><td>Voicemail <span class="muted num">· 3 days ago</span></td><td class="r"><span class="score num">38<span class="bar"><i style="width:38%"></i></span></span></td><td><span class="lang">TE</span></td><td class="sec">Site-visit qualifier</td><td class="r"></td></tr>
+        <tr><td><span class="cb"></span></td><td class="name">Mohit Agarwal</td><td><span class="mono13">+91 •••••• 0376</span></td><td><span class="tag">New</span></td><td><span class="muted">Not called yet</span></td><td class="r"><span class="muted">–</span></td><td><span class="lang">HI</span></td><td class="sec">Home-loan follow-up</td><td class="r"></td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="pager num"><span>1–50 of 1,284</span><span class="sp"></span><span><span class="kbd">J</span> <span class="kbd">K</span> move · <span class="kbd">X</span> select · <span class="kbd">?</span> all shortcuts</span><button class="btn sm b-ghost icon" aria-label="Previous page"><svg class="i"><use href="#chevl"/></svg></button><button class="btn sm b-ghost icon" aria-label="Next page"><svg class="i"><use href="#chevr"/></svg></button></div>
+
+      <div class="bulk" role="toolbar" aria-label="3 leads selected">
+        <span class="c num">3 selected</span>
+        <button class="btn sm b-primary is-press"><svg class="i s14"><use href="#phone"/></svg>Call 3 leads…</button>
+        <button class="btn sm b-ghost">Set status<svg class="i s14"><use href="#chev"/></svg></button>
+        <button class="btn sm b-ghost">Assign flow<svg class="i s14"><use href="#chev"/></svg></button>
+        <button class="btn sm b-ghost">Export</button>
+        <span class="div"></span>
+        <button class="btn sm b-ghost">Clear <span class="kbd">Esc</span></button>
+      </div>
+    </main>
+    <footer class="statusline" aria-label="Workspace status">
+      <span class="it"><span class="dot live"></span>Live flow <b>Site-visit qualifier v7</b></span>
+      <span class="it"><svg class="i s14"><use href="#phone"/></svg><span class="mono">+91 80 •••• 2210</span> ready</span>
+      <span class="it"><svg class="i s14"><use href="#wallet"/></svg>Wallet <b class="num">₹2,340.50</b></span>
+      <span class="it">2 calls in progress</span>
+      <span class="it r"><span class="kbd">?</span> Shortcuts</span>
+      <span class="it" style="border:0"><span class="kbd">⌘K</span></span>
+    </footer>
+  </div>
+  </div></div>
+  <div class="below only-d">
+    <div><div class="anchor"><svg class="i s14"><use href="#arrow"/></svg>Opens above “Call 3 leads…” (or <span class="kbd">C</span> on a row)</div>
+    <div class="pf" role="dialog" aria-label="Pre-flight: call 3 leads" style="box-shadow:var(--e3)">
+        <h4>Call 3 leads</h4>
+        <div class="sub">Nothing dials until you start. Checked just now.</div>
+        <dl>
+          <dt>Flow</dt><dd>Site-visit qualifier · v7<span class="tag t-success"><span class="dot live"></span>Live</span></dd>
+          <dt>Voice</dt><dd>Vaani · Hindi + English</dd>
+          <dt>Calling hours</dt><dd>Open until 19:00 IST<svg class="i s14" style="color:var(--success-text)"><use href="#ok"/></svg></dd>
+          <dt>DND registry</dt><dd>3 of 3 clear<svg class="i s14" style="color:var(--success-text)"><use href="#ok"/></svg></dd>
+          <dt>Estimated cost</dt><dd><span class="num">≈ ₹11 <span class="muted">(3 × ~90 s at ₹0.04/s)</span></span></dd>
+          <dt>Wallet</dt><dd class="num">₹2,340.50</dd>
+        </dl>
+        <div class="ft"><button class="btn sm b-ghost">Cancel</button><button class="btn sm b-primary">Start 3 calls<span class="kbd">⌘↵</span></button></div>
+      </div>
+    </div>
+    <div class="keys">
+      <div class="kh">Keyboard model · Leads</div>
+      <div><span>Search</span><span><span class="kbd">/</span></span></div>
+      <div><span>Command menu</span><span><span class="kbd">⌘</span><span class="kbd">K</span></span></div>
+      <div><span>Move between rows</span><span><span class="kbd">J</span><span class="kbd">K</span></span></div>
+      <div><span>Open lead in side sheet</span><span><span class="kbd">↵</span></span></div>
+      <div><span>Select row · select all</span><span><span class="kbd">X</span><span class="kbd">⇧</span><span class="kbd">A</span></span></div>
+      <div><span>Call… (opens pre-flight, never dials)</span><span><span class="kbd">C</span></span></div>
+      <div><span>New lead</span><span><span class="kbd">N</span></span></div>
+      <div><span>Clear selection · close sheet</span><span><span class="kbd">Esc</span></span></div>
+      <div><span>All shortcuts</span><span><span class="kbd">?</span></span></div>
+      <div><span>Toggle density</span><span><span class="kbd">⇧</span><span class="kbd">D</span></span></div>
+      <p class="note" style="grid-column:1/-1">Single-key shortcuts can be switched off in Settings › Accessibility (WCAG 2.1.4). Every shortcut also appears in its button’s tooltip and in ⌘K.</p>
+    </div>
+  </div>
+  <p class="note only-d"><b>States shown:</b> row 1, 2, 5 selected (accent tint + 2 px bar) · row 4 keyboard focus (J/K) · row 7 hover with row actions · pre-flight shown below. Pressing <span class="kbd">C</span> on a row opens the same pre-flight; it never dials on its own (F-A11Y-004, F-UX-013).</p>
+
+  <div class="only-m">
+    <div class="mf">
+      <div class="mtop"><h3>Leads</h3><span class="sp"></span><span class="chip"><span class="dot live"></span>₹2,340</span><button class="btn icon b-ghost" aria-label="Search"><svg class="i s20"><use href="#search"/></svg></button><button class="btn icon b-ghost" aria-label="Filter"><svg class="i s20"><use href="#filter"/></svg></button></div>
+      <div class="mtabs"><span class="tab on">All <span class="c">1,284</span></span><span class="tab">New <span class="c">312</span></span><span class="tab">Callbacks <span class="c">18</span></span><span class="tab">Interested</span></div>
+      <div class="mrow"><div class="a">Kavya Raman<span class="tag t-success">Interested</span></div><div class="b"><span class="mono">+91 •••••• 4821</span>· Visit booked · 10:42</div></div>
+      <div class="mrow"><div class="a">Siddharth Nair<span class="tag t-warning">Callback due</span></div><div class="b"><span class="mono">+91 •••••• 3307</span>· Call later · 09:15</div></div>
+      <div class="mrow"><div class="a">Farhan Qureshi<span class="tag">New</span></div><div class="b"><span class="mono">+91 •••••• 9158</span>· Not called yet</div></div>
+      <div class="mrow"><div class="a">Ishita Bose<span class="tag">Contacted</span></div><div class="b"><span class="mono">+91 •••••• 6612</span>· No answer · Yesterday</div></div>
+      <div class="mrow"><div class="a">Devika Pillai<span class="tag t-success">Interested</span></div><div class="b"><span class="mono">+91 •••••• 2045</span>· Visit booked · Yesterday</div></div>
+      <div class="mbot" role="navigation" aria-label="Primary"><span><svg class="i"><use href="#pulse"/></svg>Cockpit</span><span class="on"><svg class="i"><use href="#users"/></svg>Leads</span><span><svg class="i"><use href="#file"/></svg>Reports</span><span><svg class="i"><use href="#flow"/></svg>Flows</span><span><svg class="i"><use href="#more"/></svg>More</span></div>
+    </div>
+    <p class="note">Phone: rows become two-line items (48 px+ targets), the status line collapses into the top-bar chip, and “More” opens every remaining section including Settings and sign-out (F-RWD-001).</p>
+  </div>
+</section>
+
+<section class="s" aria-labelledby="sb">
+  <div class="sh"><h2 id="sb">Flow Designer</h2><p>Trigger → Logic → Action → Outcome, read left to right. The phase spine counts each phase; node shape carries the phase; labelled port tabs carry the branch. Edits land in a draft; the live version is untouched until you publish.</p></div>
+  <div class="only-d wrap-x"><div class="frame" style="min-width:1180px">
+  <div class="fd">
+    <div class="fd-top">
+      <span class="crumb">Flows <svg class="i s14"><use href="#chevr"/></svg><b>Site-visit qualifier</b></span>
+      <span class="vsel">Draft · from v7<svg class="i s14"><use href="#chev"/></svg></span>
+      <span class="saved"><svg class="i s14"><use href="#check"/></svg>Saved 11:24</span>
+      <span class="tag t-success" title="Version 7 answers calls now"><span class="dot live"></span>Live v7</span>
+      <span style="width:1px;height:20px;background:var(--border);margin:0 2px"></span>
+      <button class="btn sm icon b-ghost" aria-label="Undo (⌘Z)"><svg class="i"><use href="#undo"/></svg></button>
+      <button class="btn sm icon b-ghost" aria-label="Redo (⇧⌘Z)" disabled><svg class="i"><use href="#redo"/></svg></button>
+      <button class="btn sm icon b-ghost" aria-label="Tidy layout (⇧T)"><svg class="i"><use href="#tidy"/></svg></button>
+      <span class="sp"></span>
+      <button class="btn sm b-ghost" style="color:var(--warning-text)"><svg class="i s14"><use href="#alert"/></svg>1 warning</button>
+      <button class="btn sm b-secondary"><svg class="i s14"><use href="#play"/></svg>Test</button>
+      <button class="btn sm b-primary">Publish v8…</button>
+      <button class="btn sm icon b-ghost" aria-label="More flow actions"><svg class="i"><use href="#more"/></svg></button>
+    </div>
+    <div class="fd-rail">
+      <button class="btn icon b-secondary" aria-label="Add step (A)" style="color:var(--accent-text)"><svg class="i"><use href="#plus"/></svg></button>
+      <button class="btn icon b-ghost" aria-label="Outline (O)"><svg class="i"><use href="#list"/></svg></button>
+      <button class="btn icon b-ghost" aria-label="Variables (V)"><svg class="i"><use href="#db"/></svg></button>
+      <button class="btn icon b-ghost" aria-label="Version history"><svg class="i"><use href="#hist"/></svg></button>
+      <hr>
+      <button class="btn icon b-ghost" aria-label="Flow settings"><svg class="i"><use href="#sliders"/></svg></button>
+    </div>
+    <div class="spine" role="group" aria-label="Flow phases">
+      <span class="ph-i"><i class="g tr"></i>Trigger <b>2</b></span><span class="arr">→</span>
+      <span class="ph-i on"><i class="g lo"></i>Logic <b>2</b></span><span class="arr">→</span>
+      <span class="ph-i"><i class="g ac"></i>Action <b>5</b></span><span class="arr">→</span>
+      <span class="ph-i"><i class="g ou"></i>Outcome <b>5</b></span>
+      <span class="lg"><span><i></i>Path</span><span><i class="d"></i>Fallback</span></span>
+    </div>
+    <div class="cv" aria-label="Canvas">
+      <div class="world">
+        <svg class="edges" viewBox="0 0 960 600" aria-hidden="true">
+          <path d="M232 220 H248 Q256 220 256 212 V154 Q256 146 264 146 H280"/>
+          <path d="M232 378 H248 Q256 378 256 370 V154 Q256 146 264 146 H280"/>
+          <path d="M504 239 H512 Q520 239 520 231 V82 Q520 74 528 74 H556"/>
+          <path d="M504 265 H522 Q530 265 530 257 V230 Q530 222 538 222 H556"/>
+          <path d="M504 291 H528 Q536 291 536 299 V348 Q536 356 544 356 H556"/>
+          <path class="fb" d="M504 317 H508 Q516 317 516 325 V464 Q516 472 524 472 H784"/>
+          <path d="M740 74 H784"/><path d="M740 222 H784"/><path d="M740 356 H784"/>
+        </svg>
+        <div class="node trig" style="left:24px;top:164px;width:208px;height:112px">
+          <div class="hd"><i class="g tr"></i><span class="caps">Trigger</span></div>
+          <div class="tt">Inbound call</div>
+          <div class="mt"><span class="mono">+91 80 •••• 2210</span></div>
+          <div class="mt">Mon–Sat · 10:00–19:00 IST</div>
+        </div>
+        <div class="node trig" style="left:24px;top:330px;width:208px;height:96px">
+          <div class="hd"><i class="g tr"></i><span class="caps">Trigger</span></div>
+          <div class="tt">Outbound batch</div>
+          <div class="mt">From Leads · max 20 at once</div>
+        </div>
+        <div class="node sel" style="left:280px;top:120px;width:224px;height:214px">
+          <div class="hd"><i class="g lo"></i><span class="caps">Logic · Question</span><span class="mono muted" style="margin-left:auto;font-size:11px">Q1</span></div>
+          <div class="tt">Interested in a site visit?</div>
+          <div class="bd">{{lead_name}} ji, would you like to visit the site this week? We have Saturday and Sunday slots.</div>
+          <div class="outs">
+            <div><b>Yes</b><span>haan, zaroor</span></div>
+            <div><b>Later</b><span>baad mein</span></div>
+            <div><b>No</b><span>nahi</span></div>
+            <div class="fbk"><b>No reply</b><span>after 6 s</span></div>
+          </div>
+        </div>
+        <div class="node warn" style="left:556px;top:32px;width:184px;height:84px">
+          <span class="badge-n"><svg class="i" style="width:11px;height:11px"><use href="#alert"/></svg>1</span>
+          <div class="hd"><i class="g ac"></i><span class="caps">Action</span><svg class="i s14 muted" style="margin-left:auto"><use href="#cal"/></svg></div>
+          <div class="tt">Book site visit</div>
+          <div class="mt">Calendar + WhatsApp</div>
+        </div>
+        <div class="node" style="left:556px;top:184px;width:184px;height:76px">
+          <div class="hd"><i class="g ac"></i><span class="caps">Action</span><svg class="i s14 muted" style="margin-left:auto"><use href="#db"/></svg></div>
+          <div class="tt">Schedule callback</div>
+          <div class="mt">CRM · lead.callback_at</div>
+        </div>
+        <div class="node" style="left:556px;top:318px;width:184px;height:76px">
+          <div class="hd"><i class="g ac"></i><span class="caps">Action</span><svg class="i s14 muted" style="margin-left:auto"><use href="#msg"/></svg></div>
+          <div class="tt">Polite close</div>
+          <div class="mt">Speak · 1 line</div>
+        </div>
+        <div class="node out" style="left:784px;top:32px;width:168px;height:84px">
+          <div class="hd"><i class="g ou"></i><span class="caps">Outcome</span></div>
+          <div class="tt">Visit booked</div>
+          <div class="mt">Lead <svg class="i s14" style="width:12px;height:12px"><use href="#arrow"/></svg><span class="tag t-success" style="height:18px">Interested</span></div>
+        </div>
+        <div class="node out" style="left:784px;top:180px;width:168px;height:84px">
+          <div class="hd"><i class="g ou"></i><span class="caps">Outcome</span></div>
+          <div class="tt">Callback set</div>
+          <div class="mt">Lead <svg class="i s14" style="width:12px;height:12px"><use href="#arrow"/></svg><span class="tag t-warning" style="height:18px">Callback due</span></div>
+        </div>
+        <div class="node out" style="left:784px;top:314px;width:168px;height:84px">
+          <div class="hd"><i class="g ou"></i><span class="caps">Outcome</span></div>
+          <div class="tt">Not interested</div>
+          <div class="mt">Lead <svg class="i s14" style="width:12px;height:12px"><use href="#arrow"/></svg><span class="tag" style="height:18px">Closed</span></div>
+        </div>
+        <div class="node out" style="left:784px;top:430px;width:168px;height:84px">
+          <div class="hd"><i class="g ou"></i><span class="caps">Outcome</span></div>
+          <div class="tt">No answer</div>
+          <div class="mt">Lead <svg class="i s14" style="width:12px;height:12px"><use href="#arrow"/></svg><span class="tag" style="height:18px">Retry in 2 h</span></div>
+        </div>
+        <!-- ports (world coordinates) -->
+        <span class="port c" style="left:227px;top:215px"></span><span class="port c" style="left:227px;top:373px"></span>
+        <span class="port c" style="left:275px;top:141px"></span>
+        <span class="port o" style="left:499px;top:234px;border-color:var(--accent);background:var(--accent)"></span>
+        <span class="port o" style="left:499px;top:260px;border-color:var(--accent);background:var(--accent)"></span>
+        <span class="port o" style="left:499px;top:286px;border-color:var(--accent);background:var(--accent)"></span>
+        <span class="port o" style="left:499px;top:312px;border-color:var(--accent);background:var(--surface)"></span>
+        <span class="port c" style="left:551px;top:69px"></span><span class="port c" style="left:735px;top:69px"></span>
+        <span class="port c" style="left:551px;top:217px"></span><span class="port c" style="left:735px;top:217px"></span>
+        <span class="port c" style="left:551px;top:351px"></span><span class="port c" style="left:735px;top:351px"></span>
+        <span class="port c" style="left:779px;top:69px"></span><span class="port c" style="left:779px;top:217px"></span>
+        <span class="port c" style="left:779px;top:351px"></span><span class="port c" style="left:779px;top:467px"></span>
+        <span class="plus" style="left:246px;top:170px" title="Insert step on this path"><svg class="i s14"><use href="#plus"/></svg></span>
+      </div>
+      <div class="cv-ctl"><button class="btn sm icon b-ghost" aria-label="Zoom out (⌘−)">−</button><span class="z">100%</span><button class="btn sm icon b-ghost" aria-label="Zoom in (⌘+)">+</button><button class="btn sm b-ghost" style="border-left:1px solid var(--border)"><svg class="i s14"><use href="#fit"/></svg>Fit</button></div>
+      <div class="mini" aria-hidden="true">
+        <i style="left:6px;top:20px;width:21px;height:11px"></i><i style="left:6px;top:37px;width:21px;height:10px"></i><i style="left:32px;top:16px;width:22px;height:21px"></i>
+        <i style="left:60px;top:7px;width:18px;height:8px"></i><i style="left:60px;top:22px;width:18px;height:8px"></i><i style="left:60px;top:36px;width:18px;height:8px"></i>
+        <i style="left:82px;top:8px;width:15px;height:6px"></i><i style="left:82px;top:23px;width:15px;height:6px"></i><i style="left:82px;top:36px;width:15px;height:6px"></i><i style="left:82px;top:48px;width:15px;height:6px"></i>
+        <i style="left:108px;top:58px;width:20px;height:16px"></i><i style="left:134px;top:56px;width:10px;height:8px"></i><i style="left:134px;top:70px;width:10px;height:8px"></i><i style="left:120px;top:80px;width:12px;height:6px"></i>
+        <span class="vp" style="left:3px;top:3px;width:98px;height:62px"></span>
+      </div>
+    </div>
+    <aside class="insp" aria-label="Step properties">
+      <div class="insp-h"><i class="g lo"></i><b>Question</b><span class="mono muted">Q1</span><span style="flex:1"></span><button class="btn sm icon b-ghost" aria-label="Step actions"><svg class="i"><use href="#more"/></svg></button><button class="btn sm icon b-ghost" aria-label="Close (Esc)"><svg class="i"><use href="#x"/></svg></button></div>
+      <div class="tabs" role="tablist"><span class="tab on">Configure</span><span class="tab">Test data</span><span class="tab">Issues <span class="c">0</span></span></div>
+      <div class="insp-b">
+        <div class="field"><label>Label</label><div class="input">Interested in a site visit?</div></div>
+        <div class="field"><label>Agent asks</label><div class="input area is-focus"><span class="var">{{lead_name}}</span> ji, would you like to visit the site this week? We have Saturday and Sunday slots.</div><span class="help">Type <span class="mono">{{</span> to insert a variable. Hindi and English are detected per reply.</span></div>
+        <div class="field"><span class="lbl">Answers <span class="muted" style="font-weight:400">· each becomes a port</span></span>
+          <div class="ans">
+            <div><svg class="i s14 grip"><use href="#dots"/></svg><b>Yes</b><span>haan, zaroor, sure</span></div>
+            <div><svg class="i s14 grip"><use href="#dots"/></svg><b>Later</b><span>next week, baad mein</span></div>
+            <div><svg class="i s14 grip"><use href="#dots"/></svg><b>No</b><span>nahi, not interested</span></div>
+            <div style="background:var(--surface-2)"><span></span><b style="color:var(--text-2)">No reply</b><span>after <span class="num" style="color:var(--text)">6 s</span> of silence · required</span></div>
+          </div>
+          <button class="btn sm b-ghost" style="align-self:flex-start;margin-left:-8px"><svg class="i s14"><use href="#plus"/></svg>Add answer</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div class="field"><label>Save answer to</label><div class="input"><span class="var">{{visit_intent}}</span></div></div>
+          <div class="field"><label>Language</label><div class="input">Auto (HI / EN)<svg class="i s14 muted" style="margin-left:auto"><use href="#chev"/></svg></div></div>
+        </div>
+      </div>
+      <div class="insp-f"><svg class="i s14" style="margin-top:1px"><use href="#ok"/></svg><span>Autosaves to the draft. Live v7 keeps answering calls until you publish. <span class="kbd">Esc</span> returns focus to the step.</span></div>
+    </aside>
+    <div class="probs">
+      <button class="btn sm b-ghost" style="color:var(--warning-text)"><svg class="i s14"><use href="#alert"/></svg>1 warning</button>
+      <span>Book site visit: WhatsApp template “visit_confirm” is pending approval.</span>
+      <button class="btn sm b-ghost" style="color:var(--accent-text)">Go to step</button>
+      <span class="sp"></span>
+      <button class="btn sm b-ghost"><svg class="i s14"><use href="#list"/></svg>Outline</button>
+      <button class="btn sm b-ghost"><svg class="i s14"><use href="#play"/></svg>Test panel <span class="kbd">T</span></button>
+    </div>
+  </div>
+  </div></div>
+  <p class="note only-d"><b>Grammar:</b> Trigger = rounded entry edge · Logic = diamond + labelled port rows · Action = plain step with its tool icon · Outcome = rounded exit edge with a 3 px terminal bar and the lead status it writes. Colour stays out of node types: accent marks the selection, amber marks the one warning, green only means live.</p>
+
+  <div class="only-m">
+    <div class="mf">
+      <div class="mtop"><h3 style="font-size:16px">Site-visit qualifier</h3><span class="sp"></span><span class="tag t-success"><span class="dot live"></span>Live v7</span></div>
+      <div style="padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px;line-height:19px;color:var(--text-2);background:var(--surface-2)">Outline view. Editing needs a screen 1024 px or wider; on a phone you can review steps and run a text test.</div>
+      <div class="oline">
+        <div class="gh"><i class="g tr"></i>Trigger</div>
+        <div class="st"><span>Inbound call<small class="mono">+91 80 •••• 2210</small></span></div>
+        <div class="gh"><i class="g lo"></i>Logic</div>
+        <div class="st"><span>Interested in a site visit?<small>Yes · Later · No · No reply</small></span></div>
+        <div class="gh"><i class="g ac"></i>Action</div>
+        <div class="st"><span>Book site visit<small>Calendar + WhatsApp</small></span><span class="tag t-warning">1 warning</span></div>
+        <div class="st"><span>Schedule callback<small>CRM</small></span></div>
+        <div class="gh"><i class="g ou"></i>Outcome</div>
+        <div class="st"><span>Visit booked</span><span class="tag t-success">Interested</span></div>
+        <div class="st"><span>Callback set</span><span class="tag t-warning">Callback</span></div>
+      </div>
+      <div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)"><button class="btn touch b-secondary" style="flex:1"><svg class="i"><use href="#play"/></svg>Run text test</button></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" aria-labelledby="sc">
+  <div class="sh"><h2 id="sc">Agent Cockpit: live call</h2><p>Shown at laptop width (1024–1439), where the sidebar collapses to a 56 px rail. The call card holds only real call data; the transcript uses the timecode gutter, a language tag per turn and a link to the flow step that produced it.</p></div>
+  <div class="only-d wrap-x"><div class="frame" style="min-width:1040px">
+  <div class="shell rail">
+    <nav class="side" aria-label="Primary">
+      <span class="mark" style="margin:6px 0 10px"><svg viewBox="0 0 24 24"><use href="#vmark"/></svg></span>
+      <a class="nav" aria-label="Search (⌘K)"><svg class="i"><use href="#search"/></svg></a>
+      <a class="nav on" aria-current="page" aria-label="Cockpit"><svg class="i"><use href="#pulse"/></svg></a>
+      <a class="nav" aria-label="Assistant"><svg class="i"><use href="#bot"/></svg></a>
+      <a class="nav" aria-label="Rep console"><svg class="i"><use href="#head"/></svg></a>
+      <a class="nav" aria-label="Meetings"><svg class="i"><use href="#video"/></svg></a>
+      <a class="nav" aria-label="Flows"><svg class="i"><use href="#flow"/></svg></a>
+      <a class="nav" aria-label="Knowledge"><svg class="i"><use href="#book"/></svg></a>
+      <a class="nav" aria-label="Leads"><svg class="i"><use href="#users"/></svg></a>
+      <a class="nav" aria-label="Call reports"><svg class="i"><use href="#file"/></svg></a>
+      <a class="nav" aria-label="Analytics"><svg class="i"><use href="#chart"/></svg></a>
+      <a class="nav" aria-label="Billing"><svg class="i"><use href="#wallet"/></svg></a>
+      <a class="nav" aria-label="Settings"><svg class="i"><use href="#sliders"/></svg></a>
+      <span class="av" style="margin-top:auto">RK</span>
+    </nav>
+    <main class="main">
+      <div class="pgh"><h3>Cockpit</h3><span class="d">1 live call · 1 in wrap-up</span>
+        <div class="act"><span class="seg" role="group" aria-label="Call"><span class="on">Kavya R. · 02:14</span><span>Test call · wrap-up</span></span><button class="btn b-secondary"><svg class="i"><use href="#plus"/></svg>New call<span class="kbd">⌘N</span></button></div>
+      </div>
+      <div class="ck">
+        <div class="call" aria-label="Live call">
+          <div class="call-h">
+            <span class="tag t-success" role="status"><span class="dot live pulse"></span>Live</span>
+            <span class="tag t-quiet" style="padding:0">Outbound</span>
+            <span class="timer" style="margin-left:auto" aria-label="Elapsed 2 minutes 14 seconds">02:14</span>
+          </div>
+          <div class="who"><span class="av l">KR</span><div><b>Kavya Raman</b><span class="mono sec">+91 •••••• 4821</span> <span class="muted" style="font-size:12px">· Pune</span></div><span class="tag" style="margin-left:auto" title="Recording disclosed at 00:03"><svg class="i"><use href="#rec"/></svg>Recording</span></div>
+          <dl class="kv">
+            <dt>Flow</dt><dd>Site-visit qualifier · v7</dd>
+            <dt>Current step</dt><dd><span class="step">Q1</span><a href="#sb">Interested in a site visit?</a></dd>
+            <dt>Voice</dt><dd>Vaani · Hindi + English</dd>
+            <dt>Line</dt><dd><svg class="i s14" style="color:var(--success-text)"><use href="#ok"/></svg>Good <span class="muted num">· 180 ms</span></dd>
+            <dt>Cost so far</dt><dd class="num">₹5.36 <span class="muted">· ₹0.04/s</span></dd>
+          </dl>
+          <div class="meters" aria-label="Audio levels">
+            <div class="meter"><span class="lbl">Agent<span>speaking</span></span><div class="segs"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+            <div class="meter"><span class="lbl">Customer<span>quiet</span></span><div class="segs"><i class="f"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+          </div>
+          <div class="cap">
+            <div class="lbl" style="font-size:12px;color:var(--text-3);font-weight:400;margin-bottom:2px">Captured by the flow</div>
+            <div class="row"><span class="var">{{preferred_day}}</span><span>Saturday, morning</span></div>
+            <div class="row"><span class="var">{{budget}}</span><span class="num">₹85 L – ₹1 Cr</span></div>
+            <div class="row"><span class="var">{{visit_intent}}</span><span class="muted">Waiting for answer…</span></div>
+          </div>
+          <div class="ctl">
+            <button class="btn b-secondary" title="Route this call to your Rep console (⌘T)"><svg class="i"><use href="#head"/></svg>Take over</button>
+            <button class="btn b-secondary"><svg class="i"><use href="#fwd"/></svg>Transfer…</button>
+            <button class="btn b-danger" style="margin-left:auto"><svg class="i" style="transform:rotate(135deg)"><use href="#phone"/></svg>End call</button>
+          </div>
+        </div>
+        <div class="tx" aria-label="Transcript">
+          <div class="tx-h"><b>Transcript</b><span class="muted" style="font-size:12px">· streaming</span><span style="flex:1"></span>
+            <button class="btn sm icon b-ghost" aria-label="Search transcript (⌘F)"><svg class="i"><use href="#search"/></svg></button>
+            <button class="btn sm icon b-ghost" aria-label="Copy transcript"><svg class="i"><use href="#copy"/></svg></button>
+          </div>
+          <div class="turns" aria-live="polite">
+            <div class="turn"><span class="tc">00:03</span><div><div class="who2"><b>Agent</b><span class="lang">HI</span><span class="step">T1</span></div><p class="say deva" lang="hi">नमस्ते कव्या जी, मैं वाणी बोल रही हूँ, सह्याद्रि होम्स से। क्या अभी दो मिनट बात हो सकती है?</p></div></div>
+            <div class="turn cust"><span class="tc">00:11</span><div><div class="who2"><b>Kavya</b><span class="lang">HI</span></div><p class="say deva" lang="hi">हाँ जी, बोलिए।</p></div></div>
+            <div class="turn"><span class="tc">00:14</span><div><div class="who2"><b>Agent</b><span class="lang">EN</span><span class="step">Q1</span></div><p class="say">You had enquired about a 2 BHK in Hinjewadi. Would you like to visit the site this week? We have Saturday and Sunday slots.</p></div></div>
+            <div class="turn cust"><span class="tc">00:26</span><div><div class="who2"><b>Kavya</b><span class="lang">HI</span><span class="lang">EN</span></div><p class="say">Saturday ho sakta hai, but morning mein. Price range kya hai?</p></div></div>
+            <div class="turn"><span class="tc">00:31</span><div><div class="who2"><b>Agent</b><span class="lang">EN</span><span class="step">KB</span><span>Knowledge: price-sheet.pdf</span></div><p class="say">2 BHK units start at ₹85 lakh. Shall I book Saturday at 11:00?</p></div></div>
+            <div class="turn cust partial"><span class="tc">02:12</span><div><div class="who2"><b>Kavya</b><span>listening…</span></div><p class="say">Haan, eleven works, bas address WhatsApp kar dijiye…</p></div></div>
+          </div>
+          <button class="btn sm b-secondary jump" style="box-shadow:var(--e2)"><svg class="i s14"><use href="#chev"/></svg>Jump to latest</button>
+        </div>
+      </div>
+    </main>
+    <footer class="statusline" aria-label="Workspace status">
+      <span class="it"><span class="dot live"></span>On call <b class="num">02:14</b></span>
+      <span class="it">Live flow <b>Site-visit qualifier v7</b></span>
+      <span class="it"><svg class="i s14"><use href="#wallet"/></svg>Wallet <b class="num">₹2,335.14</b></span>
+      <span class="it r"><span class="kbd">?</span> Shortcuts</span>
+    </footer>
+  </div>
+  </div></div>
+  <p class="note only-d"><b>Rules:</b> the live dot is the only pulsing element in the product and stops under reduced motion · partial speech is muted and ends in “…” · only final turns are announced · meters move only on real audio and are flat when idle · “Jump to latest” appears once the operator scrolls up.</p>
+
+  <div class="only-m">
+    <div class="mf">
+      <div class="mtop"><h3>Cockpit</h3><span class="sp"></span><span class="tag t-success"><span class="dot live pulse"></span>Live</span><span class="timer" style="font-size:17px;margin:0 8px">02:14</span></div>
+      <div class="who" style="padding-top:14px"><span class="av l">KR</span><div><b>Kavya Raman</b><span class="mono sec">+91 •••••• 4821</span></div></div>
+      <dl class="kv" style="grid-template-columns:104px 1fr"><dt>Step</dt><dd><span class="step">Q1</span>Interested in a site visit?</dd><dt>Line</dt><dd>Good · 180 ms</dd></dl>
+      <div class="turn" style="padding-right:16px"><span class="tc" style="width:56px">00:26</span><div><div class="who2"><b>Kavya</b><span class="lang">HI</span><span class="lang">EN</span></div><p class="say">Saturday ho sakta hai, but morning mein. Price range kya hai?</p></div></div>
+      <div class="turn" style="padding-right:16px"><span class="tc">00:31</span><div><div class="who2"><b>Agent</b><span class="lang">EN</span><span class="step">KB</span></div><p class="say">2 BHK units start at ₹85 lakh. Shall I book Saturday at 11:00?</p></div></div>
+      <div class="turn cust partial" style="padding-right:16px"><span class="tc">02:12</span><div><div class="who2"><b>Kavya</b><span>listening…</span></div><p class="say">Haan, eleven works…</p></div></div>
+      <div style="display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--border)"><button class="btn touch b-secondary" style="flex:1">Take over</button><button class="btn touch b-danger" style="flex:1">End call</button></div>
+    </div>
+    <p class="note">Phone: card and transcript stack; the two call controls stay in a 44 px bar at the bottom (safe-area aware).</p>
+  </div>
+</section>
+
+<section class="s" aria-labelledby="st">
+  <div class="sh"><h2 id="st">Typography</h2><p>IBM Plex Sans for UI, Plex Mono for data tokens, Plex Sans Devanagari for Hindi: one superfamily, shared metrics, tabular figures by default. Weights 400 / 500 / 600 only. Nothing below 12 px except 11 px table headers.</p></div>
+  <table class="typ">
+    <tr><td class="k">caps-11</td><td class="v">11/16 · 600 · +0.04em · uppercase</td><td class="u">Table headers, canvas phase labels only</td><td><span class="caps">Last outcome</span></td></tr>
+    <tr><td class="k">meta-12</td><td class="v">12/16 · 400 / 500</td><td class="u">Help text, timestamps, tags, status line</td><td style="font-size:12px;line-height:16px" class="sec">Synced 11:24 · 2 filters applied</td></tr>
+    <tr><td class="k">sm-13</td><td class="v">13/20 · compact 13/18 · 400 / 500</td><td class="u">Table cells, nav, buttons, labels</td><td style="font-size:13px">Asked to call back after 6 pm</td></tr>
+    <tr><td class="k">body-14</td><td class="v">14/20 · 400</td><td class="u">Default UI text and inputs</td><td style="font-size:14px">Calls use the live version of this flow.</td></tr>
+    <tr><td class="k">read-15</td><td class="v">15/24 · 400</td><td class="u">Transcripts, Assistant replies, Knowledge</td><td style="font-size:15px;line-height:24px">Would you like to visit the site this week?</td></tr>
+    <tr><td class="k">deva-15</td><td class="v">Plex Sans Devanagari 15/26 · 400</td><td class="u">Hindi turns, lang="hi"</td><td class="deva" style="font-size:15px" lang="hi">नमस्ते, क्या अभी दो मिनट बात हो सकती है?</td></tr>
+    <tr><td class="k">title-16</td><td class="v">16/24 · 600</td><td class="u">Panel, card and dialog titles</td><td style="font:600 16px/24px var(--font-sans)">Call 3 leads</td></tr>
+    <tr><td class="k">title-20</td><td class="v">20/28 · 600 · −0.01em</td><td class="u">Page title (the one H1)</td><td style="font:600 20px/28px var(--font-sans);letter-spacing:-.01em">Leads</td></tr>
+    <tr><td class="k">title-24</td><td class="v">24/32 · 600 · −0.015em</td><td class="u">Setup steps, empty-state headings</td><td style="font:600 24px/32px var(--font-sans);letter-spacing:-.015em">Connect a calling number</td></tr>
+    <tr><td class="k">num-28</td><td class="v">28/32 · 500 · −0.02em · tabular</td><td class="u">KPI and balance numerals</td><td class="num" style="font:500 28px/32px var(--font-sans);letter-spacing:-.02em">₹2,340.50</td></tr>
+    <tr><td class="k">mono-12</td><td class="v">Plex Mono 12/16 · 400</td><td class="u">Timecodes, step and record IDs, keycaps</td><td class="mono sec">00:31 · Q1 · call_7c21e0</td></tr>
+    <tr><td class="k">mono-13</td><td class="v">Plex Mono 13/20 · 400</td><td class="u">Phone numbers, variables, code, API keys</td><td class="mono13">+91 •••••• 4821 &nbsp; {{lead_name}}</td></tr>
+    <tr><td class="k">display-40</td><td class="v">40/48 · 600 · −0.025em</td><td class="u">Marketing and docs only, never in the app</td><td class="disp" style="font:600 40px/48px var(--font-sans);letter-spacing:-.025em">Switchboard</td></tr>
+  </table>
+  <p class="note"><b>Mono</b> only for phone numbers, timecodes and durations, IDs, variables, code and keycaps. Never for labels, headings, money or counts. <b>Uppercase</b> only for caps-11 headers, language codes (HI, EN) and keycaps. Buttons, nav, titles and tags are sentence case.</p>
+</section>
+
+<section class="s" aria-labelledby="scol">
+  <div class="sh"><h2 id="scol">Colour</h2><p>Graphite neutrals with a cool bias, one accent (Neel, the Indian indigo-blue, same hue in both themes) and three state colours. Each card shows light | dark, with measured WCAG ratios.</p></div>
+  <div class="cols2" style="margin-bottom:20px">
+    <div><div class="lbl" style="margin-bottom:8px">Graphite · light</div>
+      <div class="ramp">
+        <div style="background:#FFFFFF;color:#434B5B">0<br>FFFFFF</div><div style="background:#F6F7F9;color:#434B5B">50<br>F6F7F9</div><div style="background:#F1F3F6;color:#434B5B">100<br>F1F3F6</div><div style="background:#E8EBF0;color:#434B5B">150<br>E8EBF0</div><div style="background:#E3E6EC;color:#434B5B">200<br>E3E6EC</div><div style="background:#C9CED8;color:#121722">300<br>C9CED8</div><div style="background:#A3AAB7;color:#121722">400<br>A3AAB7</div><div style="background:#858D9C;color:#fff">500<br>858D9C</div><div style="background:#5F6878;color:#fff">600<br>5F6878</div><div style="background:#434B5B;color:#fff">700<br>434B5B</div><div style="background:#2A303C;color:#fff">800<br>2A303C</div><div style="background:#121722;color:#fff">900<br>121722</div>
+      </div></div>
+    <div><div class="lbl" style="margin-bottom:8px">Graphite · dark</div>
+      <div class="ramp">
+        <div style="background:#0D0F13;color:#B3BAC6">bg<br>0D0F13</div><div style="background:#14171C;color:#B3BAC6">s1<br>14171C</div><div style="background:#1A1E24;color:#B3BAC6">s2<br>1A1E24</div><div style="background:#222730;color:#B3BAC6">s3<br>222730</div><div style="background:#262B33;color:#B3BAC6">bd<br>262B33</div><div style="background:#333A45;color:#E9ECF1">bd+<br>333A45</div><div style="background:#5C6370;color:#E9ECF1">dis<br>5C6370</div><div style="background:#666E7D;color:#fff">ctl<br>666E7D</div><div style="background:#8C94A2;color:#0D0F13">t3<br>8C94A2</div><div style="background:#B3BAC6;color:#0D0F13">t2<br>B3BAC6</div><div style="background:#D3D8E0;color:#0D0F13">—<br>D3D8E0</div><div style="background:#E9ECF1;color:#0D0F13">t1<br>E9ECF1</div>
+      </div></div>
+  </div>
+  <div class="sw-grid">
+    <div class="swc"><div class="pair"><div style="background:#F6F7F9;color:#121722">Aa</div><div style="background:#0D0F13;color:#E9ECF1">Aa</div></div><div class="inf"><b>--bg</b><div><span>F6F7F9 · 0D0F13</span><span>text 16.7 · 16.2</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#FFFFFF;color:#121722">Aa</div><div style="background:#14171C;color:#E9ECF1">Aa</div></div><div class="inf"><b>--surface</b><div><span>FFFFFF · 14171C</span><span>text 17.9 · 15.2</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#F1F3F6;color:#5F6878">Aa muted</div><div style="background:#1A1E24;color:#8C94A2">Aa muted</div></div><div class="inf"><b>--surface-2</b><div><span>F1F3F6 · 1A1E24</span><span>text-3 5.05 · 5.48</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;box-shadow:inset 0 -3px 0 #E3E6EC;color:#5F6878">hairline</div><div style="background:#14171C;box-shadow:inset 0 -3px 0 #262B33;color:#8C94A2">hairline</div></div><div class="inf"><b>--border</b><div><span>E3E6EC · 262B33</span><span>decorative 1.25</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;box-shadow:inset 0 0 0 2px #858D9C;color:#121722">input</div><div style="background:#14171C;box-shadow:inset 0 0 0 2px #666E7D;color:#E9ECF1">input</div></div><div class="inf"><b>--control</b><div><span>858D9C · 666E7D</span><span>3.34 · 3.50 ✓ 3:1</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;color:#121722;font-size:15px">Aa 4821</div><div style="background:#14171C;color:#E9ECF1;font-size:15px">Aa 4821</div></div><div class="inf"><b>--text</b><div><span>121722 · E9ECF1</span><span>17.9 · 15.2</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;color:#434B5B;font-size:15px">Aa 4821</div><div style="background:#14171C;color:#B3BAC6;font-size:15px">Aa 4821</div></div><div class="inf"><b>--text-2</b><div><span>434B5B · B3BAC6</span><span>8.76 · 9.20</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;color:#5F6878;font-size:15px">Aa 4821</div><div style="background:#14171C;color:#8C94A2;font-size:15px">Aa 4821</div></div><div class="inf"><b>--text-3</b><div><span>5F6878 · 8C94A2</span><span>5.62 · 5.88</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#2C4BD1;color:#fff">Publish</div><div style="background:#3F5CE8;color:#fff">Publish</div></div><div class="inf"><b>--accent</b> fill<div><span>2C4BD1 · 3F5CE8</span><span>white 6.92 · 5.37</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#fff;color:#2C4BD1;box-shadow:inset 0 0 0 2px #2C4BD1">link · focus</div><div style="background:#14171C;color:#8FA3FF;box-shadow:inset 0 0 0 2px #8FA3FF">link · focus</div></div><div class="inf"><b>--accent-text / --focus</b><div><span>2C4BD1 · 8FA3FF</span><span>6.92 · 7.57</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#EEF1FD;color:#2440B8">Selected</div><div style="background:#1B2340;color:#A9B8FF">Selected</div></div><div class="inf"><b>--accent-soft</b><div><span>EEF1FD · 1B2340</span><span>7.45 · 8.07</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#E7F5EC;color:#11703F">● Live</div><div style="background:#16271E;color:#6FD39A">● Live</div></div><div class="inf"><b>--success</b><div><span>11703F/E7F5EC · 6FD39A</span><span>5.47 · 8.53</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#FDF3E1;color:#8A4B00">Ringing…</div><div style="background:#2C2312;color:#F5B544">Ringing…</div></div><div class="inf"><b>--warning</b><div><span>8A4B00/FDF3E1 · F5B544</span><span>6.18 · 8.53</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#FDECEA;color:#B42318">Failed</div><div style="background:#2E1A1A;color:#F28B82">Failed</div></div><div class="inf"><b>--danger</b><div><span>B42318/FDECEA · F28B82</span><span>5.75 · 6.87</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#121722;color:#C9CED8">status line</div><div style="background:#1A1E24;color:#B3BAC6">status line</div></div><div class="inf"><b>--sl-bg / --sl-text</b><div><span>121722 · 1A1E24</span><span>11.4 · 8.57</span></div></div></div>
+    <div class="swc"><div class="pair"><div style="background:#F1F3F6;color:#A3AAB7">Disabled</div><div style="background:#1A1E24;color:#5C6370">Disabled</div></div><div class="inf"><b>--text-disabled</b><div><span>A3AAB7 · 5C6370</span><span>exempt, always + reason</span></div></div></div>
+  </div>
+  <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-top:16px">
+    <span class="lbl">Chart series</span>
+    <span class="stack" style="gap:14px;font-size:12px;color:var(--text-2)"><span class="stack" style="gap:6px"><i style="width:14px;height:14px;border-radius:3px;background:#2C4BD1"></i>Neel</span><span class="stack" style="gap:6px"><i style="width:14px;height:14px;border-radius:3px;background:#13867A"></i>Teal</span><span class="stack" style="gap:6px"><i style="width:14px;height:14px;border-radius:3px;background:#B7791F"></i>Ochre</span><span class="stack" style="gap:6px"><i style="width:14px;height:14px;border-radius:3px;background:#C23F6E"></i>Rose</span><span class="stack" style="gap:6px"><i style="width:14px;height:14px;border-radius:3px;background:#5F6878"></i>Slate</span></span>
+    <span class="note" style="margin:0">Charts only, never chrome. All ≥ 3.6:1 on surface (dark set: 8FA3FF, 3FB8A8, E0A94A, F07BA3, 8C94A2).</span>
+  </div>
+</section>
+
+<section class="s" aria-labelledby="scomp">
+  <div class="sh"><h2 id="scomp">Components and states</h2><p>One button system (replacing 80 styles), one input, one tag. Radius 6 on controls, 4 on tags and keycaps, 8 on panels and nodes. Focus is always a 2 px Neel ring with 2 px offset. Disabled never uses opacity and always says why.</p></div>
+  <div class="panel wrap-x">
+    <div class="cgrid" style="min-width:860px">
+      <span></span><span class="h">Default</span><span class="h">Hover</span><span class="h">Focus-visible</span><span class="h">Pressed</span><span class="h">Disabled</span><span class="h">Busy</span>
+      <span class="rl">Primary</span><button class="btn b-primary">Publish v8…</button><button class="btn b-primary is-hover">Publish v8…</button><button class="btn b-primary is-focus">Publish v8…</button><button class="btn b-primary is-press">Publish v8…</button><button class="btn b-primary" disabled>Publish v8…</button><button class="btn b-primary"><span class="spin"></span>Publishing…</button>
+      <span class="rl">Secondary</span><button class="btn b-secondary">Test</button><button class="btn b-secondary is-hover">Test</button><button class="btn b-secondary is-focus">Test</button><button class="btn b-secondary is-press">Test</button><button class="btn b-secondary" disabled>Test</button><button class="btn b-secondary"><span class="spin"></span>Dialling…</button>
+      <span class="rl">Ghost</span><button class="btn b-ghost">Cancel</button><button class="btn b-ghost is-hover">Cancel</button><button class="btn b-ghost is-focus">Cancel</button><button class="btn b-ghost is-press">Cancel</button><button class="btn b-ghost" disabled>Cancel</button><span></span>
+      <span class="rl">Danger</span><button class="btn b-danger">Delete flow…</button><button class="btn b-danger is-hover">Delete flow…</button><button class="btn b-danger is-focus">Delete flow…</button><button class="btn b-danger is-press">Delete flow…</button><button class="btn b-danger" disabled>Delete flow…</button><button class="btn b-danger-solid">Delete for everyone</button>
+    </div>
+    <div class="stack" style="margin-top:20px;gap:12px;min-width:860px">
+      <button class="btn sm b-secondary">Small 28</button><button class="btn b-secondary">Default 32</button><button class="btn lg b-secondary">Large 40</button><button class="btn touch b-secondary">Touch 44</button>
+      <button class="btn icon b-secondary" aria-label="Filter"><svg class="i"><use href="#filter"/></svg></button>
+      <button class="btn b-primary"><svg class="i"><use href="#plus"/></svg>New lead<span class="kbd">N</span></button>
+      <span style="display:inline-flex;flex-direction:column;gap:4px"><button class="btn b-primary" disabled>Publish v8…</button><span class="note" style="margin:0;color:var(--danger-text)">Fix 1 error to publish</span></span>
+      <span class="tip">Add step <span class="kbd">A</span></span>
+    </div>
+    <p class="note">Solid danger appears only inside a confirmation dialog. Loading keeps the label and ends it with “…”. Hover never lifts or glows.</p>
+  </div>
+
+  <div class="panel" style="margin-top:16px">
+    <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:16px" class="inputs-g">
+      <div class="field"><label>Flow name</label><div class="input"><span class="ph">e.g. EMI reminder…</span></div><span class="help">Shown to your team only.</span></div>
+      <div class="field"><label>Flow name</label><div class="input is-focus">Site-visit qualifier</div><span class="help">Focus: accent border + 2 px ring.</span></div>
+      <div class="field"><label>Transfer to</label><div class="input is-error"><span class="pre">+91</span><span class="mono13">98 20</span></div><span class="err"><svg class="i s14"><use href="#alert"/></svg>Enter a 10-digit mobile number.</span></div>
+      <div class="field"><label style="color:var(--text-2)">Calling number</label><div class="input is-disabled"><span class="pre" style="color:var(--text-disabled)">+91</span>Not allocated</div><span class="help">Ask an admin to allocate one in Settings › Telephony.</span></div>
+      <div class="field"><label>Language</label><div class="input">Auto (HI / EN)<svg class="i s14 muted" style="margin-left:auto"><use href="#chev"/></svg></div><span class="help">Native select, themed for dark.</span></div>
+    </div>
+    <div class="stack" style="margin-top:20px;gap:20px">
+      <span class="stack" style="gap:8px"><span class="cb"></span><span class="cb on"></span><span class="cb mixed"></span><span class="cb is-focus on"></span><span class="note" style="margin:0">16 px box, 24 px hit</span></span>
+      <span class="stack" style="gap:8px"><span class="sw"></span><span class="sw on"></span><span class="note" style="margin:0">role=switch</span></span>
+      <span class="seg"><span class="on">Standard</span><span>Compact</span></span>
+      <span class="token">Status <b>Callback due</b><svg class="i s14"><use href="#x"/></svg></span>
+      <span class="stack" style="gap:4px"><span class="kbd">⌘</span><span class="kbd">K</span><span class="kbd">/</span><span class="kbd">J</span><span class="kbd">K</span><span class="kbd">?</span><span class="kbd">Esc</span></span>
+      <span class="var">{{lead_name}}</span>
+    </div>
+    <div class="tabs" style="margin-top:20px;max-width:520px"><span class="tab on">Configure</span><span class="tab">Test data</span><span class="tab">Issues <span class="c">2</span></span><span class="tab">History</span></div>
+  </div>
+
+  <div class="cols2" style="margin-top:16px">
+    <div class="panel">
+      <div class="lbl" style="margin-bottom:10px">Call states · one machine for Cockpit, Rep console, Reports and Test</div>
+      <div class="stack">
+        <span class="tag"><svg class="i"><use href="#phone"/></svg>Idle</span>
+        <span class="tag t-warning"><svg class="i"><use href="#phone"/></svg>Dialling…</span>
+        <span class="tag t-warning"><svg class="i"><use href="#phone"/></svg>Ringing…</span>
+        <span class="tag t-success"><span class="dot live pulse"></span>Live</span>
+        <span class="tag"><svg class="i"><use href="#clock"/></svg>Wrap-up</span>
+        <span class="tag"><svg class="i"><use href="#check"/></svg>Ended</span>
+        <span class="tag"><svg class="i"><use href="#x"/></svg>No answer</span>
+        <span class="tag t-danger"><svg class="i"><use href="#alert"/></svg>Failed</span>
+      </div>
+      <div class="lbl" style="margin:16px 0 10px">Lead status</div>
+      <div class="stack"><span class="tag">New</span><span class="tag">Contacted</span><span class="tag t-warning"><svg class="i"><use href="#clock"/></svg>Callback due</span><span class="tag t-success">Interested</span><span class="tag t-accent">Converted</span><span class="tag t-quiet" style="border-color:var(--border)">Not interested</span></div>
+    </div>
+    <div class="panel">
+      <div class="lbl" style="margin-bottom:10px">Save and publish states · Flow Designer header</div>
+      <div class="stack">
+        <span class="saved"><svg class="i s14"><use href="#check"/></svg>Saved 11:24</span>
+        <span class="saved" style="color:var(--warning-text)"><span class="dot"></span>Unsaved changes</span>
+        <span class="saved"><span class="spin" style="width:12px;height:12px"></span>Saving…</span>
+        <span class="saved" style="color:var(--danger-text)"><svg class="i s14"><use href="#alert"/></svg>Couldn’t save · <u>Retry</u></span>
+      </div>
+      <div class="stack" style="margin-top:12px">
+        <span class="tag t-success"><span class="dot live"></span>Live v7</span>
+        <span class="tag">Draft · 3 changes</span>
+        <span class="tag">Not published yet</span>
+        <span class="tag t-warning"><svg class="i"><use href="#alert"/></svg>1 warning</span>
+        <span class="tag t-danger"><svg class="i"><use href="#alert"/></svg>2 errors</span>
+        <span class="tag"><svg class="i"><use href="#ok"/></svg>No issues</span>
+      </div>
+      <p class="note">There is no permanent “validated” pill: the issues chip is recomputed on every change (F-FLOW-004).</p>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-top:16px;padding:16px">
+    <div class="lbl" style="margin-bottom:10px">Status line states · replaces the wallet banner and the fake “SYS: ONLINE” readout</div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="statusline" style="border-radius:6px;height:28px"><span class="it"><span class="dot live"></span>Live flow <b>Site-visit qualifier v7</b></span><span class="it"><span class="mono">+91 80 •••• 2210</span> ready</span><span class="it">Wallet <b class="num">₹2,340.50</b></span><span class="it r"><span class="kbd">?</span> Shortcuts</span></div>
+      <div class="statusline" style="border-radius:6px;height:28px"><span class="it"><span class="dot live"></span>Live flow <b>Site-visit qualifier v7</b></span><span class="it warn"><svg class="i s14"><use href="#alert"/></svg>Wallet <b class="num" style="color:inherit">₹42.10</b> · about 10 calls left</span><span class="it" style="color:var(--sl-strong);text-decoration:underline">Top up in Billing</span><span class="it r"><span class="kbd">?</span> Shortcuts</span></div>
+      <div class="statusline" style="border-radius:6px;height:28px"><span class="it"><span class="dot" style="background:#8C94A2"></span>No live flow</span><span class="it warn"><svg class="i s14"><use href="#alert"/></svg>No calling number · calls can’t be placed</span><span class="it" style="color:var(--sl-strong);text-decoration:underline">Finish setup (2 of 4)</span><span class="it r"><span class="kbd">?</span> Shortcuts</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="s" aria-labelledby="sbp">
+  <div class="sh"><h2 id="sbp">Breakpoints</h2><p>Each range is designed, not shrunk. Navigation always reaches all 12 sections.</p></div>
+  <div class="bp">
+    <div class="box"><h5>Desktop · 1440+</h5><div class="sk" style="grid-template-columns:22% 1fr 26%;grid-template-rows:1fr 10px"><i style="border-right-width:1px"></i><i></i><i style="border-left-width:1px"></i><i style="grid-column:1/-1;background:var(--sl-bg)"></i></div><p>232 px labelled sidebar, docked 320 px inspector, status line. Tables show all columns; Compact density available.</p></div>
+    <div class="box"><h5>Laptop · 1024–1439</h5><div class="sk" style="grid-template-columns:7% 1fr;grid-template-rows:1fr 10px"><i style="border-right-width:1px"></i><i></i><i style="grid-column:1/-1;background:var(--sl-bg)"></i></div><p>56 px rail with tooltips; <span class="kbd">[</span> expands it as an overlay. Below 1280 the inspector overlays the canvas; the minimap hides.</p></div>
+    <div class="box"><h5>Tablet · 768–1023</h5><div class="sk" style="grid-template-rows:16px 1fr"><i style="border-bottom-width:1px"></i><i></i></div><p>Top bar with menu sheet (overlays, never pushes). One pane plus slide-over detail sheets. Flows open as outline plus read-only canvas and Test.</p></div>
+    <div class="box"><h5>Mobile · 320–767</h5><div class="sk" style="grid-template-rows:14px 1fr 16px;width:56%;margin-left:auto;margin-right:auto"><i style="border-bottom-width:1px"></i><i></i><i style="border-top-width:1px"></i></div><p>Top bar with status chip; bottom tabs Cockpit, Leads, Reports, Flows, More. Tables become two-line lists; inputs 16 px; 44 px targets.</p></div>
+  </div>
+</section>
+
+<footer style="margin-top:64px;padding-top:16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text-3)">
+  <span>Switchboard · Vaani Labs redesign direction · reference specimen, all data fictional</span>
+  <span>Spec: spec/directions/operator.md · Evidence: audit/consolidated</span>
+</footer>
+</div>
+</body>
+</html>

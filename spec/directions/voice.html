@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bolchaal · Vaani Labs direction</title>
+<meta name="description" content="Voice-native identity direction for the Vaani Labs redesign: type, colour, components and three product screens.">
+<meta name="theme-color" content="#fbf9f6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0f0e0c" media="(prefers-color-scheme: dark)">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anek+Latin:wdth,wght@75..125,400..700&family=Anek+Devanagari:wdth,wght@75..125,400..700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anek+Tamil:wght@500;600&family=Anek+Telugu:wght@500;600&family=Anek+Bangla:wght@500;600&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC" rel="stylesheet">
+<style>
+/* ============ 1. TOKENS ============ */
+:root{
+  color-scheme: light dark;
+  --font-ui: "Hanken Grotesk","Anek Devanagari","Anek Tamil","Anek Telugu","Anek Bangla",system-ui,sans-serif;
+  --font-display: "Anek Latin","Anek Devanagari","Hanken Grotesk",system-ui,sans-serif;
+  --font-mono: "JetBrains Mono",ui-monospace,"Cascadia Mono",monospace;
+  --display-stretch: 112%;
+
+  --canvas:#fbf9f6; --surface:#ffffff; --surface-2:#f4f2ef; --surface-3:#ece9e5;
+  --border:#e5e1dd; --border-strong:#c1bdb8; --border-control:#928e89;
+  --text:#1c1915; --text-2:#504c48; --text-3:#6d6a65; --text-disabled:#a7a4a0;
+  --accent:#006c85; --accent-hover:#005b71; --accent-soft:#e0f4f9; --accent-text:#006077; --accent-border:#a0cdd9; --on-accent:#ffffff;
+  --success:#1a763f; --success-soft:#e0f7e5; --success-text:#0a562b;
+  --warning:#e4a339; --warning-soft:#fff1d1; --warning-text:#7d460b;
+  --danger:#b6322d; --danger-soft:#ffeae8; --danger-text:#9e2320; --on-danger:#ffffff;
+  --jamun:#79466f; --jamun-soft:#f9ebf6; --ink-tile:#2c2823; --on-ink:#fbf9f6;
+  --lane-agent:var(--accent); --lane-human:#8a8580; --edge:#928e89; --dot:#d6d2cd;
+  --c1:#0084a4; --c2:#c48225; --c3:#a2568a; --c4:#548436; --c5:#ae593a; --c6:#596fbb;
+
+  --e1: 0 1px 2px rgba(44,40,35,.06);
+  --e2: 0 1px 1px rgba(44,40,35,.03), 0 4px 10px -2px rgba(44,40,35,.08);
+  --e3: 0 1px 1px rgba(44,40,35,.03), 0 8px 16px -4px rgba(44,40,35,.09), 0 24px 40px -8px rgba(44,40,35,.12);
+  --r-xs:4px; --r-sm:6px; --r-md:8px; --r-lg:12px; --r-xl:16px;
+  --dur-1:120ms; --dur-2:180ms; --dur-3:240ms; --ease-out:cubic-bezier(.16,1,.3,1);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --canvas:#0f0e0c; --surface:#171614; --surface-2:#201e1b; --surface-3:#2a2724;
+    --border:#2c2a26; --border-strong:#403d39; --border-control:#6c6863;
+    --text:#f2f0ed; --text-2:#c1bdb8; --text-3:#9f9b95; --text-disabled:#605d5a;
+    --accent:#65bcd3; --accent-hover:#7bd3e9; --accent-soft:#0e2d36; --accent-text:#74cde2; --accent-border:#205563; --on-accent:#04191f;
+    --success:#63ca84; --success-soft:#172c1d; --success-text:#86db9d;
+    --warning:#ebb353; --warning-soft:#342611; --warning-text:#f4c677;
+    --danger:#ed756e; --danger-soft:#3e1e1c; --danger-text:#fb9890; --on-danger:#1a0a08;
+    --jamun:#cf95c1; --jamun-soft:#32232f; --ink-tile:#403c37; --on-ink:#f2f0ed;
+    --lane-human:#847f7a; --edge:#6c6863; --dot:#2f2c29;
+    --c1:#49bbda; --c2:#d79e59; --c3:#d98fc1; --c4:#8cbb73; --c5:#e69275; --c6:#90a7f1;
+    --e1: 0 0 0 transparent; --e2: 0 0 0 transparent; --e3: 0 16px 40px -8px rgba(0,0,0,.5);
+  }
+}
+
+/* ============ 2. BASE ============ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--canvas);color:var(--text);font:400 14px/20px var(--font-ui);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+h1,h2,h3,h4,p{margin:0}
+svg.i{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+svg.i.s14{width:14px;height:14px} svg.i.s20{width:20px;height:20px} svg.i.s12{width:12px;height:12px}
+.mono{font-family:var(--font-mono);font-size:12px;line-height:16px;font-variant-numeric:tabular-nums;letter-spacing:0}
+.tnum{font-variant-numeric:tabular-nums}
+.muted{color:var(--text-3)} .t2{color:var(--text-2)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[lang="hi"]{line-height:1.7}
+
+/* type roles */
+.display-xl{font:600 56px/60px var(--font-display);font-stretch:var(--display-stretch);letter-spacing:-.025em}
+.display{font:600 40px/44px var(--font-display);font-stretch:var(--display-stretch);letter-spacing:-.02em}
+.h1{font:600 24px/32px var(--font-display);font-stretch:var(--display-stretch);letter-spacing:-.012em}
+.kpi{font:600 28px/32px var(--font-display);font-stretch:var(--display-stretch);letter-spacing:-.01em;font-variant-numeric:lining-nums}
+.h2{font:600 18px/26px var(--font-ui);letter-spacing:-.01em}
+.h3{font:600 16px/24px var(--font-ui);letter-spacing:-.005em}
+.body-l{font:400 15px/24px var(--font-ui)}
+.body{font:400 14px/20px var(--font-ui)}
+.label{font:500 14px/20px var(--font-ui)}
+.small{font:400 13px/18px var(--font-ui)}
+.small-m{font:500 13px/18px var(--font-ui)}
+.caption{font:400 12px/16px var(--font-ui)}
+.caption-m{font:500 12px/16px var(--font-ui)}
+
+/* ============ 3. COMPONENTS ============ */
+.btn{--h:36px;display:inline-flex;align-items:center;justify-content:center;gap:8px;height:var(--h);padding:0 14px;border-radius:var(--r-sm);border:1px solid transparent;font:500 14px/20px var(--font-ui);color:var(--text);background:transparent;cursor:pointer;white-space:nowrap;transition:background-color var(--dur-1) var(--ease-out),border-color var(--dur-1) var(--ease-out),color var(--dur-1) var(--ease-out)}
+.btn.sm{--h:32px;padding:0 10px;font-size:13px;gap:6px} .btn.lg{--h:40px;padding:0 16px}
+.btn.icon{width:var(--h);padding:0}
+.btn-primary{background:var(--accent);color:var(--on-accent)}
+.btn-primary:hover,.btn-primary.is-hover{background:var(--accent-hover)}
+.btn-primary.is-active{background:var(--accent-hover);box-shadow:inset 0 1px 2px rgba(0,0,0,.25)}
+.btn-secondary{background:var(--surface);border-color:var(--border-strong);box-shadow:var(--e1)}
+.btn-secondary:hover,.btn-secondary.is-hover{background:var(--surface-2);border-color:var(--border-control)}
+.btn-secondary.is-active{background:var(--surface-3)}
+.btn-ghost{color:var(--text-2)}
+.btn-ghost:hover,.btn-ghost.is-hover{background:var(--surface-2);color:var(--text)}
+.btn-danger{background:var(--surface);color:var(--danger-text);border-color:var(--border-strong)}
+.btn-danger:hover,.btn-danger.is-hover{background:var(--danger-soft);border-color:var(--danger)}
+.btn-danger-solid{background:var(--danger);color:var(--on-danger)}
+.btn.is-focus{outline:2px solid var(--accent);outline-offset:2px}
+.btn[disabled],.btn.is-disabled{background:var(--surface-2);color:var(--text-disabled);border-color:var(--border);box-shadow:none;cursor:not-allowed}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid color-mix(in oklab,currentColor 25%,transparent);border-top-color:currentColor;flex:none}
+
+.field{display:grid;gap:6px;min-width:0}
+.field>label,.field .flabel{font:500 13px/18px var(--font-ui);color:var(--text-2)}
+.field .help{font:400 12px/16px var(--font-ui);color:var(--text-3)}
+.field .err{font:400 12px/16px var(--font-ui);color:var(--danger-text);display:flex;gap:6px;align-items:center}
+.input{height:36px;width:100%;display:flex;align-items:center;gap:8px;white-space:nowrap;overflow:hidden;padding:0 12px;border:1px solid var(--border-control);border-radius:var(--r-sm);background:var(--surface);color:var(--text);font:400 14px/20px var(--font-ui)}
+.input .ph{color:var(--text-3);overflow:hidden;text-overflow:ellipsis;min-width:0}
+.input.is-focus{border-color:var(--accent);outline:2px solid var(--accent);outline-offset:1px}
+.input.is-error{border-color:var(--danger)}
+.input.is-disabled{background:var(--surface-2);border-color:var(--border);color:var(--text-disabled)}
+.input .prefix{font-family:var(--font-mono);font-size:13px;color:var(--text-2);padding-right:10px;margin-right:2px;border-right:1px solid var(--border);height:100%;display:flex;align-items:center}
+.input .caret{display:inline-block;width:1px;height:16px;background:var(--text);margin-left:1px;vertical-align:middle}
+
+.badge{display:inline-flex;align-items:center;gap:4px;height:22px;padding:0 8px;border-radius:999px;font:500 12px/16px var(--font-ui);white-space:nowrap;background:var(--surface-3);color:var(--text-2)}
+.badge.accent{background:var(--accent-soft);color:var(--accent-text)}
+.badge.success{background:var(--success-soft);color:var(--success-text)}
+.badge.warning{background:var(--warning-soft);color:var(--warning-text)}
+.badge.danger{background:var(--danger-soft);color:var(--danger-text)}
+.badge.outline{background:transparent;box-shadow:inset 0 0 0 1px var(--border-strong)}
+
+.script{display:inline-flex;align-items:center;gap:6px;height:24px;padding:0 8px 0 3px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);font:500 12px/16px var(--font-ui);color:var(--text-2);white-space:nowrap}
+.script b{display:inline-grid;place-items:center;min-width:18px;height:18px;padding:0 3px;border-radius:var(--r-xs);background:var(--surface-3);color:var(--text);font:600 12px/1 var(--font-display);font-stretch:100%}
+.script.bare{padding:0;border:0;background:none;height:auto}
+.script.is-on{border-color:var(--accent-border);background:var(--accent-soft);color:var(--accent-text)}
+.script.is-on b{background:var(--surface);color:var(--accent-text)}
+
+.kbd{display:inline-grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border:1px solid var(--border-strong);border-bottom-width:2px;border-radius:var(--r-xs);background:var(--surface);font:500 11px/1 var(--font-mono);color:var(--text-2)}
+
+.seg{display:inline-flex;padding:2px;gap:2px;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--r-md)}
+.seg>span{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:var(--r-sm);font:500 13px/18px var(--font-ui);color:var(--text-2);white-space:nowrap}
+.seg>span .n{font-size:12px;color:var(--text-3);font-variant-numeric:tabular-nums}
+.seg>span.on{background:var(--surface);color:var(--text);box-shadow:var(--e1),0 0 0 1px var(--border)}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--border)}
+.tabs>span{padding:8px 0 10px;font:500 14px/20px var(--font-ui);color:var(--text-3);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs>span.on{color:var(--text);border-bottom-color:var(--accent)}
+.tabs>span.is-focus{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+
+.toggle{width:32px;height:20px;border-radius:999px;background:var(--border-control);position:relative;flex:none}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.toggle.on{background:var(--accent)} .toggle.on::after{left:14px}
+.cb{width:16px;height:16px;border-radius:var(--r-xs);border:1px solid var(--border-control);background:var(--surface);display:inline-grid;place-items:center;flex:none}
+.cb.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+
+/* ---- Signature 1: voice meter (only animates on real audio) ---- */
+.vm{display:inline-flex;align-items:center;gap:2px;height:12px}
+.vm i{display:block;width:2px;border-radius:1px;background:currentColor;height:6px}
+.vm i:nth-child(2){height:12px} .vm i:nth-child(3){height:8px}
+.vm.live i{animation:vm 900ms ease-in-out infinite alternate;transform-origin:center}
+.vm.live i:nth-child(2){animation-duration:700ms} .vm.live i:nth-child(3){animation-duration:1100ms}
+@keyframes vm{0%{transform:scaleY(.35)}100%{transform:scaleY(1)}}
+@media (prefers-reduced-motion: reduce){.vm.live i{animation:none}}
+
+/* ---- Signature 2: conversation line (two lanes: agent / human) ---- */
+.cl{position:relative;height:20px;border-radius:var(--r-xs);background:var(--surface-2)}
+.cl .ln{position:absolute;left:4px;right:4px;height:6px}
+.cl .ln.a{top:3px} .cl .ln.h{bottom:3px}
+.cl .ln i{position:absolute;top:0;bottom:0;border-radius:2px}
+.cl .ln.a i{background:var(--lane-agent)} .cl .ln.h i{background:var(--lane-human)}
+.cl .ln i.partial{opacity:.45}
+.cl .now{position:absolute;top:-3px;bottom:-3px;width:2px;border-radius:1px;background:var(--text)}
+.cl.mini{height:12px;width:96px;border-radius:3px}
+.cl.mini .ln{left:2px;right:2px;height:3px} .cl.mini .ln.a{top:2px} .cl.mini .ln.h{bottom:2px}
+
+/* ---- call state pill ---- */
+.cs{display:inline-flex;align-items:center;gap:8px;height:28px;padding:0 10px;border-radius:999px;font:500 13px/18px var(--font-ui);white-space:nowrap}
+.cs .t{font-family:var(--font-mono);font-size:12px;font-variant-numeric:tabular-nums}
+.cs.idle{background:var(--surface-3);color:var(--text-2)}
+.cs.ring{background:var(--warning-soft);color:var(--warning-text)}
+.cs.live{background:var(--success-soft);color:var(--success-text)}
+.cs.wrap{background:var(--accent-soft);color:var(--accent-text)}
+.cs.end{background:var(--surface-3);color:var(--text-2)}
+.cs.fail{background:var(--danger-soft);color:var(--danger-text)}
+</style>
+<style>
+/* ============ 4. SPECIMEN PAGE LAYOUT ============ */
+.page{max-width:1440px;margin:0 auto;padding:0 48px 96px}
+.top{display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:1px solid var(--border)}
+.brand{display:flex;align-items:center;gap:10px;font:600 17px/1 var(--font-display);font-stretch:var(--display-stretch);letter-spacing:-.01em}
+.mark{width:28px;height:28px;border-radius:7px;background:var(--ink-tile);color:var(--on-ink);display:grid;place-items:center}
+.mark .vm{height:12px}
+.brand small{font:500 12px/1 var(--font-ui);color:var(--text-3);letter-spacing:0;margin-left:2px}
+.hero{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:72px;padding:80px 0 48px;align-items:start}
+.hero .display-xl{font-size:84px;line-height:88px;letter-spacing:-.03em}
+.hstrip{margin-top:36px;display:flex;align-items:center;gap:14px;padding:12px 14px;border:1px solid var(--border);background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--e2);max-width:560px}
+.hstrip .cl{flex:1;min-width:120px}
+.eyebrow{font:500 13px/18px var(--font-ui);color:var(--accent-text);margin-bottom:14px;display:flex;gap:8px;align-items:center}
+.hero .display-xl{margin-bottom:18px}
+.hero .deva{font:500 36px/1.2 "Anek Devanagari",sans-serif;color:var(--text-3);margin-left:14px;letter-spacing:0;font-stretch:100%}
+.essence{font:400 19px/30px var(--font-ui);color:var(--text-2);max-width:40ch;text-wrap:pretty}
+.principles{list-style:none;padding:0;margin:0;display:grid;gap:0;border-top:1px solid var(--border)}
+.principles li{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:12px 0;border-bottom:1px solid var(--border)}
+.principles .n{font:500 12px/20px var(--font-mono);color:var(--text-3)}
+.principles b{font:600 14px/20px var(--font-ui);display:block}
+.principles span.d{font:400 13px/18px var(--font-ui);color:var(--text-2)}
+.sec{padding:64px 0 8px}
+.sec-h{display:grid;grid-template-columns:minmax(0,360px) minmax(0,1fr);gap:48px;margin-bottom:28px;align-items:start}
+.sec-h .h1{margin-bottom:4px}
+.sec-h p{font:400 15px/24px var(--font-ui);color:var(--text-2);max-width:72ch;text-wrap:pretty}
+.sub{font:600 14px/20px var(--font-ui);margin:32px 0 12px;display:flex;align-items:baseline;gap:12px}
+.sub .muted{font-weight:400;font-size:13px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
+.note{font:400 13px/18px var(--font-ui);color:var(--text-3);margin-top:10px}
+
+/* type specimen */
+.tspec{display:grid}
+.trow{display:grid;grid-template-columns:180px minmax(0,1fr) 300px;gap:24px;align-items:baseline;padding:14px 20px;border-bottom:1px solid var(--border)}
+.trow:last-child{border-bottom:0}
+.trow .role{font:500 13px/18px var(--font-ui);color:var(--text-2)}
+.trow .spec{font:400 12px/16px var(--font-mono);color:var(--text-3)}
+.trow .sample{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.fam{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.fam .card{padding:16px 18px}
+.fam .big{font-size:40px;line-height:48px;margin:6px 0 8px;color:var(--text)}
+.fam p{font:400 13px/18px var(--font-ui);color:var(--text-2)}
+
+/* palette */
+.pal{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.pal .theme{border-radius:var(--r-lg);padding:18px;border:1px solid}
+.pal .theme.lt{background:#fbf9f6;border-color:#e5e1dd;color:#1c1915}
+.pal .theme.dk{background:#0f0e0c;border-color:#2c2a26;color:#f2f0ed}
+.pal .theme h4{font:600 14px/20px var(--font-ui);margin-bottom:12px;display:flex;justify-content:space-between}
+.pal .theme h4 span{font-weight:400;font-size:12px;opacity:.7}
+.sw{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:10px}
+.sw>div{border-radius:8px;overflow:hidden;font:400 11px/14px var(--font-mono)}
+.sw .chip{height:44px;display:flex;align-items:flex-end;padding:5px 6px;font:500 11px/1 var(--font-mono)}
+.sw .meta{padding:6px 2px 0}
+.sw .meta b{display:block;font:500 11px/14px var(--font-ui)}
+.lt .sw .meta{color:#504c48} .dk .sw .meta{color:#c1bdb8}
+.lt .sw .meta b{color:#1c1915} .dk .sw .meta b{color:#f2f0ed}
+.statepal{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.statepal .card{padding:14px 16px;display:grid;gap:10px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* components board */
+.board{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:16px}
+.board>.card{padding:18px 20px}
+.board h4{font:600 14px/20px var(--font-ui);margin-bottom:4px}
+.board .hint{font:400 12px/16px var(--font-ui);color:var(--text-3);margin-bottom:14px}
+.states{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px 12px;align-items:center}
+.states .st{font:400 12px/16px var(--font-ui);color:var(--text-3)}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}
+.sig{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.sig .card{padding:20px}
+.sig .num{font:500 12px/16px var(--font-mono);color:var(--text-3)}
+.sig h4{font:600 16px/24px var(--font-ui);margin:2px 0 6px}
+.sig p{font:400 13px/20px var(--font-ui);color:var(--text-2)}
+.sig .demo{margin:18px 0 16px;padding:16px;border-radius:var(--r-md);background:var(--canvas);border:1px solid var(--border)}
+.sig ul{margin:10px 0 0;padding-left:16px;font:400 13px/20px var(--font-ui);color:var(--text-2)}
+
+/* ============ 5. MINI SCREENS ============ */
+.screen-cap{display:flex;justify-content:space-between;align-items:baseline;margin:40px 0 12px;gap:24px}
+.screen-cap h3{font:600 16px/24px var(--font-ui)}
+.screen-cap p{font:400 13px/18px var(--font-ui);color:var(--text-3);max-width:80ch;text-align:right}
+.screen{border:1px solid var(--border-strong);border-radius:var(--r-lg);background:var(--canvas);overflow:hidden;box-shadow:var(--e3);position:relative}
+
+/* A. app shell */
+.shell{display:grid;grid-template-columns:232px minmax(0,1fr);height:700px}
+.side{display:flex;flex-direction:column;padding:12px 10px;gap:2px;min-height:0}
+.side .org{display:flex;align-items:center;gap:10px;padding:6px 8px 12px}
+.side .org .nm{font:600 14px/18px var(--font-ui)}
+.side .org .sub2{font:400 12px/16px var(--font-ui);color:var(--text-3)}
+.side .search{display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface);color:var(--text-3);font:400 13px/18px var(--font-ui);margin-bottom:10px}
+.side .search .kbd{margin-left:auto}
+.side .grp{font:500 12px/16px var(--font-ui);color:var(--text-3);padding:12px 8px 4px}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:var(--r-sm);font:500 14px/20px var(--font-ui);color:var(--text-2)}
+.nav svg{color:var(--text-3)}
+.nav.on{background:var(--surface);color:var(--text);box-shadow:var(--e1),0 0 0 1px var(--border)}
+.nav.on svg{color:var(--accent)}
+.nav .aux{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:500 12px/16px var(--font-ui);color:var(--success-text)}
+.side .foot{margin-top:auto;display:grid;gap:8px}
+.wallet{border:1px solid var(--border);background:var(--surface);border-radius:var(--r-md);padding:10px 12px;display:grid;gap:4px}
+.wallet .l1{display:flex;justify-content:space-between;align-items:center;font:500 12px/16px var(--font-ui);color:var(--text-3)}
+.wallet .amt{font:600 18px/24px var(--font-display);font-stretch:var(--display-stretch)}
+.wallet a{font:500 13px/18px var(--font-ui);color:var(--accent-text);text-decoration:none}
+.me{display:flex;align-items:center;gap:10px;padding:6px 8px}
+.av{width:28px;height:28px;border-radius:50%;background:var(--surface-3);color:var(--text-2);display:grid;place-items:center;font:600 11px/1 var(--font-ui);flex:none}
+.av.sm{width:24px;height:24px;font-size:10px}
+.main{background:var(--surface);border:1px solid var(--border);border-radius:10px;margin:8px 8px 8px 0;display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative}
+.phead{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 24px 14px}
+.phead .desc{font:400 13px/18px var(--font-ui);color:var(--text-3);margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:0 24px;border:1px solid var(--border);border-radius:var(--r-md)}
+.kpis>div{padding:12px 16px;border-left:1px solid var(--border)}
+.kpis>div:first-child{border-left:0}
+.kpis .k{font:500 12px/16px var(--font-ui);color:var(--text-3)}
+.kpis .v{display:flex;align-items:baseline;gap:8px;margin-top:4px}
+.kpis .d{font:500 12px/16px var(--font-ui);color:var(--success-text)}
+.tools{display:flex;align-items:center;gap:8px;padding:14px 24px 12px}
+.tools .input{width:260px;height:32px}
+.tools .sp{flex:1}
+.tbl{width:100%;border-collapse:separate;border-spacing:0;font:400 13px/18px var(--font-ui)}
+.tbl th{position:sticky;top:0;background:var(--surface);text-align:left;font:500 12px/16px var(--font-ui);color:var(--text-3);height:36px;padding:0 12px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{height:52px;padding:0 12px;border-bottom:1px solid var(--border);white-space:nowrap;vertical-align:middle}
+.tbl th:first-child,.tbl td:first-child{padding-left:24px;width:44px}
+.tbl th.r,.tbl td.r{text-align:right}
+.tbl tr.hover td{background:var(--surface-2)}
+.tbl tr.sel td{background:color-mix(in oklab,var(--accent-soft) 70%,var(--surface))}
+.tbl tr.focus td:first-child{box-shadow:inset 2px 0 0 var(--accent)}
+.lead{display:flex;flex-direction:column;gap:1px}
+.lead .nm{font:500 14px/20px var(--font-ui);color:var(--text)}
+.lead .ph2{font:400 12px/16px var(--font-mono);color:var(--text-3)}
+.score{display:inline-flex;align-items:center;gap:8px;font-variant-numeric:tabular-nums}
+.score .bar{width:44px;height:4px;border-radius:2px;background:var(--surface-3);overflow:hidden}
+.score .bar i{display:block;height:100%;background:var(--accent);border-radius:2px}
+.last{display:flex;align-items:center;gap:10px}
+.last .o{font:400 13px/18px var(--font-ui);color:var(--text-2)}
+.last .o small{display:block;font-size:12px;line-height:16px;color:var(--text-3)}
+.bulk{position:absolute;left:50%;transform:translateX(-50%);bottom:16px;display:flex;align-items:center;gap:14px;padding:8px 8px 8px 16px;background:var(--ink-tile);color:var(--on-ink);border-radius:var(--r-md);box-shadow:var(--e3);white-space:nowrap}
+.bulk .sep{width:1px;height:20px;background:rgba(255,255,255,.18)}
+.bulk .m{font:400 13px/18px var(--font-ui);opacity:.82;display:flex;align-items:center;gap:6px}
+.bulk .btn-primary{background:var(--on-ink);color:var(--ink-tile)}
+.bottomnav,.mcards,.mhead{display:none}
+</style>
+<style>
+/* B. flow designer */
+.fd{display:grid;grid-template-columns:216px minmax(0,1fr) 328px;grid-template-rows:52px 600px}
+.fbar{grid-column:1/-1;display:flex;align-items:center;gap:10px;padding:0 10px 0 12px;background:var(--surface);border-bottom:1px solid var(--border)}
+.fbar .fname{display:flex;align-items:center;gap:6px;font:600 14px/20px var(--font-ui);padding:0 8px;height:32px;border-radius:var(--r-sm)}
+.fbar .save{font:400 12px/16px var(--font-ui);color:var(--text-3);display:flex;align-items:center;gap:6px}
+.fbar .vr{width:1px;height:20px;background:var(--border)}
+.fbar .grow{flex:1}
+.pal2{background:var(--surface);border-right:1px solid var(--border);padding:12px 10px;display:flex;flex-direction:column;gap:2px;overflow:hidden}
+.pal2 .input{height:32px;margin-bottom:6px}
+.pal2 .g{display:flex;align-items:center;gap:8px;font:500 12px/16px var(--font-ui);color:var(--text-3);padding:10px 6px 4px}
+.pal2 .g .step{font:500 11px/1 var(--font-mono);color:var(--text-3);border:1px solid var(--border);border-radius:var(--r-xs);padding:2px 4px}
+.pi{display:flex;align-items:center;gap:10px;height:32px;padding:0 6px;border-radius:var(--r-sm);font:500 13px/18px var(--font-ui);color:var(--text)}
+.pi.hover{background:var(--surface-2)}
+.tile{width:24px;height:24px;border-radius:6px;display:grid;place-items:center;flex:none}
+.tile.sm{width:20px;height:20px;border-radius:5px}
+.tile.sm svg{width:12px;height:12px}
+.tile.trigger{background:var(--ink-tile);color:var(--on-ink)}
+.tile.logic{background:var(--jamun-soft);color:var(--jamun)}
+.tile.action{background:var(--accent-soft);color:var(--accent-text)}
+.tile.out-good{background:var(--success-soft);color:var(--success-text)}
+.tile.out-neutral{background:var(--surface-3);color:var(--text-2)}
+.tile.out-warn{background:var(--warning-soft);color:var(--warning-text)}
+.cv{position:relative;overflow:hidden;background-color:var(--canvas);background-image:radial-gradient(var(--dot) 1.2px,transparent 1.2px);background-size:20px 20px;background-position:10px 10px}
+.cv svg.edges{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.cv svg.edges path{fill:none;stroke:var(--edge);stroke-width:1.5}
+.cv svg.edges path.hl{stroke:var(--accent);stroke-width:2}
+.cv svg.edges path.dash{stroke-dasharray:4 4}
+.legend{position:absolute;top:12px;left:12px;display:flex;align-items:center;gap:6px;padding:4px 10px 4px 6px;background:var(--surface);border:1px solid var(--border);border-radius:999px;font:500 12px/16px var(--font-ui);color:var(--text-2);box-shadow:var(--e1)}
+.legend .arr{color:var(--text-3)}
+.node{position:absolute;width:236px;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--r-md);box-shadow:var(--e1)}
+.node .nh{display:flex;gap:10px;align-items:center;padding:10px 12px 0}
+.node .cat{font:500 12px/16px var(--font-ui);color:var(--text-3);display:block}
+.node .ttl{font:500 14px/20px var(--font-ui);color:var(--text);display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.node .nb{padding:6px 12px 10px 46px;font:400 13px/18px var(--font-ui);color:var(--text-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.node .nb .var{font-family:var(--font-mono);font-size:12px;color:var(--accent-text);background:var(--accent-soft);padding:0 3px;border-radius:3px}
+.node.cap{border-radius:999px;display:flex;align-items:center;gap:10px;padding:6px 18px 6px 6px;width:auto;min-width:188px}
+.node.cap .tile{width:32px;height:32px;border-radius:50%}
+.node.sel{outline:2px solid var(--accent);outline-offset:2px;box-shadow:var(--e2)}
+.node .in{position:absolute;top:-6px;left:50%;margin-left:-5px;width:10px;height:10px;border-radius:50%;background:var(--surface);border:1.5px solid var(--edge)}
+.node .out{position:absolute;bottom:-6px;left:50%;margin-left:-5px;width:10px;height:10px;border-radius:50%;background:var(--edge);border:2px solid var(--surface)}
+.node.sel .in{border-color:var(--accent)}
+.ports{display:flex;gap:6px;padding:2px 10px 10px;flex-wrap:nowrap}
+.port{position:relative;display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);font:500 12px/16px var(--font-ui);color:var(--text-2);white-space:nowrap}
+.port.hl{border-color:var(--accent-border);color:var(--accent-text);background:var(--accent-soft)}
+.port.open{border-style:dashed;border-color:var(--warning);color:var(--warning-text);background:var(--warning-soft)}
+.issue{position:absolute;top:-8px;right:-8px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--warning);color:#231a06;font:600 11px/18px var(--font-ui);text-align:center;box-shadow:0 0 0 2px var(--canvas)}
+.cvctl{position:absolute;left:12px;bottom:12px;display:flex;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--e1);height:32px}
+.cvctl span{display:grid;place-items:center;min-width:32px;height:30px;padding:0 8px;font:500 12px/1 var(--font-ui);color:var(--text-2);border-left:1px solid var(--border)}
+.cvctl span:first-child{border-left:0}
+.mini-map{position:absolute;right:12px;bottom:12px;width:148px;height:96px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);box-shadow:var(--e1);overflow:hidden}
+.mini-map i{position:absolute;background:var(--border-strong);border-radius:2px}
+.mini-map .vp{position:absolute;border:1.5px solid var(--accent);border-radius:3px}
+.insp{background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.insp .ih{display:flex;align-items:center;gap:10px;padding:14px 16px 12px;border-bottom:1px solid var(--border)}
+.insp .ib{padding:14px 16px;display:grid;gap:16px;overflow:hidden;flex:1;align-content:start}
+.insp .if{padding:10px 16px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.ta{min-height:72px;border:1px solid var(--border-control);border-radius:var(--r-sm);padding:8px 12px;font:400 14px/20px var(--font-ui);background:var(--surface)}
+.ans{display:grid;gap:6px}
+.ans .a{display:flex;align-items:center;gap:8px;height:32px;padding:0 8px 0 6px;border:1px solid var(--border);border-radius:var(--r-sm);font:400 13px/18px var(--font-ui);background:var(--surface)}
+.ans .a .grip{color:var(--text-disabled);font:600 12px/1 var(--font-mono);letter-spacing:-1px}
+.ans .a .to{margin-left:auto;font-size:12px;color:var(--text-3);display:flex;align-items:center;gap:4px}
+.ans .a.warn{border-color:var(--warning);background:var(--warning-soft)}
+.ans .a.warn .to{color:var(--warning-text)}
+.chiprow{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.fdo{display:none}
+
+/* C. cockpit */
+.ck{display:grid;grid-template-columns:minmax(0,1fr) 340px;min-height:620px}
+.ck .call{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;min-width:0}
+.ck .chd{display:flex;align-items:center;gap:14px;padding:16px 20px 14px;flex-wrap:wrap}
+.who .nm{font:600 16px/22px var(--font-ui)}
+.who .meta{display:flex;align-items:center;gap:8px;font:400 12px/16px var(--font-ui);color:var(--text-3)}
+.ck .chd .rt{margin-left:auto;display:flex;align-items:center;gap:8px}
+.ck .line{padding:0 20px 14px;border-bottom:1px solid var(--border)}
+.ck .line .lg{display:flex;gap:16px;margin-top:8px;font:400 12px/16px var(--font-ui);color:var(--text-3);align-items:center}
+.ck .line .lg i{display:inline-block;width:10px;height:4px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.ck .line .ticks{display:flex;justify-content:space-between;font:400 11px/14px var(--font-mono);color:var(--text-3);margin-top:6px}
+.nowat{display:flex;align-items:center;gap:8px;padding:10px 20px;border-bottom:1px solid var(--border);font:400 13px/18px var(--font-ui);color:var(--text-2);background:var(--canvas)}
+.nowat b{font-weight:500;color:var(--text)}
+.nowat a{margin-left:auto;color:var(--accent-text);text-decoration:none;font-weight:500}
+.tx{padding:6px 20px 16px;flex:1;display:flex;flex-direction:column;position:relative}
+.turn{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;padding:10px 0;border-bottom:1px solid var(--border)}
+.turn:last-child{border-bottom:0}
+.turn .tm{font:400 12px/24px var(--font-mono);color:var(--text-3);font-variant-numeric:tabular-nums}
+.turn .sp{display:flex;align-items:center;gap:8px;font:600 13px/20px var(--font-ui)}
+.turn.agent .sp{color:var(--accent-text)}
+.turn .sp .script b{width:auto}
+.turn .said{font:400 15px/24px var(--font-ui);color:var(--text);margin-top:2px;text-wrap:pretty}
+.turn .said[lang="hi"]{line-height:26px}
+.turn.partial .said{color:var(--text-3)}
+.turn .tag{font:400 12px/16px var(--font-ui);color:var(--text-3);margin-top:4px;display:flex;gap:6px;align-items:center}
+.jump{position:absolute;right:20px;bottom:14px}
+.ck .side2{background:var(--canvas);display:flex;flex-direction:column}
+.ck .side2 .blk{padding:16px 18px;border-bottom:1px solid var(--border)}
+.ck .side2 h5{font:600 13px/18px var(--font-ui);margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.ck .side2 h5 span{font-weight:400;color:var(--text-3);font-size:12px}
+.kv{display:grid;grid-template-columns:96px minmax(0,1fr);gap:8px 12px;font:400 13px/18px var(--font-ui)}
+.kv dt{color:var(--text-3)} .kv dd{margin:0;color:var(--text)}
+.kv dd.pend{color:var(--text-3)}
+.ck .ctrl{margin-top:auto;padding:14px 18px;display:grid;grid-template-columns:1fr 1fr;gap:8px;border-top:1px solid var(--border);background:var(--surface)}
+.ck .ctrl .full{grid-column:1/-1;display:flex;justify-content:space-between;font:400 12px/16px var(--font-ui);color:var(--text-3)}
+.sent{display:flex;align-items:center;gap:8px}
+.sent .bar{flex:1;height:4px;border-radius:2px;background:var(--surface-3);position:relative}
+.sent .bar i{position:absolute;left:0;top:0;bottom:0;border-radius:2px;background:var(--success)}
+
+/* ============ 6. RESPONSIVE ============ */
+@media (max-width:1279px){
+  .hero{grid-template-columns:1fr;gap:40px}
+  .fd{grid-template-columns:0 minmax(0,1fr) 300px}.pal2{display:none}
+  .board .c4,.board .c5,.board .c7,.board .c8{grid-column:span 6}
+}
+@media (max-width:1023px){
+  .page{padding:0 24px 72px}
+  .sec-h{grid-template-columns:1fr;gap:8px}
+  .shell{grid-template-columns:56px minmax(0,1fr)}
+  .side .org .nm,.side .org .sub2,.side .search span,.side .search .kbd,.side .grp,.nav .lbl,.nav .aux,.wallet,.me .nm{display:none}
+  .fd{grid-template-columns:minmax(0,1fr);grid-template-rows:52px 600px}.insp{display:none}
+  .ck{grid-template-columns:1fr}.fam{grid-template-columns:1fr 1fr}.statepal{grid-template-columns:1fr 1fr}
+  .board>.card{grid-column:span 12}.sig{grid-template-columns:1fr}
+  .trow{grid-template-columns:140px minmax(0,1fr)}.trow .spec{grid-column:2}
+}
+@media (max-width:767px){
+  .page{padding:0 16px 64px}
+  .top .row{display:none}
+  .hero{padding:40px 0 32px}
+  .display-xl,.hero .display-xl{font-size:48px;line-height:52px}
+  .hero .deva{font-size:26px}
+  .hstrip{flex-wrap:wrap}
+  .hero .deva{display:block;margin:6px 0 0}
+  .essence{font-size:17px;line-height:26px}
+  .sec{padding:48px 0 0}
+  .h1{font-size:22px;line-height:28px}
+  .screen-cap{flex-direction:column;gap:4px}.screen-cap p{text-align:left}
+  .trow{grid-template-columns:1fr;gap:4px;padding:12px 14px}.trow .spec{grid-column:1}
+  .trow .sample{white-space:normal}
+  .fam{grid-template-columns:1fr}
+  .pal{grid-template-columns:1fr}.sw{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .statepal{grid-template-columns:1fr}
+  .states{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .states .st.hdr{display:none}
+  /* shell -> phone: bottom bar, cards */
+  .shell{grid-template-columns:1fr;height:auto}
+  .side{display:none}
+  .main{margin:0;border:0;border-radius:0}
+  .mhead{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--surface)}
+  .phead{padding:16px}.phead .btn-secondary{display:none}
+  .kpis{grid-template-columns:1fr 1fr;margin:0 16px}.kpis>div:nth-child(3){border-left:0;border-top:1px solid var(--border)}.kpis>div:nth-child(4){border-top:1px solid var(--border)}
+  .tools{flex-wrap:wrap;padding:12px 16px}.tools .input{width:100%;height:40px}.tools .fbtn{display:none}
+  .tools .seg{overflow:hidden;max-width:100%}
+  .tbl,.bulk{display:none}
+  .mcards{display:grid;padding:0 16px 12px}
+  .mc{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;padding:14px 0;border-bottom:1px solid var(--border)}
+  .mc .r2{grid-column:1/-1;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .bottomnav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--border);background:var(--surface);padding:6px 4px calc(6px + env(safe-area-inset-bottom))}
+  .bottomnav span{display:grid;justify-items:center;gap:2px;font:500 11px/14px var(--font-ui);color:var(--text-3);padding:4px 0;min-height:44px;align-content:center}
+  .bottomnav span.on{color:var(--accent-text)}
+  /* flow -> read-only outline */
+  .fd{display:block}.fbar{height:auto;flex-wrap:wrap;padding:10px 12px;gap:8px}.fbar .hide-m{display:none}
+  .cv,.insp,.pal2{display:none}
+  .fdo{display:block;padding:12px 16px 16px;background:var(--surface)}
+  .ro{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border-radius:var(--r-md);background:var(--warning-soft);color:var(--warning-text);font:400 13px/18px var(--font-ui);margin-bottom:12px}
+  .ol{list-style:none;margin:0;padding:0}
+  .ol li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+  .ol li.ind{padding-left:22px}
+  .ol .cat{font:500 12px/16px var(--font-ui);color:var(--text-3)}
+  .ol .ttl{font:500 14px/20px var(--font-ui)}
+  /* cockpit */
+  .ck .chd{padding:14px 16px}.ck .chd .rt{margin-left:0;width:100%;flex-wrap:wrap}
+  .nowat .muted{display:none}.nowat a{white-space:nowrap}.nowat b{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .tools .seg{overflow-x:auto;scrollbar-width:none}
+  .ck .line,.tx{padding-left:16px;padding-right:16px}.nowat{padding:10px 16px}
+  .turn{grid-template-columns:1fr;gap:2px}.turn .tm{line-height:16px}
+  .ck .ctrl{position:sticky;bottom:0}
+  .hide-m{display:none !important}
+}
+
+/* patches */
+.cl{display:block}.cl.mini{display:inline-block;flex:none}
+.states{grid-template-columns:72px repeat(6,minmax(0,1fr))}
+.states>.btn{justify-self:start;max-width:100%}
+.c3{grid-column:span 3}
+@media (max-width:1279px){.board .c3{grid-column:span 6}}
+@media (max-width:767px){.states{grid-template-columns:repeat(3,minmax(0,1fr))}.states>.st:not(.hdr){grid-column:1/-1;margin-top:6px}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-phone-out" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/><path d="M16 2h6v6M22 2l-7 7"/></symbol>
+<symbol id="i-fork" viewBox="0 0 24 24"><circle cx="12" cy="18" r="2.5"/><circle cx="6" cy="6" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M18 8.5V10a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8.5M12 12v3.5"/></symbol>
+<symbol id="i-ask" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M9.5 8.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 2M12 14h.01"/></symbol>
+<symbol id="i-say" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 9h8M8 13h5"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-wa" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7l3 2.7"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-report" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-flow" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect x="13" y="13" width="8" height="8" rx="2"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m22 8-6 4 6 4V8Z"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/></symbol>
+<symbol id="i-tasks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="i-radio" viewBox="0 0 24 24"><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5M19.1 4.9C23 8.8 23 15.1 19.1 19"/><circle cx="12" cy="12" r="2"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="m7 4 13 8-13 8z"/></symbol>
+<symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.2-2.7a1.2 1.2 0 0 1 1.6 0C14.5 3.8 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-rec" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><circle cx="12" cy="12" r="3" fill="currentColor"/></symbol>
+<symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="13" height="13" x="9" y="9" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></symbol>
+<symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9.5"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></symbol>
+</svg>
+
+<div class="page">
+<header class="top">
+  <div class="brand"><span class="mark" aria-hidden="true"><span class="vm"><i></i><i></i><i></i></span></span>vaani<small>labs</small></div>
+  <div class="row"><span class="badge outline">Redesign direction</span><span class="badge accent">Voice-native identity</span></div>
+</header>
+
+<section class="hero">
+  <div>
+    <div class="eyebrow"><span class="vm" aria-hidden="true"><i></i><i></i><i></i></span>A design direction for Vaani Labs</div>
+    <h1 class="display-xl">Bolchaal<span class="deva" lang="hi">बोलचाल</span></h1>
+    <p class="essence">Conversation is the interface. A calm ink-on-khadi workspace where colour and motion belong to the voice: peacock marks what Vaani says and does, each call draws its own shape as it happens, and every language appears in its own script.</p>
+    <div class="hstrip" aria-label="Example: a live call in Hinglish"><span class="cs live"><span class="vm live"><i></i><i></i><i></i></span>Live <span class="t">01:27</span></span><span class="cl" aria-hidden="true"><span class="ln a"><i style="left:0;width:10%"></i><i style="left:22%;width:15%"></i><i style="left:47%;width:7%"></i><i style="left:62%;width:13%"></i><i style="left:86%;width:7%"></i></span><span class="ln h"><i style="left:11%;width:10%"></i><i style="left:38%;width:8%"></i><i style="left:55%;width:6%"></i><i style="left:76%;width:9%"></i><i class="partial" style="left:94%;width:5%"></i></span><span class="now" style="left:99%"></span></span><span class="script"><b lang="hi">अA</b>Hinglish</span></div>
+  </div>
+  <ol class="principles">
+    <li><span class="n">01</span><div><b>Only the voice moves</b><span class="d">Live colour and motion appear only while audio is flowing: a live call, a recording, a test run. Idle screens are still.</span></div></li>
+    <li><span class="n">02</span><div><b>Peacock means Vaani</b><span class="d">One accent for the agent's voice, primary actions, focus and selection. Never a gradient, never decoration.</span></div></li>
+    <li><span class="n">03</span><div><b>Speak India natively</b><span class="d">Scripts, lakh grouping, rupees and Hinglish are designed in, not translated in.</span></div></li>
+    <li><span class="n">04</span><div><b>Say only what is true</b><span class="d">Draft or live, saved or failing, valid or not: every status comes from real state or is not shown.</span></div></li>
+    <li><span class="n">05</span><div><b>Every call has a cost</b><span class="d">Anything that dials a real person shows who, which flow and roughly what it costs, then asks.</span></div></li>
+    <li><span class="n">06</span><div><b>Calm chrome, dense data</b><span class="d">Sentence case, one UI sans, mono only for tokens. Tables and transcripts get the density.</span></div></li>
+    <li><span class="n">07</span><div><b>Every hand reaches everything</b><span class="d">Keyboard, screen reader, touch and 200% zoom reach every task, including building a flow and reading a call.</span></div></li>
+  </ol>
+</section>
+
+<!-- TYPOGRAPHY -->
+<section class="sec" id="type">
+  <div class="sec-h"><div><h2 class="h1">Typography</h2><p class="small muted">Three families, strict roles</p></div>
+  <p>Anek, from Mumbai's Ek Type, is one superfamily drawn across Latin and ten Indian scripts, so a Hindi turn and an English turn share one voice. It is used wide and confident for titles and numerals only. Hanken Grotesk, already the marketing face, carries every control and table. JetBrains Mono is kept for tokens: numbers you dial, IDs, timers and variables.</p></div>
+  <div class="fam">
+    <div class="card"><span class="caption-m muted">Display · voice</span><div class="big" style="font-family:var(--font-display);font-stretch:112%;font-weight:600;letter-spacing:-.02em">Aa ₹</div><p>Anek Latin, width 112, weight 600. Page titles, KPI numerals, marketing display.</p></div>
+    <div class="card"><span class="caption-m muted">Interface</span><div class="big" style="font-weight:500">Aa 14</div><p>Hanken Grotesk 400, 500, 600. Everything at 18 px and below.</p></div>
+    <div class="card"><span class="caption-m muted">Indian scripts</span><div class="big" style="font-family:'Anek Devanagari',var(--font-ui);font-weight:500" lang="hi">अ क्ष <span lang="ta" style="font-family:'Anek Tamil'">த</span></div><p>Anek Devanagari, Tamil, Telugu, Bangla via unicode-range. Line-height 1.7.</p></div>
+    <div class="card"><span class="caption-m muted">Tokens</span><div class="big" style="font-family:var(--font-mono);font-size:32px">01:27</div><p>JetBrains Mono 400/500, tabular. Phone masks, IDs, timers, variables, code.</p></div>
+  </div>
+  <div class="card tspec" style="margin-top:12px">
+    <div class="trow"><span class="role">Display XL · marketing</span><span class="sample display-xl" style="font-size:44px;line-height:52px">The voice AI that speaks India</span><span class="spec">Anek 56/60 · 600 · wdth 112 · -2.5%</span></div>
+    <div class="trow"><span class="role">Page title (h1)</span><span class="sample h1">Leads</span><span class="spec">Anek 24/32 · 600 · wdth 112 · -1.2%</span></div>
+    <div class="trow"><span class="role">KPI numeral</span><span class="sample kpi">₹1,24,500</span><span class="spec">Anek 28/32 · 600 · lining, en-IN grouping</span></div>
+    <div class="trow"><span class="role">Section title (h2)</span><span class="sample h2">Captured so far</span><span class="spec">Hanken 18/26 · 600 · -1%</span></div>
+    <div class="trow"><span class="role">Panel title (h3)</span><span class="sample h3">Ask about the site visit</span><span class="spec">Hanken 16/24 · 600 · -0.5%</span></div>
+    <div class="trow"><span class="role">Transcript · reading</span><span class="sample body-l">Budget around 85 lakh, thoda flexible hai.</span><span class="spec">Hanken 15/24 · 400</span></div>
+    <div class="trow"><span class="role">Hindi turn</span><span class="sample body-l" lang="hi" style="line-height:26px">हाँ, बोलिए। पिछले हफ़्ते मैंने आपकी साइट देखी थी।</span><span class="spec">Anek Devanagari 15/26 · 400 · lang="hi"</span></div>
+    <div class="trow"><span class="role">Body (default)</span><span class="sample body">Calls use the published version. Edits here stay in your draft.</span><span class="spec">Hanken 14/20 · 400</span></div>
+    <div class="trow"><span class="role">Label · button</span><span class="sample label">Place test call</span><span class="spec">Hanken 14/20 · 500</span></div>
+    <div class="trow"><span class="role">Small · table cell</span><span class="sample small">Callback set for Sat, 11:00</span><span class="spec">Hanken 13/18 · 400 or 500</span></div>
+    <div class="trow"><span class="role">Caption · helper</span><span class="sample caption muted">Saved to draft 2 min ago</span><span class="spec">Hanken 12/16 · 400 or 500</span></div>
+    <div class="trow"><span class="role">Token</span><span class="sample mono">+91 ••••• •4821 · 00:01:27 · {{lead_name}}</span><span class="spec">JetBrains Mono 12/16 · 400 · tnum</span></div>
+  </div>
+  <p class="note">Rules: weights 400, 500, 600 only. Negative tracking only at 20 px and up, never positive. Uppercase only for acronyms as written (UPI, CRM, DND) and keycaps. Mono never for labels, headings or buttons. Numbers that change or are compared use tabular figures.</p>
+</section>
+
+<!-- COLOUR -->
+<section class="sec" id="colour">
+  <div class="sec-h"><div><h2 class="h1">Colour</h2><p class="small muted">Khadi neutrals, one peacock</p></div>
+  <p>Neutrals are a barely warm "khadi" ramp (OKLCH hue 75, chroma under 0.01): paper and ink, never beige. Peacock is the single accent and keeps its hue in both themes, fixing today's blue-to-violet swap. It stands for Vaani: the agent's voice lane, primary actions, focus and selection. Green, amber and red are reserved for real state. Ratios below are WCAG 2 contrast, measured.</p></div>
+  <div class="pal">
+    <div class="theme lt"><h4>Light <span>ratios against white unless noted</span></h4>
+      <div class="sw">
+        <div><div class="chip" style="background:#fbf9f6;box-shadow:inset 0 0 0 1px #e5e1dd"></div><div class="meta"><b>canvas</b>#fbf9f6</div></div>
+        <div><div class="chip" style="background:#ffffff;box-shadow:inset 0 0 0 1px #e5e1dd"></div><div class="meta"><b>surface</b>#ffffff</div></div>
+        <div><div class="chip" style="background:#f4f2ef"></div><div class="meta"><b>surface-2</b>#f4f2ef</div></div>
+        <div><div class="chip" style="background:#ece9e5"></div><div class="meta"><b>surface-3</b>#ece9e5</div></div>
+        <div><div class="chip" style="background:#e5e1dd"></div><div class="meta"><b>border</b>#e5e1dd · 1.3 deco</div></div>
+        <div><div class="chip" style="background:#928e89"></div><div class="meta"><b>border-control</b>#928e89 · 3.25</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#1c1915;color:#fff">Aa</div><div class="meta"><b>text</b>#1c1915 · 17.5</div></div>
+        <div><div class="chip" style="background:#504c48;color:#fff">Aa</div><div class="meta"><b>text-2</b>#504c48 · 8.5</div></div>
+        <div><div class="chip" style="background:#6d6a65;color:#fff">Aa</div><div class="meta"><b>text-3</b>#6d6a65 · 5.4 (4.8 on s-2)</div></div>
+        <div><div class="chip" style="background:#a7a4a0;color:#1c1915">Aa</div><div class="meta"><b>disabled</b>#a7a4a0 · 2.5 only</div></div>
+        <div><div class="chip" style="background:#006c85;color:#fff">Aa</div><div class="meta"><b>accent</b>#006c85 · white 6.0</div></div>
+        <div><div class="chip" style="background:#005b71;color:#fff">Aa</div><div class="meta"><b>accent-hover</b>#005b71 · 7.7</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#e0f4f9;color:#006077">Aa</div><div class="meta"><b>accent-soft</b>text #006077 · 6.3</div></div>
+        <div><div class="chip" style="background:#1a763f;color:#fff">Aa</div><div class="meta"><b>success</b>#1a763f · 5.7</div></div>
+        <div><div class="chip" style="background:#e0f7e5;color:#0a562b">Aa</div><div class="meta"><b>success-soft</b>#0a562b · 7.8</div></div>
+        <div><div class="chip" style="background:#e4a339;color:#231a06">Aa</div><div class="meta"><b>warning</b>#e4a339 · ink 7.9</div></div>
+        <div><div class="chip" style="background:#fff1d1;color:#7d460b">Aa</div><div class="meta"><b>warning-soft</b>#7d460b · 6.8</div></div>
+        <div><div class="chip" style="background:#b6322d;color:#fff">Aa</div><div class="meta"><b>danger</b>#b6322d · 6.0</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#ffeae8;color:#9e2320">Aa</div><div class="meta"><b>danger-soft</b>#9e2320 · 6.7</div></div>
+        <div><div class="chip" style="background:#f9ebf6;color:#79466f">Aa</div><div class="meta"><b>jamun · logic</b>#79466f · 6.3</div></div>
+        <div><div class="chip" style="background:#2c2823;color:#fbf9f6">Aa</div><div class="meta"><b>ink-tile · trigger</b>#2c2823 · 13.9</div></div>
+        <div><div class="chip" style="background:#8a8580"></div><div class="meta"><b>lane-human</b>#8a8580 · 3.3 on s-2</div></div>
+        <div><div class="chip" style="background:#928e89"></div><div class="meta"><b>edge</b>#928e89 · 3.1 on canvas</div></div>
+        <div><div class="chip" style="background:#fbf9f6;background-image:radial-gradient(#d6d2cd 1.2px,transparent 1.2px);background-size:8px 8px;box-shadow:inset 0 0 0 1px #e5e1dd"></div><div class="meta"><b>dot grid</b>#d6d2cd</div></div>
+      </div>
+    </div>
+    <div class="theme dk"><h4>Dark <span>ratios against canvas unless noted</span></h4>
+      <div class="sw">
+        <div><div class="chip" style="background:#0f0e0c;box-shadow:inset 0 0 0 1px #2c2a26"></div><div class="meta"><b>canvas</b>#0f0e0c</div></div>
+        <div><div class="chip" style="background:#171614;box-shadow:inset 0 0 0 1px #2c2a26"></div><div class="meta"><b>surface</b>#171614</div></div>
+        <div><div class="chip" style="background:#201e1b"></div><div class="meta"><b>surface-2</b>#201e1b</div></div>
+        <div><div class="chip" style="background:#2a2724"></div><div class="meta"><b>surface-3</b>#2a2724</div></div>
+        <div><div class="chip" style="background:#2c2a26;box-shadow:inset 0 0 0 1px #403d39"></div><div class="meta"><b>border</b>#2c2a26 · deco</div></div>
+        <div><div class="chip" style="background:#6c6863"></div><div class="meta"><b>border-control</b>#6c6863 · 3.3</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#f2f0ed;color:#0f0e0c">Aa</div><div class="meta"><b>text</b>#f2f0ed · 17.0</div></div>
+        <div><div class="chip" style="background:#c1bdb8;color:#0f0e0c">Aa</div><div class="meta"><b>text-2</b>#c1bdb8 · 10.3</div></div>
+        <div><div class="chip" style="background:#9f9b95;color:#0f0e0c">Aa</div><div class="meta"><b>text-3</b>#9f9b95 · 7.0 (6.5 surf)</div></div>
+        <div><div class="chip" style="background:#605d5a;color:#f2f0ed">Aa</div><div class="meta"><b>disabled</b>#605d5a · 3.0 only</div></div>
+        <div><div class="chip" style="background:#65bcd3;color:#04191f">Aa</div><div class="meta"><b>accent</b>#65bcd3 · 8.9, ink 8.3</div></div>
+        <div><div class="chip" style="background:#7bd3e9;color:#04191f">Aa</div><div class="meta"><b>accent-hover</b>#7bd3e9</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#0e2d36;color:#74cde2">Aa</div><div class="meta"><b>accent-soft</b>#74cde2 · 8.0</div></div>
+        <div><div class="chip" style="background:#63ca84;color:#04190c">Aa</div><div class="meta"><b>success</b>#63ca84 · 8.9</div></div>
+        <div><div class="chip" style="background:#172c1d;color:#86db9d">Aa</div><div class="meta"><b>success-soft</b>#86db9d · 8.9</div></div>
+        <div><div class="chip" style="background:#ebb353;color:#231a06">Aa</div><div class="meta"><b>warning</b>#ebb353 · ink 9.1</div></div>
+        <div><div class="chip" style="background:#342611;color:#f4c677">Aa</div><div class="meta"><b>warning-soft</b>#f4c677 · 9.2</div></div>
+        <div><div class="chip" style="background:#ed756e;color:#1a0a08">Aa</div><div class="meta"><b>danger</b>#ed756e · ink 6.8</div></div>
+      </div>
+      <div class="sw">
+        <div><div class="chip" style="background:#3e1e1c;color:#fb9890">Aa</div><div class="meta"><b>danger-soft</b>#fb9890 · 7.1</div></div>
+        <div><div class="chip" style="background:#32232f;color:#cf95c1">Aa</div><div class="meta"><b>jamun · logic</b>#cf95c1 · 6.2</div></div>
+        <div><div class="chip" style="background:#403c37;color:#f2f0ed">Aa</div><div class="meta"><b>ink-tile · trigger</b>#403c37 · 9.6</div></div>
+        <div><div class="chip" style="background:#847f7a"></div><div class="meta"><b>lane-human</b>#847f7a · 4.2 on s-2</div></div>
+        <div><div class="chip" style="background:#6c6863"></div><div class="meta"><b>edge</b>#6c6863 · 3.5</div></div>
+        <div><div class="chip" style="background:#0f0e0c;background-image:radial-gradient(#2f2c29 1.2px,transparent 1.2px);background-size:8px 8px;box-shadow:inset 0 0 0 1px #2c2a26"></div><div class="meta"><b>dot grid</b>#2f2c29</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="statepal" style="margin-top:16px">
+    <div class="card"><span class="small-m">Call states</span><div class="row"><span class="cs idle"><svg class="i s14"><use href="#i-phone"/></svg>Idle</span><span class="cs ring"><svg class="i s14"><use href="#i-phone-out"/></svg>Ringing</span><span class="cs live"><span class="vm live"><i></i><i></i><i></i></span>Live <span class="t">01:27</span></span><span class="cs wrap"><svg class="i s14"><use href="#i-edit"/></svg>Wrap-up</span><span class="cs end"><svg class="i s14"><use href="#i-check"/></svg>Ended</span><span class="cs fail"><svg class="i s14"><use href="#i-alert"/></svg>Failed</span></div><span class="caption muted">Each state: label, icon, colour and a polite live-region line.</span></div>
+    <div class="card"><span class="small-m">Speakers</span><div style="display:grid;gap:8px"><div class="row small"><i style="width:28px;height:6px;border-radius:2px;background:var(--lane-agent)"></i>Vaani (agent) · accent lane</div><div class="row small"><i style="width:28px;height:6px;border-radius:2px;background:var(--lane-human)"></i>Caller · neutral lane</div><div class="row small"><i style="width:28px;height:6px;border-radius:2px;background:var(--lane-agent);opacity:.45"></i>Partial, still speaking</div></div></div>
+    <div class="card"><span class="small-m">Flow categories · tile only</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><span class="row caption" style="gap:8px"><span class="tile trigger"><svg class="i s14"><use href="#i-phone-out"/></svg></span>Trigger</span><span class="row caption" style="gap:8px"><span class="tile logic"><svg class="i s14"><use href="#i-fork"/></svg></span>Logic</span><span class="row caption" style="gap:8px"><span class="tile action"><svg class="i s14"><use href="#i-say"/></svg></span>Action</span><span class="row caption" style="gap:8px"><span class="tile out-good"><svg class="i s14"><use href="#i-flag"/></svg></span>Outcome</span></div><span class="caption muted">Ink, jamun, peacock, then the outcome's own state colour.</span></div>
+    <div class="card"><span class="small-m">Charts · separate from chrome</span><div class="row" style="gap:4px"><i style="width:26px;height:20px;border-radius:4px;background:var(--c1)"></i><i style="width:26px;height:20px;border-radius:4px;background:var(--c2)"></i><i style="width:26px;height:20px;border-radius:4px;background:var(--c3)"></i><i style="width:26px;height:20px;border-radius:4px;background:var(--c4)"></i><i style="width:26px;height:20px;border-radius:4px;background:var(--c5)"></i><i style="width:26px;height:20px;border-radius:4px;background:var(--c6)"></i></div><div class="row" style="gap:0"><i style="flex:1;height:8px;background:#b1f4ff"></i><i style="flex:1;height:8px;background:#8bd0e5"></i><i style="flex:1;height:8px;background:#62aac0"></i><i style="flex:1;height:8px;background:#37869b"></i><i style="flex:1;height:8px;background:#006378"></i><i style="flex:1;height:8px;background:#00475c"></i></div><span class="caption muted">Peacock, marigold, jamun, leaf, clay, indigo. Sequential: peacock.</span></div>
+  </div>
+</section>
+
+<!-- SIGNATURE -->
+<section class="sec" id="signature">
+  <div class="sec-h"><div><h2 class="h1">Signature elements</h2><p class="small muted">Three, each carrying data</p></div>
+  <p>The identity lives in three small devices that only appear where they mean something. None is decorative: each encodes call state, conversation structure or language, and each replaces something the audit found noisy (the idle orb, decorative status dots, letter-glyph source badges, mono language codes).</p></div>
+  <div class="sig">
+    <div class="card"><span class="num">S1</span><h4>The conversation line</h4><p>Two thin lanes, agent above and caller below, drawn from diarised turns. It shows talk ratio, interruptions and silences at a glance, and grows only during a real call.</p>
+      <div class="demo"><div class="cl" role="img" aria-label="Conversation so far: Vaani 58 percent, caller 42 percent, 9 turns"><div class="ln a"><i style="left:0;width:9%"></i><i style="left:24%;width:14%"></i><i style="left:47%;width:7%"></i><i style="left:63%;width:12%"></i><i style="left:86%;width:6%"></i></div><div class="ln h"><i style="left:10%;width:12%"></i><i style="left:39%;width:7%"></i><i style="left:55%;width:7%"></i><i style="left:76%;width:9%"></i><i class="partial" style="left:93%;width:6%"></i></div><span class="now" style="left:99%"></span></div>
+      <div class="row" style="margin-top:12px;justify-content:space-between"><span class="cl mini" aria-hidden="true"><span class="ln a"><i style="left:0;width:20%"></i><i style="left:45%;width:25%"></i></span><span class="ln h"><i style="left:22%;width:20%"></i><i style="left:72%;width:26%"></i></span></span><span class="caption muted">Mini, 96 x 12, in tables</span></div></div>
+      <ul><li>Cockpit live card, with a now marker</li><li>Call Reports rows and the recording scrubber</li><li>Leads "Last call" column, Flow test panel</li></ul></div>
+    <div class="card"><span class="num">S2</span><h4>The voice meter</h4><p>Three bars, the brand's mark. Static at rest; it moves only when driven by real audio levels. It is the only live indicator in the product and replaces every decorative dot.</p>
+      <div class="demo row" style="gap:16px"><span class="cs live"><span class="vm live"><i></i><i></i><i></i></span>Live <span class="t">01:27</span></span><span class="row caption" style="gap:6px;color:var(--success-text)"><span class="vm live"><i></i><i></i><i></i></span>2 live</span><span class="mark"><span class="vm"><i></i><i></i><i></i></span></span></div>
+      <ul><li>Call state pill (Cockpit, Rep Console)</li><li>Sidebar count of live calls, meeting rooms</li><li>A node's "Running" chip during a test call</li><li>Static inside the logo mark</li></ul></div>
+    <div class="card"><span class="num">S3</span><h4>Script chips</h4><p>Languages are named in their own script: a glyph key plus the name. They are recognisable at a glance by any user, and they make code-switching (Hinglish) visible as a two-glyph chip.</p>
+      <div class="demo row"><span class="script"><b lang="hi">अ</b>Hindi</span><span class="script is-on"><b>A</b>English</span><span class="script"><b lang="hi">अA</b>Hinglish</span><span class="script"><b lang="ta" style="font-family:'Anek Tamil'">த</b>Tamil</span><span class="script"><b lang="te" style="font-family:'Anek Telugu'">తె</b>Telugu</span><span class="script"><b lang="bn" style="font-family:'Anek Bangla'">ব</b>Bengali</span></div>
+      <ul><li>Language filters and pickers, lead language</li><li>Per-turn tags in transcripts (with lang set)</li><li>Agent voice rows, flow and step language</li></ul></div>
+  </div>
+</section>
+
+<!-- COMPONENTS -->
+<section class="sec" id="components">
+  <div class="sec-h"><div><h2 class="h1">Components</h2><p class="small muted">One of each, every state</p></div>
+  <p>One button system replaces today's three (80 styles). Controls are 32, 36 or 40 px tall (44 px on touch), 6 px radius, labels 14/500 in sentence case. Focus is always a 2 px peacock ring with 2 px offset. Disabled controls say why nearby. Only one filled primary per region.</p></div>
+  <div class="board">
+    <div class="card c8"><h4>Buttons</h4><p class="hint">Primary, secondary, ghost, danger. Destructive fills only inside its confirmation.</p>
+      <div class="states">
+        <span></span><span class="st hdr">Default</span><span class="st hdr">Hover</span><span class="st hdr">Focus</span><span class="st hdr">Pressed</span><span class="st hdr">Disabled</span><span class="st hdr">Loading</span>
+        <span class="st">Primary</span><button class="btn btn-primary sm">Publish…</button><button class="btn btn-primary sm is-hover">Publish…</button><button class="btn btn-primary sm is-focus">Publish…</button><button class="btn btn-primary sm is-active">Publish…</button><button class="btn btn-primary sm" disabled>Publish…</button><button class="btn btn-primary sm"><span class="spin"></span>Publishing…</button>
+        <span class="st">Secondary</span><button class="btn btn-secondary sm">Test call</button><button class="btn btn-secondary sm is-hover">Test call</button><button class="btn btn-secondary sm is-focus">Test call</button><button class="btn btn-secondary sm is-active">Test call</button><button class="btn btn-secondary sm" disabled>Test call</button><button class="btn btn-secondary sm"><span class="spin"></span>Dialling…</button>
+        <span class="st">Ghost</span><button class="btn btn-ghost sm">Discard draft</button><button class="btn btn-ghost sm is-hover">Discard draft</button><button class="btn btn-ghost sm is-focus">Discard draft</button><button class="btn btn-ghost sm is-active" style="background:var(--surface-3)">Discard draft</button><button class="btn btn-ghost sm" disabled style="background:none">Discard draft</button><span></span>
+        <span class="st">Danger</span><button class="btn btn-danger sm">End call</button><button class="btn btn-danger sm is-hover">End call</button><button class="btn btn-danger sm is-focus">End call</button><button class="btn btn-danger-solid sm">Delete flow</button><button class="btn btn-danger sm" disabled>End call</button><button class="btn btn-danger sm"><span class="spin"></span>Ending…</button>
+      </div>
+      <div class="row" style="margin-top:16px;gap:12px"><button class="btn btn-primary lg"><svg class="i"><use href="#i-phone-out"/></svg>Place call</button><button class="btn btn-secondary"><svg class="i"><use href="#i-upload"/></svg>Import</button><button class="btn btn-secondary icon sm" aria-label="More actions"><svg class="i"><use href="#i-more"/></svg></button><span class="caption muted" style="max-width:34ch">40 px form primary, 36 px default, 32 px compact and icon (always named, with tooltip).</span></div>
+      <div class="row" style="margin-top:12px;gap:10px"><button class="btn btn-primary sm" disabled><svg class="i"><use href="#i-phone-out"/></svg>Place call</button><span class="caption" style="color:var(--warning-text);display:flex;gap:6px;align-items:center"><svg class="i s14"><use href="#i-wallet"/></svg>Wallet is ₹0.00. <a href="#" style="color:var(--accent-text);font-weight:500">Top up in Billing</a> to place calls.</span></div>
+    </div>
+    <div class="card c4"><h4>Inputs</h4><p class="hint">Label above (13/500), help or error below, 3:1 border, placeholder is an example ending in "…".</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 14px">
+        <div class="field"><label>Phone number</label><div class="input"><span class="prefix">+91</span><span class="ph mono" style="font-size:13px">98765 43210…</span></div><span class="help">Mobile or landline, 10 digits</span></div>
+        <div class="field"><label>Phone number</label><div class="input is-focus"><span class="prefix">+91</span><span class="mono" style="font-size:13px">98200 1<span class="caret"></span></span></div><span class="help">Focus: peacock border and ring</span></div>
+        <div class="field"><label>Transfer to</label><div class="input is-error"><span class="prefix">+91</span><span class="mono" style="font-size:13px">abc</span></div><span class="err"><svg class="i s14"><use href="#i-alert"/></svg>Enter a 10-digit number</span></div>
+        <div class="field"><label style="color:var(--text-3)">Calling number</label><div class="input is-disabled"><span class="mono" style="font-size:13px">+91 80•• ••4521</span></div><span class="help">Assigned by your admin</span></div>
+        <div class="field" style="grid-column:1/-1"><label>Flow</label><div class="input" style="justify-content:space-between"><span>Site-visit follow-up <span class="muted">· v6 · live</span></span><svg class="i"><use href="#i-down"/></svg></div></div>
+      </div>
+    </div>
+    <div class="card c4"><h4>Badges and status</h4><p class="hint">12/500 pill, icon when it is state. One badge per cell.</p>
+      <div style="display:grid;gap:10px">
+        <div class="row"><span class="badge outline">New</span><span class="badge accent">Interested</span><span class="badge warning"><svg class="i s12"><use href="#i-clock"/></svg>Callback due</span><span class="badge success"><svg class="i s12"><use href="#i-check"/></svg>Converted</span><span class="badge">Not interested</span></div>
+        <div class="row"><span class="badge success"><svg class="i s12"><use href="#i-smile"/></svg>Positive</span><span class="badge">Neutral</span><span class="badge danger"><svg class="i s12"><use href="#i-alert"/></svg>Negative</span><span class="badge danger"><svg class="i s12"><use href="#i-x"/></svg>Failed</span></div>
+        <div class="row"><span class="badge success"><svg class="i s12"><use href="#i-radio"/></svg>Live v6</span><span class="badge warning">Draft · 3 changes</span><span class="caption muted" style="display:inline-flex;gap:6px;align-items:center"><svg class="i s12"><use href="#i-check"/></svg>Saved 12:04</span></div>
+        <div class="row"><span class="caption muted" style="display:inline-flex;gap:6px;align-items:center"><span class="spin" style="width:12px;height:12px"></span>Saving…</span><span class="badge danger"><svg class="i s12"><use href="#i-alert"/></svg>Couldn't save · Retry</span></div>
+      </div>
+    </div>
+    <div class="card c4"><h4>Tabs, segments, keys</h4><p class="hint">Tabs for views, segments for filters. Selection lives in the URL.</p>
+      <div class="tabs" style="margin-bottom:14px"><span>Summary</span><span class="on">Transcript</span><span class="is-focus">Recording</span><span>Fields</span></div>
+      <div class="seg" style="margin-bottom:14px"><span class="on">All <span class="n">248</span></span><span>New <span class="n">112</span></span><span>Interested <span class="n">36</span></span></div>
+      <div class="row" style="gap:6px"><span class="kbd">⌘</span><span class="kbd">K</span><span class="caption muted" style="margin-right:8px">Search</span><span class="kbd">/</span><span class="caption muted" style="margin-right:8px">Filter</span><span class="kbd">?</span><span class="caption muted">Shortcuts</span></div>
+      <div class="row" style="margin-top:12px;gap:14px"><span class="row caption" style="gap:8px"><span class="toggle on"></span>Autopay</span><span class="row caption" style="gap:8px"><span class="toggle"></span>Record calls</span><span class="row caption" style="gap:8px"><span class="cb on"><svg class="i s12" style="stroke-width:2.5"><use href="#i-check"/></svg></span>Selected</span></div>
+    </div>
+    <div class="card c4"><h4>Paid action, confirmed</h4><p class="hint">Any action that dials a real person. No single-key calling.</p>
+      <div style="border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--e3);background:var(--surface);padding:16px">
+        <div class="h3" style="margin-bottom:10px">Call 2 leads now?</div>
+        <dl class="kv" style="grid-template-columns:104px 1fr;margin:0 0 14px"><dt>Flow</dt><dd>Site-visit follow-up · v6</dd><dt>Agent</dt><dd>Vaani · warm, <span class="script bare"><b lang="hi">अA</b></span> Hinglish</dd><dt>Calling hours</dt><dd style="color:var(--success-text)">Within 10:00 to 19:00</dd><dt>Estimated cost</dt><dd class="tnum">₹6 to ₹9 <span class="muted">of ₹142.50</span></dd></dl>
+        <div class="row" style="justify-content:flex-end"><button class="btn btn-ghost sm">Cancel</button><button class="btn btn-primary sm"><svg class="i s14"><use href="#i-phone-out"/></svg>Call 2 leads</button></div>
+      </div>
+      <div class="row" style="margin-top:14px;padding:8px 8px 8px 12px;background:var(--ink-tile);color:var(--on-ink);border-radius:var(--r-md);justify-content:space-between;box-shadow:var(--e2)"><span class="small">Deleted "Send brochure" and 2 connections</span><button class="btn sm" style="color:var(--on-ink);height:28px">Undo</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREENS -->
+<section class="sec" id="screens">
+  <div class="sec-h"><div><h2 class="h1">In the product</h2><p class="small muted">Plausible sample data, no real customers</p></div>
+  <p>Three working surfaces under this direction. The shell is identical on every page: grouped sidebar, one page header (title, one-line description, at most one primary), and content. Resize to a phone width: the sidebar becomes a five-item bottom bar with More, the table becomes cards, and the Flow Designer becomes a read-only outline.</p></div>
+
+  <div class="screen-cap"><h3>A · App shell and Leads</h3><p>Grouped navigation with labels, live-call count, wallet with a real Top up target, one KPI strip, sentence-case filters, a 52 px row table with conversation lines, and a bulk bar that states cost before calling.</p></div>
+  <div class="screen">
+    <div class="shell">
+      <nav class="side" aria-label="Main">
+        <div class="org"><span class="mark" aria-hidden="true"><span class="vm"><i></i><i></i><i></i></span></span><div><div class="nm">Nestwell Homes</div><div class="sub2">Vaani Labs workspace</div></div></div>
+        <div class="search"><svg class="i s14"><use href="#i-search"/></svg><span>Search or jump to</span><span class="kbd">⌘K</span></div>
+        <div class="grp">Operate</div>
+        <a class="nav"><svg class="i"><use href="#i-radio"/></svg><span class="lbl">Cockpit</span><span class="aux"><span class="vm live"><i></i><i></i><i></i></span>2 live</span></a>
+        <a class="nav"><svg class="i"><use href="#i-chat"/></svg><span class="lbl">Assistant</span></a>
+        <a class="nav"><svg class="i"><use href="#i-head"/></svg><span class="lbl">Rep console</span></a>
+        <a class="nav"><svg class="i"><use href="#i-video"/></svg><span class="lbl">Meetings</span></a>
+        <a class="nav"><svg class="i"><use href="#i-tasks"/></svg><span class="lbl">Personal agents</span></a>
+        <div class="grp">Build</div>
+        <a class="nav"><svg class="i"><use href="#i-flow"/></svg><span class="lbl">Flows</span></a>
+        <a class="nav"><svg class="i"><use href="#i-book"/></svg><span class="lbl">Knowledge</span></a>
+        <div class="grp">Data</div>
+        <a class="nav on" aria-current="page"><svg class="i"><use href="#i-users"/></svg><span class="lbl">Leads</span></a>
+        <a class="nav"><svg class="i"><use href="#i-report"/></svg><span class="lbl">Call reports</span></a>
+        <a class="nav"><svg class="i"><use href="#i-chart"/></svg><span class="lbl">Analytics</span></a>
+        <div class="grp">Account</div>
+        <a class="nav"><svg class="i"><use href="#i-wallet"/></svg><span class="lbl">Billing</span></a>
+        <a class="nav"><svg class="i"><use href="#i-sliders"/></svg><span class="lbl">Settings</span></a>
+        <div class="foot">
+          <div class="wallet"><div class="l1">Wallet <span class="badge warning" style="height:20px">Low</span></div><div class="amt tnum">₹142.50</div><a href="#">Top up in Billing</a></div>
+          <div class="me"><span class="av">IB</span><div class="nm"><div class="small-m">Ishita Bose</div><div class="caption muted">Admin</div></div></div>
+        </div>
+      </nav>
+      <main class="main">
+        <div class="mhead"><span class="brand"><span class="mark"><span class="vm"><i></i><i></i><i></i></span></span></span><div class="row"><span class="badge warning"><svg class="i s12"><use href="#i-wallet"/></svg>₹142.50</span><button class="btn btn-ghost icon sm" aria-label="Search"><svg class="i"><use href="#i-search"/></svg></button></div></div>
+        <div class="phead"><div><h1 class="h1">Leads</h1><p class="desc">248 leads · 21 callbacks due today</p></div><div class="row"><button class="btn btn-secondary"><svg class="i"><use href="#i-upload"/></svg>Import</button><button class="btn btn-primary"><svg class="i"><use href="#i-plus"/></svg>New lead</button></div></div>
+        <div class="kpis">
+          <div><div class="k">Open pipeline</div><div class="v"><span class="kpi">248</span></div></div>
+          <div><div class="k">Interested</div><div class="v"><span class="kpi">36</span><span class="d">+12 vs previous 7 days</span></div></div>
+          <div><div class="k">Site visits booked</div><div class="v"><span class="kpi">9</span></div></div>
+          <div><div class="k">Connect rate</div><div class="v"><span class="kpi">61%</span><span class="d" style="color:var(--text-3)">last 7 days</span></div></div>
+        </div>
+        <div class="tools">
+          <div class="input"><svg class="i s14" style="color:var(--text-3)"><use href="#i-search"/></svg><span class="ph">Search name, phone or city…</span><span class="kbd" style="margin-left:auto">/</span></div>
+          <div class="seg"><span class="on">All <span class="n">248</span></span><span>New <span class="n">112</span></span><span>Interested <span class="n">36</span></span><span>Callback <span class="n">21</span></span><span class="hide-m">Converted <span class="n">9</span></span></div>
+          <button class="btn btn-secondary sm fbtn"><span class="script bare"><b lang="hi">अ</b></span>Language<svg class="i s14"><use href="#i-down"/></svg></button>
+          <button class="btn btn-secondary sm fbtn">Source<svg class="i s14"><use href="#i-down"/></svg></button>
+          <span class="sp"></span>
+          <button class="btn btn-ghost sm fbtn">View: Follow-ups<svg class="i s14"><use href="#i-down"/></svg></button>
+        </div>
+        <table class="tbl">
+          <thead><tr><th><span class="cb"></span></th><th>Lead</th><th>Language</th><th>Status</th><th class="r">Interest</th><th>Last call</th><th>Next step</th><th></th></tr></thead>
+          <tbody>
+            <tr class="sel"><td><span class="cb on"><svg class="i s12" style="stroke-width:2.5"><use href="#i-check"/></svg></span></td><td><div class="lead"><span class="nm">Kabir Anand</span><span class="ph2">+91 ••••• •4821</span></div></td><td><span class="script"><b lang="hi">अA</b>Hinglish</span></td><td><span class="badge accent">Interested</span></td><td class="r"><span class="score"><span class="bar"><i style="width:82%"></i></span>82</span></td><td><div class="last"><span class="cl mini"><span class="ln a"><i style="left:0;width:18%"></i><i style="left:40%;width:22%"></i><i style="left:80%;width:12%"></i></span><span class="ln h"><i style="left:20%;width:18%"></i><i style="left:64%;width:14%"></i><i style="left:93%;width:6%"></i></span></span><span class="o">Visit requested<small>Today 11:42 · 1:27</small></span></div></td><td>Site visit, Sat 11:00</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Kabir Anand…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr class="sel"><td><span class="cb on"><svg class="i s12" style="stroke-width:2.5"><use href="#i-check"/></svg></span></td><td><div class="lead"><span class="nm">Meera Iyer</span><span class="ph2">+91 ••••• •3310</span></div></td><td><span class="script"><b lang="ta" style="font-family:'Anek Tamil'">த</b>Tamil</span></td><td><span class="badge warning"><svg class="i s12"><use href="#i-clock"/></svg>Callback due</span></td><td class="r"><span class="score"><span class="bar"><i style="width:64%"></i></span>64</span></td><td><div class="last"><span class="cl mini"><span class="ln a"><i style="left:0;width:30%"></i><i style="left:62%;width:20%"></i></span><span class="ln h"><i style="left:32%;width:28%"></i><i style="left:84%;width:14%"></i></span></span><span class="o">Asked to call back<small>Yesterday · 0:48</small></span></div></td><td>Call today, 17:30</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Meera Iyer…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr class="focus"><td><span class="cb"></span></td><td><div class="lead"><span class="nm">Sana Qureshi</span><span class="ph2">+91 ••••• •7702</span></div></td><td><span class="script"><b lang="hi">अ</b>Hindi</span></td><td><span class="badge outline">New</span></td><td class="r muted">Not scored</td><td><span class="muted">Not called yet</span></td><td>First call</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Sana Qureshi…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr><td><span class="cb"></span></td><td><div class="lead"><span class="nm">Vikram Rao</span><span class="ph2">+91 ••••• •1956</span></div></td><td><span class="script"><b>A</b>English</span></td><td><span class="badge success"><svg class="i s12"><use href="#i-check"/></svg>Converted</span></td><td class="r"><span class="score"><span class="bar"><i style="width:91%"></i></span>91</span></td><td><div class="last"><span class="cl mini"><span class="ln a"><i style="left:0;width:12%"></i><i style="left:30%;width:16%"></i><i style="left:60%;width:10%"></i><i style="left:84%;width:14%"></i></span><span class="ln h"><i style="left:14%;width:14%"></i><i style="left:48%;width:10%"></i><i style="left:72%;width:10%"></i></span></span><span class="o">Visit booked<small>22 Sep · 3:05</small></span></div></td><td class="muted">None</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Vikram Rao…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr class="hover"><td><span class="cb"></span></td><td><div class="lead"><span class="nm">Arnab Sen</span><span class="ph2">+91 ••••• •6627</span></div></td><td><span class="script"><b lang="bn" style="font-family:'Anek Bangla'">ব</b>Bengali</span></td><td><span class="badge">Not interested</span></td><td class="r"><span class="score"><span class="bar"><i style="width:18%"></i></span>18</span></td><td><div class="last"><span class="cl mini"><span class="ln a"><i style="left:0;width:40%"></i><i style="left:75%;width:15%"></i></span><span class="ln h"><i style="left:42%;width:30%"></i></span></span><span class="o">Declined<small>21 Sep · 0:34</small></span></div></td><td>Nurture in 30 days</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Arnab Sen…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr><td><span class="cb"></span></td><td><div class="lead"><span class="nm">Lakshmi Narayanan</span><span class="ph2">+91 ••••• •4410</span></div></td><td><span class="script"><b lang="te" style="font-family:'Anek Telugu'">తె</b>Telugu</span></td><td><span class="badge accent">Interested</span></td><td class="r"><span class="score"><span class="bar"><i style="width:70%"></i></span>70</span></td><td><div class="last"><span class="cl mini"><span class="ln a"><i style="left:0;width:14%"></i><i style="left:36%;width:18%"></i><i style="left:74%;width:16%"></i></span><span class="ln h"><i style="left:16%;width:18%"></i><i style="left:56%;width:16%"></i></span></span><span class="o">Wants brochure<small>21 Sep · 2:12</small></span></div></td><td>Brochure sent on WhatsApp</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Lakshmi Narayanan…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+            <tr><td><span class="cb"></span></td><td><div class="lead"><span class="nm">Rohan D'Souza</span><span class="ph2">+91 ••••• •9083</span></div></td><td><span class="script"><b>A</b>English</span></td><td><span class="badge outline">Contacted</span></td><td class="r"><span class="score"><span class="bar"><i style="width:45%"></i></span>45</span></td><td><span class="o" style="color:var(--text-2)">No answer<small class="muted" style="display:block;font-size:12px">20 Sep</small></span></td><td>Retry tomorrow, 10:00</td><td class="r"><button class="btn btn-ghost icon sm" aria-label="Call Rohan D'Souza…"><svg class="i"><use href="#i-phone"/></svg></button></td></tr>
+          </tbody>
+        </table>
+        <div class="bulk" role="region" aria-label="Bulk actions"><span class="small-m">2 selected</span><span class="sep"></span><span class="m"><svg class="i s14"><use href="#i-flow"/></svg>Site-visit follow-up v6</span><span class="m"><svg class="i s14"><use href="#i-wallet"/></svg>Est. ₹6 to ₹9</span><span class="m"><svg class="i s14"><use href="#i-clock"/></svg>Within calling hours</span><button class="btn sm" style="color:var(--on-ink)">Clear</button><button class="btn btn-primary sm"><svg class="i s14"><use href="#i-phone-out"/></svg>Review and call…</button></div>
+        <div class="mcards">
+          <div class="mc"><div class="lead"><span class="nm">Kabir Anand</span><span class="ph2">+91 ••••• •4821</span></div><span class="badge accent">Interested</span><div class="r2"><span class="script"><b lang="hi">अA</b>Hinglish</span><span class="cl mini"><span class="ln a"><i style="left:0;width:18%"></i><i style="left:40%;width:22%"></i></span><span class="ln h"><i style="left:20%;width:18%"></i><i style="left:64%;width:14%"></i></span></span><span class="caption muted">Visit requested · 1:27</span></div><div class="r2 small">Next: Site visit, Sat 11:00</div></div>
+          <div class="mc"><div class="lead"><span class="nm">Meera Iyer</span><span class="ph2">+91 ••••• •3310</span></div><span class="badge warning">Callback due</span><div class="r2"><span class="script"><b lang="ta" style="font-family:'Anek Tamil'">த</b>Tamil</span><span class="caption muted">Asked to call back · 0:48</span></div><div class="r2 small">Next: Call today, 17:30</div></div>
+          <div class="mc"><div class="lead"><span class="nm">Sana Qureshi</span><span class="ph2">+91 ••••• •7702</span></div><span class="badge outline">New</span><div class="r2"><span class="script"><b lang="hi">अ</b>Hindi</span><span class="caption muted">Not called yet</span></div></div>
+        </div>
+        <nav class="bottomnav" aria-label="Main"><span><svg class="i s20"><use href="#i-radio"/></svg>Cockpit</span><span class="on"><svg class="i s20"><use href="#i-users"/></svg>Leads</span><span><svg class="i s20"><use href="#i-report"/></svg>Reports</span><span><svg class="i s20"><use href="#i-chat"/></svg>Assistant</span><span><svg class="i s20"><use href="#i-menu"/></svg>More</span></nav>
+      </main>
+    </div>
+  </div>
+
+  <div class="screen-cap"><h3>B · Flow Designer</h3><p>Trigger, logic, action, outcome as a shape grammar: capsules enter and exit, rectangles do work, category colour lives only in the tile. Edits go to a draft; calls keep using the live version until you publish.</p></div>
+  <div class="screen">
+    <div class="fd">
+      <div class="fbar">
+        <span class="fname"><svg class="i" style="color:var(--text-3)"><use href="#i-flow"/></svg>Site-visit follow-up<svg class="i s14" style="color:var(--text-3)"><use href="#i-down"/></svg></span>
+        <span class="badge success"><svg class="i s12"><use href="#i-radio"/></svg>Live v6</span>
+        <span class="badge warning">Draft · 3 changes</span>
+        <span class="save hide-m"><svg class="i s14"><use href="#i-check"/></svg>Saved to draft 12:04</span>
+        <span class="grow"></span>
+        <span class="row hide-m" style="gap:2px"><button class="btn btn-ghost icon sm" aria-label="Undo (Ctrl+Z)"><svg class="i"><use href="#i-undo"/></svg></button><button class="btn btn-ghost icon sm" aria-label="Redo (Ctrl+Shift+Z)" disabled style="background:none"><svg class="i"><use href="#i-redo"/></svg></button><button class="btn btn-ghost sm"><svg class="i"><use href="#i-grid"/></svg>Tidy</button></span>
+        <span class="vr hide-m"></span>
+        <button class="btn btn-ghost sm hide-m" style="color:var(--warning-text)"><svg class="i"><use href="#i-warn"/></svg>1 warning</button>
+        <button class="btn btn-secondary sm"><svg class="i s14"><use href="#i-play"/></svg>Test call</button>
+        <button class="btn btn-primary sm hide-m">Publish…</button>
+      </div>
+      <aside class="pal2" aria-label="Add a step">
+        <div class="input"><svg class="i s14" style="color:var(--text-3)"><use href="#i-search"/></svg><span class="ph">Add a step…</span><span class="kbd" style="margin-left:auto">/</span></div>
+        <div class="g"><span class="step">1</span>Trigger</div>
+        <div class="pi"><span class="tile sm trigger"><svg class="i"><use href="#i-phone"/></svg></span>Inbound call</div>
+        <div class="pi"><span class="tile sm trigger"><svg class="i"><use href="#i-phone-out"/></svg></span>Outbound call</div>
+        <div class="pi"><span class="tile sm trigger"><svg class="i"><use href="#i-code"/></svg></span>API or webhook</div>
+        <div class="g"><span class="step">2</span>Logic</div>
+        <div class="pi hover"><span class="tile sm logic"><svg class="i"><use href="#i-ask"/></svg></span>Question</div>
+        <div class="pi"><span class="tile sm logic"><svg class="i"><use href="#i-fork"/></svg></span>Condition</div>
+        <div class="pi"><span class="tile sm logic"><svg class="i"><use href="#i-shield"/></svg></span>Verify caller</div>
+        <div class="g"><span class="step">3</span>Action</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-say"/></svg></span>Say</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-book"/></svg></span>Answer from knowledge</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-db"/></svg></span>CRM lookup</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-cal"/></svg></span>Book meeting</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-wa"/></svg></span>Send WhatsApp</div>
+        <div class="pi"><span class="tile sm action"><svg class="i"><use href="#i-head"/></svg></span>Transfer to a person</div>
+        <div class="g"><span class="step">4</span>Outcome</div>
+        <div class="pi"><span class="tile sm out-good"><svg class="i"><use href="#i-flag"/></svg></span>End call with outcome</div>
+      </aside>
+      <div class="cv" role="application" aria-label="Flow canvas, 8 steps. Use arrow keys to move between steps." data-edges='[["n-trig","n-q","hl"],["p-int","n-a1","hl"],["p-later","n-a2","hl"],["p-not","n-a3","hl",12],["n-a1","n-o1"],["n-a2","n-o2"],["n-a3","n-o3"]]'>
+        <svg class="edges" aria-hidden="true"></svg>
+        <div class="legend"><span class="tile sm trigger"><svg class="i"><use href="#i-phone-out"/></svg></span>Trigger<span class="arr">→</span><span class="tile sm logic"><svg class="i"><use href="#i-fork"/></svg></span>Logic<span class="arr">→</span><span class="tile sm action"><svg class="i"><use href="#i-say"/></svg></span>Action<span class="arr">→</span><span class="tile sm out-good"><svg class="i"><use href="#i-flag"/></svg></span>Outcome</div>
+
+        <div class="node cap" id="n-trig" style="left:calc(50% - 112px);top:56px;width:224px"><span class="tile trigger"><svg class="i"><use href="#i-phone-out"/></svg></span><div><span class="cat">Trigger · 10:00 to 19:00</span><span class="ttl">Outbound call answered</span></div><span class="out"></span></div>
+
+        <div class="node sel" id="n-q" tabindex="0" aria-label="Step 2 of 8, Question: Ask about the site visit. 4 answers, 1 warning." style="left:calc(50% - 176px);top:134px;width:352px">
+          <span class="in"></span><span class="issue" title="1 warning">1</span>
+          <div class="nh"><span class="tile logic"><svg class="i"><use href="#i-ask"/></svg></span><div style="min-width:0"><span class="cat">Logic · Question</span><span class="ttl">Ask about the site visit</span></div><span class="script bare" style="margin-left:auto"><b lang="hi">अA</b></span></div>
+          <p class="nb">Aapne pichhle hafte <span class="var">{{project}}</span> dekha tha. Kya aap site visit plan karna chahenge?</p>
+          <div class="ports"><span class="port hl" id="p-int">Interested</span><span class="port hl" id="p-later">Later</span><span class="port hl" id="p-not">Not now</span><span class="port open">No reply <svg class="i s12"><use href="#i-plus"/></svg></span></div>
+        </div>
+
+        <div class="node" id="n-a1" style="left:calc(50% - 382px);top:316px"><span class="in" style="border-color:var(--accent)"></span><div class="nh"><span class="tile action"><svg class="i"><use href="#i-cal"/></svg></span><div style="min-width:0"><span class="cat">Action · Book meeting</span><span class="ttl">Book site visit</span></div></div><p class="nb">Offer Sat or Sun slots, confirm on WhatsApp.</p><span class="out"></span></div>
+        <div class="node" id="n-a2" style="left:calc(50% - 118px);top:316px"><span class="in" style="border-color:var(--accent)"></span><div class="nh"><span class="tile action"><svg class="i"><use href="#i-clock"/></svg></span><div style="min-width:0"><span class="cat">Action · Schedule</span><span class="ttl">Schedule callback</span></div></div><p class="nb">Ask for a time, save to <span class="var">{{callback_at}}</span>.</p><span class="out"></span></div>
+        <div class="node" id="n-a3" style="left:calc(50% + 146px);top:316px"><span class="in" style="border-color:var(--accent)"></span><div class="nh"><span class="tile action"><svg class="i"><use href="#i-wa"/></svg></span><div style="min-width:0"><span class="cat">Action · WhatsApp</span><span class="ttl">Send brochure</span></div></div><p class="nb">Template: project brochure, PDF attached.</p><span class="out"></span></div>
+
+        <div class="node cap" id="n-o1" style="left:calc(50% - 358px);top:444px"><span class="in"></span><span class="tile out-good"><svg class="i"><use href="#i-flag"/></svg></span><div><span class="cat">Outcome</span><span class="ttl">Visit booked</span></div></div>
+        <div class="node cap" id="n-o2" style="left:calc(50% - 94px);top:444px"><span class="in"></span><span class="tile out-neutral"><svg class="i"><use href="#i-clock"/></svg></span><div><span class="cat">Outcome</span><span class="ttl">Callback set</span></div></div>
+        <div class="node cap" id="n-o3" style="left:calc(50% + 170px);top:444px"><span class="in"></span><span class="tile out-neutral"><svg class="i"><use href="#i-x"/></svg></span><div><span class="cat">Outcome</span><span class="ttl">Not interested</span></div></div>
+
+        <div class="cvctl"><span aria-label="Zoom out">−</span><span class="tnum">100%</span><span aria-label="Zoom in">+</span><span><svg class="i s14"><use href="#i-fit"/></svg></span></div>
+        <div class="mini-map" style="width:132px;height:80px" aria-hidden="true"><i style="left:56px;top:8px;width:20px;height:6px"></i><i style="left:46px;top:20px;width:40px;height:14px;background:var(--accent)"></i><i style="left:20px;top:40px;width:26px;height:10px"></i><i style="left:53px;top:40px;width:26px;height:10px"></i><i style="left:86px;top:40px;width:26px;height:10px"></i><i style="left:23px;top:58px;width:20px;height:6px"></i><i style="left:56px;top:58px;width:20px;height:6px"></i><i style="left:89px;top:58px;width:20px;height:6px"></i><span class="vp" style="left:12px;top:4px;width:108px;height:68px"></span></div>
+      </div>
+      <aside class="insp" aria-label="Step settings">
+        <div class="ih"><span class="tile logic"><svg class="i"><use href="#i-ask"/></svg></span><div style="flex:1;min-width:0"><span class="caption muted">Logic · Question · step 2</span><div class="h3" style="font-size:15px;line-height:20px">Ask about the site visit</div></div><button class="btn btn-ghost icon sm" aria-label="Close step settings"><svg class="i"><use href="#i-x"/></svg></button></div>
+        <div class="ib">
+          <div class="field"><span class="flabel">Vaani says</span><div class="ta">Aapne pichhle hafte <span class="mono" style="color:var(--accent-text)">{{project}}</span> dekha tha. Kya aap site visit plan karna chahenge?</div><div class="chiprow"><span class="script"><b lang="hi">अA</b>Hinglish, auto</span><button class="btn btn-ghost sm" style="height:24px;padding:0 6px"><svg class="i s14"><use href="#i-play"/></svg>Hear it</button></div></div>
+          <div class="field"><span class="flabel">Listen for</span>
+            <div class="ans">
+              <div class="a"><span class="grip">⋮⋮</span>Interested<span class="to">→ Book site visit</span></div>
+              <div class="a"><span class="grip">⋮⋮</span>Later<span class="to">→ Schedule callback</span></div>
+              <div class="a"><span class="grip">⋮⋮</span>Not now<span class="to">→ Send brochure</span></div>
+              <div class="a warn"><svg class="i s14" style="color:var(--warning-text)"><use href="#i-warn"/></svg>No reply<span class="to">Not connected</span></div>
+            </div>
+            <span class="help">Every question needs a no-reply path. Add a step or end the call.</span>
+          </div>
+          <div class="field"><span class="flabel">Save answer to</span><div class="input" style="height:32px"><span class="mono" style="color:var(--accent-text)">{{visit_intent}}</span></div></div>
+        </div>
+        <div class="if"><button class="btn btn-ghost sm" style="color:var(--danger-text)"><svg class="i s14"><use href="#i-trash"/></svg>Delete step</button><span class="caption muted">Edits save to your draft</span></div>
+      </aside>
+    </div>
+    <div class="fdo">
+      <div class="ro"><svg class="i" style="margin-top:1px"><use href="#i-alert"/></svg><span>Editing needs a screen 1024 px or wider. Here you can review the flow and place a test call.</span></div>
+      <ol class="ol">
+        <li><span class="tile sm trigger"><svg class="i"><use href="#i-phone-out"/></svg></span><div><div class="cat">Trigger</div><div class="ttl">Outbound call answered</div></div></li>
+        <li><span class="tile sm logic"><svg class="i"><use href="#i-ask"/></svg></span><div><div class="cat">Logic · Question</div><div class="ttl">Ask about the site visit <span class="badge warning" style="height:20px;margin-left:4px">1 warning</span></div></div></li>
+        <li class="ind"><span class="tile sm action"><svg class="i"><use href="#i-cal"/></svg></span><div><div class="cat">If Interested</div><div class="ttl">Book site visit → Visit booked</div></div></li>
+        <li class="ind"><span class="tile sm action"><svg class="i"><use href="#i-clock"/></svg></span><div><div class="cat">If Later</div><div class="ttl">Schedule callback → Callback set</div></div></li>
+        <li class="ind"><span class="tile sm action"><svg class="i"><use href="#i-wa"/></svg></span><div><div class="cat">If Not now</div><div class="ttl">Send brochure → Not interested</div></div></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="screen-cap"><h3>C · Agent Cockpit, live call</h3><p>The idle orb is gone. The centre of the screen belongs to the conversation: state, who and which flow, the conversation line, where the agent is in the flow, and a speaker-labelled transcript with Hindi set in Devanagari.</p></div>
+  <div class="screen">
+    <div class="ck">
+      <div class="call">
+        <div class="chd">
+          <span class="cs live" role="status"><span class="vm live" aria-hidden="true"><i></i><i></i><i></i></span>Live <span class="t">01:27</span></span>
+          <div class="who"><div class="nm">Kabir Anand</div><div class="meta"><span class="mono">+91 ••••• •4821</span><span>·</span><span class="script bare"><b lang="hi">अA</b></span>Hinglish<span>·</span>Outbound</div></div>
+          <div class="rt"><span class="badge outline"><svg class="i s12" style="color:var(--danger)"><use href="#i-rec"/></svg>Recording, disclosed at 00:01</span><span class="badge outline"><svg class="i s12"><use href="#i-flow"/></svg>Site-visit follow-up v6</span></div>
+        </div>
+        <div class="line">
+          <div class="cl" role="img" aria-label="Conversation so far: Vaani 58 percent, Kabir 42 percent, 9 turns, 1 interruption"><div class="ln a"><i style="left:0;width:9%"></i><i style="left:19%;width:15%"></i><i style="left:42%;width:6%"></i><i style="left:57%;width:14%"></i><i style="left:84%;width:9%"></i></div><div class="ln h"><i style="left:10%;width:8%"></i><i style="left:33%;width:8%"></i><i style="left:49%;width:7%"></i><i style="left:72%;width:11%"></i><i class="partial" style="left:94%;width:5%"></i></div><span class="now" style="left:99.4%"></span></div>
+          <div class="ticks"><span>0:00</span><span>0:30</span><span>1:00</span><span>1:27</span></div>
+          <div class="lg"><span><i style="background:var(--lane-agent)"></i>Vaani 58%</span><span><i style="background:var(--lane-human)"></i>Kabir 42%</span><span>9 turns</span><span>1 interruption</span></div>
+        </div>
+        <div class="nowat"><span class="tile sm logic"><svg class="i"><use href="#i-ask"/></svg></span><span style="white-space:nowrap">Now at</span><b>Ask about the site visit</b><span class="muted">step 2 of 8</span><a href="#">Open in flow</a></div>
+        <div class="tx" aria-live="polite">
+          <div class="turn agent"><span class="tm">00:02</span><div><div class="sp">Vaani<span class="script bare"><b lang="hi">अA</b></span></div><p class="said">Namaste Kabir ji, main Vaani bol rahi hoon, Nestwell Homes se. Kya abhi do minute baat ho sakti hai?</p></div></div>
+          <div class="turn"><span class="tm">00:09</span><div><div class="sp">Kabir<span class="script bare"><b lang="hi">अ</b></span></div><p class="said" lang="hi">हाँ, बोलिए। पिछले हफ़्ते मैंने आपकी साइट देखी थी।</p></div></div>
+          <div class="turn agent"><span class="tm">00:15</span><div><div class="sp">Vaani<span class="script bare"><b lang="hi">अA</b></span></div><p class="said">Bahut badhiya. Aap 2BHK dekh rahe the ya 3BHK? Aur budget roughly kitna socha hai?</p></div></div>
+          <div class="turn"><span class="tm">00:26</span><div><div class="sp">Kabir<span class="script bare"><b lang="hi">अA</b></span></div><p class="said">3BHK. Budget around 85 lakh, thoda flexible hai.</p><div class="tag"><svg class="i s12" style="color:var(--accent-text)"><use href="#i-check"/></svg>Captured unit and budget</div></div></div>
+          <div class="turn agent"><span class="tm">01:19</span><div><div class="sp">Vaani<span class="script bare"><b lang="hi">अA</b></span></div><p class="said">Perfect. Kya is Saturday 11 baje site visit theek rahega?</p></div></div>
+          <div class="turn partial"><span class="tm">01:26</span><div><div class="sp" style="color:var(--text-2)">Kabir<span class="vm live" style="color:var(--lane-human)"><i></i><i></i><i></i></span></div><p class="said">Saturday chalega, bas thoda late…</p><div class="tag">Transcribing…</div></div></div>
+        </div>
+      </div>
+      <div class="side2">
+        <div class="blk"><h5>Captured so far <span>4 of 6 fields</span></h5>
+          <dl class="kv"><dt>Interest</dt><dd><span class="badge accent">Interested</span></dd><dt>Unit</dt><dd>3BHK</dd><dt>Budget</dt><dd class="tnum">₹85,00,000 <span class="muted">(85 lakh)</span></dd><dt>Site visit</dt><dd class="pend">Sat 11:00, awaiting yes</dd><dt>Callback</dt><dd class="pend">Not captured</dd></dl></div>
+        <div class="blk"><h5>Sentiment <span>updates every turn</span></h5><div class="sent"><svg class="i" style="color:var(--success-text)"><use href="#i-smile"/></svg><span class="small-m" style="color:var(--success-text)">Positive</span><span class="bar"><i style="width:72%"></i></span><span class="small tnum t2">0.72</span></div></div>
+        <div class="blk"><h5>If he confirms</h5><div class="row"><span class="tile out-good"><svg class="i s14"><use href="#i-flag"/></svg></span><div><div class="small-m">Outcome: Visit booked</div><div class="caption muted">WhatsApp confirmation goes out after the call</div></div></div></div>
+        <div class="ctrl"><button class="btn btn-secondary"><svg class="i"><use href="#i-head"/></svg>Take over</button><button class="btn btn-danger"><svg class="i"><use href="#i-phone"/></svg>End call</button><div class="full"><span>Voice latency: good, 210 ms</span><span><span class="kbd">M</span> mute agent</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="breakpoints">
+  <div class="sec-h"><div><h2 class="h1">Four breakpoints, four layouts</h2><p class="small muted">Designed, not shrunk</p></div>
+  <p>Each range changes structure, not just scale. Breakpoint tokens: 768, 1024, 1280 and 1440 px. Full-height shells use 100dvh; bottom bars respect safe-area insets; inputs are 16 px on touch.</p></div>
+  <div class="board">
+    <div class="card c3"><h4>Mobile · 320 to 767</h4><p class="hint">Five-item bottom bar (Cockpit, Leads, Reports, Assistant, More). Tables become cards. Flow Designer is a read-only outline with Test call. Cockpit controls stick to the bottom. Wallet is a header chip.</p></div>
+    <div class="card c3"><h4>Tablet · 768 to 1023</h4><p class="hint">56 px icon rail; the labelled sidebar overlays instead of pushing. Tables keep a sticky first column. Flow Designer: pan, zoom, outline and Test call; editing starts at 1024 px. Cockpit stacks transcript over context.</p></div>
+    <div class="card c3"><h4>Laptop · 1024 to 1439</h4><p class="hint">Rail by default below 1280, labels from 1280. Flow palette collapses while the inspector is open; the inspector overlays the canvas below 1280. Minimap hides under a 600 px canvas.</p></div>
+    <div class="card c3"><h4>Desktop · 1440 and up</h4><p class="hint">232 px labelled sidebar, palette, canvas and inspector together. Reading pages cap at 1280 px; tables, canvas and Cockpit go full width.</p></div>
+  </div>
+</section>
+
+<footer style="margin-top:64px;padding-top:20px;border-top:1px solid var(--border);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap" class="caption muted">
+  <span>Bolchaal · voice-native identity direction for Vaani Labs · specification in voice.md</span>
+  <span>All names, numbers and amounts are invented sample data.</span>
+</footer>
+</div>
+
+<script>
+(function(){
+  function draw(){
+    document.querySelectorAll('.cv').forEach(function(cv){
+      var svg=cv.querySelector('svg.edges'), c=cv.getBoundingClientRect();
+      if(!c.width){return;}
+      var defs='<defs>'+
+        '<marker id="an" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path d="M2 1.5 8 5 2 8.5" fill="none" style="stroke:var(--edge)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>'+
+        '<marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerUnits="userSpaceOnUse" markerWidth="10" markerHeight="10" orient="auto"><path d="M2 1.5 8 5 2 8.5" fill="none" style="stroke:var(--accent)" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></marker></defs>';
+      var out='';
+      JSON.parse(cv.dataset.edges).forEach(function(e){
+        var a=document.getElementById(e[0]).getBoundingClientRect(), b=document.getElementById(e[1]).getBoundingClientRect();
+        var src=document.getElementById(e[0]), isPort=e[0].indexOf('p-')===0, nb=isPort?src.closest('.node').getBoundingClientRect():a;
+        var x1=Math.round(a.left+a.width/2-c.left), y1=Math.round(nb.bottom-c.top)+(isPort?0:4);
+        var x2=Math.round(b.left+b.width/2-c.left), y2=Math.round(b.top-c.top)-7;
+        var ym=Math.round((y1+y2)/2)+(e[3]||0), d;
+        if(Math.abs(x2-x1)<2){ d='M'+x1+' '+y1+'V'+y2; }
+        else{ var s=x2>x1?1:-1, r=Math.min(10,Math.abs(x2-x1)/2,Math.abs(ym-y1));
+          d='M'+x1+' '+y1+'V'+(ym-r)+'Q'+x1+' '+ym+' '+(x1+s*r)+' '+ym+'H'+(x2-s*r)+'Q'+x2+' '+ym+' '+x2+' '+(ym+r)+'V'+y2; }
+        var hl=(e[2]||'').indexOf('hl')>-1;
+        out+='<path class="'+(e[2]||'')+'" d="'+d+'" marker-end="url(#'+(hl?'ah':'an')+')"/>';
+        if(isPort){ out+='<circle cx="'+x1+'" cy="'+y1+'" r="4.5" style="fill:var(--surface);stroke:'+(hl?'var(--accent)':'var(--edge)')+';stroke-width:1.5"/>'; }
+      });
+      svg.innerHTML=defs+out;
+    });
+  }
+  (document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve()).then(draw);
+  window.addEventListener('resize',draw);
+})();
+</script>
+</body>
+</html>
