@@ -1,0 +1,14 @@
+# Screenshots of the live vaanilabs.in product show real customer data from the audited
+# account (lead names, partly masked phone numbers, emails). They stay on the local machine.
+# Reports still reference them by path under audit/screenshots/.
+audit/screenshots/
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+desktop.ini
+*.bak
+*.tmp
+__pycache__/
+node_modules/
+.playwright-mcp/
