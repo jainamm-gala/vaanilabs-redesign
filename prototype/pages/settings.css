@@ -1,0 +1,346 @@
+/* Vaani Labs prototype · pages/settings.css — Settings (03-pages/06). Tokens only. Layout for the SettingsLayout frame, plus
+   the page-local components the shared layer does not have yet (SettingsNav, SettingsIndex, SettingsSection, SectionFooter,
+   IntegrationRow, ServiceMark, NotificationMatrix, CodeBlock head, CallingHours): each is listed as a shared request.
+   Reserved component classes are only placed (margin, width, position), never restyled. */
+
+/* ---------- SettingsLayout (§3.2): SettingsNav 200 | page column; the page scrolls, not the frame (≥ 1024) ---------- */
+.settings-main { display: grid; grid-template-columns: var(--size-settings-nav) minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); overflow: hidden; }
+.settings-cbar { grid-column: 1 / -1; grid-row: 1; }
+.settings-side { grid-column: 1; grid-row: 2; display: flex; flex-direction: column; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: var(--space-12) var(--space-8) var(--space-64); background: var(--surface); border-right: var(--bw-hairline) solid var(--border); scrollbar-width: thin; }
+.settings-pane { grid-column: 2; grid-row: 2; min-width: 0; min-height: 0; overflow: hidden auto; overscroll-behavior: contain; }
+.settings-pane > .settings-ph { position: sticky; top: 0; z-index: var(--z-sticky); padding-right: max(var(--page-margin), calc(100% - var(--size-container-form) - var(--page-margin))); }
+.settings-main[data-width="data"] .settings-ph { padding-right: max(var(--page-margin), calc(100% - var(--size-container-page) - var(--page-margin))); }
+.settings-crumbs { flex: none; }
+.settings-back { display: none; align-self: center; }
+@media (min-width: 768px) and (max-width: 1023.98px) { .settings-back { display: inline-flex; } }
+.settings-col { max-width: calc(var(--size-container-form) + 2 * var(--page-margin)); padding: var(--space-24) var(--page-margin) var(--space-64); isolation: isolate; }
+.settings-main[data-width="data"] .settings-col { max-width: calc(var(--size-container-page) + 2 * var(--page-margin)); }
+.settings-page { display: flex; flex-direction: column; min-width: 0; }
+.settings-sk-meta { display: inline-block; width: calc(var(--space-96) * 2); vertical-align: middle; }
+
+/* ---------- SettingsNav (§3.3): text only; current = the raised key ---------- */
+.settings-nav { display: grid; }
+.settings-nav-g + .settings-nav-g { margin-top: var(--space-12); }
+.settings-nav-label { display: block; padding: var(--space-4) var(--space-8); font: var(--type-label-12); color: var(--text-3); }
+.settings-nav-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.settings-nav-item { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); height: var(--control-h); padding: 0 var(--space-8); border: var(--bw-hairline) solid transparent; border-radius: var(--radius-6); font: var(--type-label-13); color: var(--text-2); text-decoration: none; transition: background-color var(--dur-fast) var(--ease-standard), color var(--dur-fast) var(--ease-standard); }
+.settings-nav-text { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+@media (hover: hover) and (pointer: fine) { .settings-nav-item:hover { background: var(--nav-hover-bg); color: var(--text); } }
+.settings-nav-item[aria-current="page"] { background: var(--nav-active-bg); border-color: var(--nav-active-border); box-shadow: var(--e1); color: var(--text); }
+.settings-nav-item--danger, .settings-nav-item--danger[aria-current="page"] { color: var(--danger-text); }
+.settings-nav-item:focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset-inset); }
+@media (min-width: 1024px) and (max-height: 800px) and (pointer: fine) {
+  .settings-nav-item { height: var(--control-h-sm); }
+  .settings-nav-g + .settings-nav-g { margin-top: var(--space-4); }
+  .settings-nav-label { padding-block: var(--space-2); }
+}
+
+/* ---------- SettingsSection (§3.2): h2 + Copy link + status slot; sections split by a hairline, never boxed ---------- */
+.settings-sec { position: relative; min-width: 0; scroll-margin-top: calc(var(--size-header) + var(--space-16)); }
+.settings-sec ~ .settings-sec { margin-top: var(--space-24); padding-top: var(--space-32); border-top: var(--bw-hairline) solid var(--border); }
+.settings-page-notice { margin-bottom: var(--space-24); }
+.settings-sec-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); min-height: var(--space-28); }
+.settings-sec-title { margin: 0; font: var(--type-title-16); color: var(--text); }
+.settings-copy { opacity: 0; transition: opacity var(--dur-fast) var(--ease-standard); }
+.settings-sec-head:hover .settings-copy, .settings-copy:focus-visible { opacity: 1; }
+@media (hover: none), (pointer: coarse) { .settings-copy { opacity: 1; } }
+.settings-sec-status { display: inline-flex; align-items: center; min-height: var(--space-20); margin-left: auto; }
+.settings-sec-status:empty { display: none; }
+.settings-sec-headact { margin-left: auto; }
+.settings-sec-status:not(:empty) + .settings-sec-headact { margin-left: var(--space-8); }
+.settings-sec-desc { max-width: var(--size-measure); margin: var(--space-4) 0 0; font: var(--type-body-14); color: var(--text-2); }
+.settings-sec-body { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; margin-top: var(--space-16); }
+.settings-sec-foot { margin: 0; font: var(--type-data-13); color: var(--text-2); }
+.settings-sec[data-targeted]::before, .settings-irow[data-targeted]::before { content: ""; position: absolute; left: calc(-1 * var(--space-12)); top: 0; bottom: 0; width: var(--bw-strong); border-radius: var(--radius-2); background: var(--accent-mark); }
+.settings-sec ~ .settings-sec[data-targeted]::before { top: var(--space-32); }
+.settings-sec ~ .settings-sec--box { margin-top: var(--space-40); padding-top: 0; border-top: 0; }
+.settings-sec--box[data-targeted]::before { top: 0; }
+.settings-sheet .settings-sec--box { margin-top: var(--space-8); }
+
+/* SectionFooter (§4.2): only while dirty; no fill, no border; hidden on phones (the bar is the one save control) */
+.settings-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-12); margin-top: var(--space-8); }
+.settings-foot-acts { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: var(--space-inline-md); margin-left: auto; }
+.settings-foot-why { flex: 0 1 auto; }
+.settings-form-err { margin-top: var(--space-4); }
+.settings-err-details { margin: var(--space-6) 0 0 calc(var(--icon-md) + var(--space-8)); }
+
+/* Fields, rows, key-value */
+.settings-kv-link { margin-left: auto; font: var(--type-data-13); }
+.settings-kv-flush { margin-top: calc(-1 * var(--space-4)); }
+.settings-row-ctl { display: flex; flex: none; align-items: center; gap: var(--space-8); }
+.settings-field-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-8) var(--space-16); }
+.settings-field-aside { margin-top: calc(var(--type-label-13-lh) + var(--space-label-gap)); min-height: var(--control-h); }
+.settings-field-row .field--medium { flex: 0 1 var(--field-w-medium); }
+.settings-btnrow { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); }
+.settings-inline-danger { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-16); margin-top: var(--space-8); }
+.settings-lead { margin: 0 0 var(--space-24); font: var(--type-body-14); color: var(--text-2); }
+.settings-lead-strong { max-width: var(--size-measure); margin: 0; font: var(--type-body-14); color: var(--text); }
+.settings-code-inline { padding: 0 var(--space-4); border-radius: var(--radius-4); background: var(--surface-2); font: var(--type-mono-13); color: var(--text); overflow-wrap: anywhere; }
+.settings-why { flex-basis: 100%; margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.settings-test { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); }
+.settings-test .settings-why { flex-basis: auto; }
+.settings-mt { margin-top: var(--space-8); }
+.settings-sub { margin: var(--space-8) 0 0; font: var(--type-title-14); color: var(--text); }
+.settings-plain-list { display: grid; gap: var(--space-2); margin: 0; padding: 0; list-style: none; }
+.settings-proto-note { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.settings-dlg-copy { display: grid; gap: var(--space-8); }
+.settings-dlg-copy p { margin: 0; }
+.settings-typed-short { width: var(--field-w-short); }
+.settings-rcol { display: grid; gap: var(--space-8); }
+.field > .seg { justify-self: start; }
+.settings-rcards2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(calc(var(--space-40) * 6), 100%), 1fr)); gap: var(--space-12); }
+.settings-rcard-why { color: var(--warning-text); }
+.settings-always { gap: var(--space-8); }
+.settings-cols2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(calc(var(--space-40) * 6), 100%), 1fr)); gap: var(--space-16) var(--space-24); }
+.settings-col-label { margin: 0 0 var(--space-6); font: var(--type-label-12); color: var(--text-3); }
+.settings-cols2 .settings-plain-list { gap: var(--space-4); font: var(--type-body-14); color: var(--text); }
+.settings-typed { max-width: var(--field-w-medium); }
+.settings-roles { font: var(--type-data-13); color: var(--text-2); }
+.settings-roles > summary { width: max-content; padding-block: var(--space-4); border-radius: var(--radius-2); color: var(--text); cursor: pointer; }
+.settings-only { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); }
+.settings-only > span { flex: 1 1 calc(var(--space-96) * 2); }
+
+/* Skeletons (FormSkeleton, TableSkeleton; static fill, no shimmer) */
+.settings-sk { display: grid; gap: var(--space-40); }
+.settings-sk-sec { display: grid; gap: var(--space-12); }
+.settings-sk-field { display: grid; gap: var(--space-8); margin-top: var(--space-8); }
+.settings-sk-w1 { width: calc(var(--space-96) * 1.2); }
+.settings-sk-w2 { width: calc(var(--space-96) * 1.8); }
+.settings-sk-w3 { width: min(100%, calc(var(--space-96) * 4)); }
+.settings-sk-box { height: var(--control-h); }
+.settings-sk-cell { width: calc(var(--space-40) * 2); }
+.settings-sk-cell--1 { width: calc(var(--space-40) * 3); }
+.settings-sk-cell--2 { width: var(--space-48); }
+
+/* ---------- Overview: attention Notice + SettingsIndex (§7.0) ---------- */
+.settings-att { margin-bottom: var(--space-32); }
+.settings-att-title { margin: 0; }
+.settings-att-list { display: grid; gap: var(--space-4); margin: var(--space-4) 0 0; padding: 0; list-style: none; }
+.settings-att-more { margin-top: var(--space-4); }
+.settings-idx-g + .settings-idx-g { margin-top: var(--space-24); }
+.settings-idx-label { margin: 0; padding-bottom: var(--space-4); font: var(--type-label-12); color: var(--text-3); }
+.settings-idx-list { margin: 0; padding: 0; list-style: none; border-top: var(--bw-hairline) solid var(--border); }
+.settings-idx-row { display: grid; grid-template-columns: var(--icon-md) minmax(0, 1fr) auto var(--icon-sm); align-items: center; gap: var(--space-2) var(--space-12); min-height: var(--space-56); padding: var(--space-8); border-bottom: var(--bw-hairline) solid var(--border); color: var(--text); text-decoration: none; transition: background-color var(--dur-fast) var(--ease-standard); }
+@media (hover: hover) and (pointer: fine) { .settings-idx-row:hover { background: var(--row-hover); } }
+.settings-idx-row:focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset-inset); }
+.settings-idx-ic { display: grid; color: var(--text-3); }
+.settings-idx-text { display: grid; gap: var(--space-2); min-width: 0; }
+.settings-idx-name { font: var(--type-label-13); color: var(--text); }
+.settings-idx-name--danger { color: var(--danger-text); }
+.settings-idx-desc { font: var(--type-meta-12); color: var(--text-3); }
+.settings-idx-status { display: inline-flex; align-items: center; gap: var(--space-4); font: var(--type-meta-12); color: var(--text-2); text-align: right; }
+.settings-idx-status--warn { color: var(--warning-text); }
+.settings-idx-sk { width: calc(var(--space-40) * 2); }
+.settings-idx-ch { display: grid; color: var(--text-3); }
+
+/* ---------- NotificationMatrix (§7.3): two switch columns; one channel at a time on phones ---------- */
+.settings-nm-head, .settings-nm-row { display: grid; grid-template-columns: minmax(0, 1fr) var(--space-80) var(--space-80); align-items: center; gap: var(--space-12); }
+.settings-nm-head { padding-bottom: var(--space-6); border-bottom: var(--bw-hairline) solid var(--border); font: var(--type-label-12); color: var(--text-3); text-align: center; }
+.settings-nm-row { min-height: max(var(--space-40), var(--row-h)); padding-block: var(--space-8); border-bottom: var(--bw-hairline) solid var(--border); }
+.settings-nm-cell { display: flex; justify-content: center; }
+.settings-nm-none { font: var(--type-data-13); color: var(--text-3); }
+.settings-nm-why { display: flex; align-items: center; gap: var(--space-6); margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.settings-nm-channel { margin-bottom: var(--space-24); }
+
+/* ---------- Lists (phone ListRows), people, tables ---------- */
+.settings-list { margin: 0; padding: 0; list-style: none; border-top: var(--bw-hairline) solid var(--border); }
+.settings-list-row { display: flex; align-items: center; gap: var(--space-12); min-height: var(--space-56); padding-block: var(--space-8); border-bottom: var(--bw-hairline) solid var(--border); }
+.settings-list-main { display: grid; flex: 1 1 auto; gap: var(--space-2); min-width: 0; color: var(--text); text-decoration: none; }
+.settings-list-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); font: var(--type-label-13); color: var(--text); }
+.settings-list-meta { font: var(--type-meta-12); color: var(--text-3); }
+.settings-list-end { display: flex; flex: none; align-items: center; gap: var(--space-4); margin-left: auto; }
+.settings-person { display: inline-flex; align-items: center; gap: var(--space-10); min-width: 0; }
+.settings-person-text { display: grid; min-width: 0; }
+.settings-person-name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); font: var(--type-label-13); color: var(--text); }
+.settings-person-meta { font: var(--type-meta-12); color: var(--text-3); font-weight: var(--fw-regular); }
+.settings-list-row > .settings-person { flex: 1 1 auto; }
+.settings-td-when { color: var(--text-2); }
+/* Members table (§7.2, §11): Person · Role · Last active · ⋯ at ≥ 1024 with a fine pointer. Below 1024, and on coarse
+   pointers at any width (Touch density grows the role Select to 44 px at 16 px text), Last active folds into the Person
+   cell as its last line (P2) so the table is Person + Role + ⋯ and fits its form-width frame; ⋯ also pins right (05 R9). */
+.settings-person-when { display: none; font: var(--type-meta-12); color: var(--text-3); font-weight: var(--fw-regular); }
+@media (max-width: 1023.98px), (pointer: coarse) {
+  .settings-members .settings-c-when { display: none; }
+  .settings-members .settings-person-when { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-6); margin-top: var(--space-2); }
+}
+/* Record tables — API keys, Webhooks, Deliveries, Activity (N §7.5, §7.13; S §3.6, §11). Each column declares a priority:
+   P1 always · P2 at ≥ 1024 · P3 at ≥ 1280 · P4 off by default (its value stays in the row's Sheet and the CSV). The key
+   column pins left (.sticky-l) and ⋯ pins right (.sticky-r), so whenever a table is still wider than its frame (zoom,
+   long names, 768–1023 at 200 % text) the row's name and its actions never scroll away; the pinned edge gets its
+   hairline from [data-scrolled-x] (components §37). Phones get ListRows instead (u-hide-phone / u-only-phone). */
+.dt .settings-p4 { display: none; }
+@media (max-width: 1279.98px) { .dt .settings-p3 { display: none; } }
+/* Touch density (coarse pointers) adds 8 px of cell padding per column, so there P3 starts at 1366 (a verified width,
+   S §11) instead of 1280: a touch laptop at 1280 keeps a table that fits instead of one that scrolls. */
+@media (pointer: coarse) and (max-width: 1365.98px) { .dt .settings-p3 { display: none; } }
+@media (max-width: 1023.98px) { .dt .settings-p2 { display: none; } }
+/* Wrapping columns (Event, Target): sentences wrap instead of widening the table. Needs the .dt prefix to beat
+   `.dt td { white-space: nowrap }`; a long token (an email) breaks only when the column truly can't hold it. */
+.dt .settings-td-wrap { min-width: calc(var(--space-40) * 3); white-space: normal; overflow-wrap: break-word; }
+.settings-del-acts { justify-content: flex-end; }
+.settings-del-acts > .settings-why { flex: 1 1 auto; }
+.settings-row-muted td { color: var(--text-3); }
+.settings-mono { font: var(--type-mono-13); }
+.settings-mono-12 { font: var(--type-mono-12); color: var(--text-2); }
+/* Webhook Endpoint (§7.9): middle-truncated in CSS, so the column gives way before the table scrolls. The cell takes a
+   share of the table (its content doesn't size the column); the head ellipsizes and the last characters stay. The
+   full URL is in the tooltip and the accessible name. */
+.dt .settings-c-endpoint { width: 36%; max-width: 0; }
+@media (min-width: 1440px) { .dt .settings-c-endpoint { width: 42%; } }
+@media (max-width: 1023.98px) { .dt .settings-c-endpoint { width: 56%; } }
+.settings-endpoint { display: inline-flex; max-width: 100%; min-width: 0; vertical-align: middle; border-radius: var(--radius-2); }
+.settings-mid-h { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.settings-mid-t { flex: none; }
+.settings-badge-btn { padding: 0 var(--space-6); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-4); background: transparent; cursor: default; }
+.settings-cell-stack { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-8); }
+.settings-cell-note { display: block; flex-basis: 100%; white-space: normal; }
+.settings-pager-note { margin: var(--space-12) 0 0; font: var(--type-meta-12); color: var(--text-3); }
+.settings-filters { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-12) var(--space-16); margin-bottom: var(--space-16); }
+.settings-search { flex: 1 1 calc(var(--space-96) * 2.5); max-width: calc(var(--space-96) * 3.5); }
+.settings-empty { padding-block: var(--space-48); }
+.settings-num { display: inline-flex; font: var(--type-mono-13); }
+.settings-before { color: var(--text-3); text-decoration: line-through; }
+.settings-tabs { display: grid; gap: var(--space-12); }
+
+/* ---------- IntegrationRow + ServiceMark (§7.4, §14): single-colour mark in currentColor on a neutral tile ---------- */
+.settings-irows { border-top: var(--bw-hairline) solid var(--border); }
+.settings-irow { position: relative; display: grid; grid-template-columns: var(--space-28) minmax(0, 1fr) minmax(0, calc(var(--space-40) * 4)) calc(var(--space-40) * 2.5); align-items: center; gap: var(--space-4) var(--space-12); min-height: var(--space-64); padding-block: var(--space-12); border-bottom: var(--bw-hairline) solid var(--border); scroll-margin-top: calc(var(--size-header) + var(--space-16)); }
+.settings-irow-main { min-width: 0; }
+.settings-irow-name { margin: 0; font: var(--type-title-14); color: var(--text); }
+.settings-irow-purpose { margin: var(--space-2) 0 0; font: var(--type-body-14); color: var(--text-2); }
+.settings-irow-status { display: grid; justify-items: end; gap: var(--space-2); text-align: right; }
+.settings-irow-meta { font: var(--type-meta-12); color: var(--text-3); }
+.settings-irow-main > .settings-irow-meta { margin: var(--space-4) 0 0; }
+.settings-irow-act { display: flex; justify-content: flex-end; }
+.settings-irow-err { grid-column: 2 / -1; }
+.settings-svc { display: grid; place-items: center; flex: none; width: var(--space-28); height: var(--space-28); background: var(--surface-2); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-6); color: var(--text); }
+.settings-svc--sm { width: var(--space-20); height: var(--space-20); border: 0; border-radius: var(--radius-4); background: var(--surface-3); color: var(--text-2); }
+.settings-bm { width: var(--icon-md); height: var(--icon-md); fill: currentColor; }
+.settings-oauth-head { display: flex; align-items: flex-start; gap: var(--space-12); }
+.settings-oauth-head p { margin: 0; }
+.settings-sheet .sheet-head > .settings-svc { margin-right: var(--space-8); }
+
+/* ---------- Phone setup: StageProgress, transfers, CallingHours (§7.6) ---------- */
+.settings-stage-main { display: grid; gap: var(--space-2); min-width: 0; }
+.settings-stage-title { font: var(--type-title-14); color: var(--text); }
+.settings-stage-form { display: grid; gap: var(--space-16); margin-top: var(--space-12); }
+.settings-stage-err { margin: var(--space-4) 0 0; font: var(--type-meta-12); }
+.settings-hours { display: grid; border-top: var(--bw-hairline) solid var(--border); }
+.settings-hours-row { display: grid; grid-template-columns: var(--space-96) var(--space-80) minmax(0, 1fr); align-items: center; gap: var(--space-8) var(--space-12); min-height: max(var(--space-48), var(--row-h)); padding-block: var(--space-4); border-bottom: var(--bw-hairline) solid var(--border); }
+.settings-hours-day { font: var(--type-label-13); color: var(--text); }
+.settings-hours-times { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.settings-hours-time { width: calc(var(--space-40) * 3.2); }
+.settings-hours-to, .settings-hours-tz { font: var(--type-meta-12); color: var(--text-3); }
+.settings-gate { width: min(var(--size-popover-gate), calc(100vw - 2 * var(--space-8))); }
+
+/* ---------- Two-factor: steps and QR (tokens --qr-fg on --qr-bg in both themes) ---------- */
+.settings-steps { display: flex; flex-wrap: wrap; gap: var(--space-8) var(--space-16); margin: 0; padding: 0; list-style: none; font: var(--type-label-13); color: var(--text-3); }
+.settings-steps li { display: flex; align-items: center; gap: var(--space-6); }
+.settings-steps [aria-current="step"], .settings-steps [data-done="true"] { color: var(--text); }
+.settings-qr-wrap { display: flex; justify-content: center; }
+.settings-qr { width: calc(var(--space-40) * 4); height: calc(var(--space-40) * 4); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-6); background: var(--qr-bg); }
+.settings-qr rect { fill: var(--qr-fg); }
+.settings-qr .settings-qr-bg { fill: var(--qr-bg); }
+
+/* ---------- CodeBlock (§14): one raw string shown and copied ---------- */
+.settings-code { display: grid; min-width: 0; }
+.settings-code-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); padding-bottom: var(--space-4); }
+.settings-code-label { font: var(--type-label-12); color: var(--text-3); }
+.settings-code-pre { max-height: calc(var(--space-96) * 3.5); }
+.settings-code-text { display: block; font: inherit; font-variant-ligatures: none; }
+.settings-code-text--wrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------- Embed: options and preview (a framed sample page; scales down as a whole below 400) ---------- */
+.settings-rate { display: grid; gap: var(--space-12); }
+.settings-options { display: flex; flex-wrap: wrap; align-items: flex-end; gap: var(--space-16) var(--space-24); }
+.settings-preview { position: relative; min-width: 0; }
+.settings-preview-frame { position: relative; display: flex; flex-direction: column; height: calc(var(--space-96) * 5); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-8); background: var(--bg); overflow: hidden; }
+.settings-pv-bar { display: flex; align-items: center; justify-content: space-between; flex: none; height: var(--space-40); padding: 0 var(--space-16); background: var(--surface); border-bottom: var(--bw-hairline) solid var(--border); }
+.settings-pv-logo { width: var(--space-64); height: var(--space-12); border-radius: var(--radius-2); background: var(--surface-3); }
+.settings-pv-nav { width: calc(var(--space-96) * 1.5); height: var(--space-8); border-radius: var(--radius-2); background: var(--surface-3); }
+.settings-pv-body { display: grid; align-content: start; gap: var(--space-12); padding: var(--space-32) var(--space-24); }
+.settings-pv-h { width: 60%; height: var(--space-20); border-radius: var(--radius-4); background: var(--surface-3); }
+.settings-pv-l { width: 90%; height: var(--space-8); border-radius: var(--radius-2); background: var(--skeleton); }
+.settings-pv-l--short { width: 55%; }
+.settings-pv-panel { display: grid; justify-items: start; gap: var(--space-12); margin-top: var(--space-12); padding: var(--space-16); background: var(--surface); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); }
+.settings-pv-ptitle { font: var(--type-title-14); color: var(--text); }
+.settings-pv-float { position: absolute; right: var(--space-16); bottom: var(--space-16); }
+.settings-preview-frame[data-position="bottom-left"] .settings-pv-float { right: auto; left: var(--space-16); }
+.settings-widget-btn { display: inline-flex; align-items: center; gap: var(--space-6); height: var(--control-h); padding: 0 var(--space-12); border-radius: var(--radius-6); background: var(--accent); box-shadow: var(--e2); font: var(--type-label-13); color: var(--on-accent); white-space: nowrap; }
+
+/* ---------- Danger zone rows (§5.1): text left, destructive outline right; full width under the text on phones ---------- */
+.settings-dz-text { flex: 1 1 calc(var(--space-96) * 3); min-width: 0; }
+.settings-dz-title { margin: 0; font: var(--type-title-14); color: var(--text); }
+.settings-dz-desc { max-width: var(--size-measure); margin: var(--space-2) 0 0; font: var(--type-body-14); color: var(--text-2); }
+.settings-dz-why { margin: var(--space-6) 0 0; font: var(--type-meta-12); color: var(--text-2); }
+
+/* ---------- UnsavedChangesBar and the prototype control ----------
+   The prototype-only control is the first PageHeader action (as on assistant.html), so it never covers sections, the
+   SectionFooter or the UnsavedChangesBar. Tertiary, and icon-only below 1280 (aria-label and tooltip keep the name).
+   #settings-actions (the page's own actions, re-rendered per page) is display: contents so they share the row and gap. */
+.settings-savebar { margin-top: var(--space-24); }
+.settings-acts { display: contents; }
+.settings-proto-pop { width: min(calc(var(--space-40) * 9), calc(100vw - 2 * var(--space-8))); }
+.settings-proto-body { gap: var(--space-16); }
+.settings-proto-intro { margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.settings-proto-g { display: grid; gap: var(--space-6); }
+.settings-proto-label { font: var(--type-label-12); color: var(--text-3); }
+.settings-proto-sub { display: block; margin-bottom: var(--space-4); font: var(--type-meta-12); color: var(--text-2); }
+.settings-proto-link { justify-self: start; }
+.settings-proto-acts { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+
+/* ---------- Breakpoints (05-responsive; §3.6, §11) ---------- */
+@media (max-width: 1279.98px) { .settings-proto-l { display: none; } }
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  .settings-main { display: block; overflow: visible; }
+  .settings-side, .settings-crumbs { display: none; }
+  .settings-pane { overflow: visible; }
+  .settings-cbar .cbar { top: var(--size-topbar); }
+  .settings-pane > .settings-ph { position: static; padding-inline: max(var(--page-margin), calc((100% - var(--size-container-form)) / 2)); }
+  .settings-main[data-width="data"] .settings-ph { padding-inline: var(--page-margin); }
+  .settings-col { margin-inline: auto; }
+  .settings-sec, .settings-irow { scroll-margin-top: var(--space-16); }
+}
+@media (max-width: 767.98px) {
+  .settings-col { padding: var(--space-16) var(--page-margin) var(--space-32); }
+  .settings-pane > .settings-ph { padding-inline: var(--page-margin); }
+  .settings-foot { display: none; }
+  .settings-savebar { flex-wrap: wrap; }
+  .settings-savebar > .savebar-text { flex-basis: 100%; }
+  .settings-savebar > .btn { flex: 1 1 0; }
+  .settings-idx-row { grid-template-columns: var(--icon-lg) minmax(0, 1fr) var(--icon-sm); padding-block: var(--space-10); }
+  .settings-idx-status { grid-column: 2; grid-row: 2; text-align: left; }
+  .settings-idx-ic { grid-row: 1 / span 2; }
+  .settings-idx-ch { grid-column: 3; grid-row: 1 / span 2; }
+  .settings-row--seg { flex-wrap: wrap; }
+  .settings-row--seg > .settings-row-ctl { flex-basis: 100%; }
+  .settings-row--seg .seg, .settings-nm-channel .seg { width: 100%; }
+  .settings-row--seg .seg > button, .settings-nm-channel .seg > button { flex: 1 1 0; }
+  .settings-nm-head, .settings-nm-row { grid-template-columns: minmax(0, 1fr) auto; }
+  .settings-nm[data-channel="email"] .settings-nm-cell--wa, .settings-nm[data-channel="whatsapp"] .settings-nm-cell--email { display: none; }
+  .settings-nm-head { grid-template-columns: minmax(0, 1fr); text-align: right; }
+  .settings-nm-head > span:first-child { display: none; }
+  .settings-irow { grid-template-columns: var(--space-28) minmax(0, 1fr); align-items: start; }
+  .settings-irow-status { grid-column: 2; justify-items: start; text-align: left; }
+  .settings-irow-act { grid-column: 2; justify-content: stretch; }
+  .settings-irow-act > .btn { flex: 1 1 auto; }
+  .settings-irow-act:empty { display: none; }
+  .settings-dz-btn { width: 100%; }
+  .settings-hours-row { grid-template-columns: minmax(0, 1fr) auto; padding-block: var(--space-8); }
+  .settings-hours-times { grid-column: 1 / -1; }
+  .settings-hours-time { flex: 1 1 0; width: auto; }
+  .settings-field-row > .settings-field-aside { margin-top: 0; }
+  .settings-sticky-acts { position: sticky; bottom: calc(var(--size-bottombar) + env(safe-area-inset-bottom) + var(--space-8)); z-index: var(--z-float); margin-inline: calc(-1 * var(--space-8)); padding: var(--space-8); background: var(--surface-overlay); border: var(--bw-hairline) solid var(--border-overlay); border-radius: var(--radius-8); box-shadow: var(--e3); }
+  .settings-sticky-acts > .btn { flex: 1 1 0; }
+  .settings-search { flex-basis: 100%; max-width: none; }
+  .settings-filters { gap: var(--space-8) var(--space-12); }
+}
+@media (max-width: 479.98px) { .settings-idx-desc { display: none; } }
+@media (forced-colors: active) {
+  .settings-nav-item[aria-current="page"] { border-color: Highlight; }
+  .settings-sec[data-targeted]::before, .settings-irow[data-targeted]::before { forced-color-adjust: none; background: Highlight; }
+  .settings-svc { border-color: CanvasText; }
+  .settings-bm { fill: CanvasText; }
+}
+@media (prefers-reduced-motion: reduce) { .settings-copy, .settings-nav-item, .settings-idx-row { transition: none; } }
+:root[data-motion="reduce"] .settings-copy, :root[data-motion="reduce"] .settings-nav-item, :root[data-motion="reduce"] .settings-idx-row { transition: none; }

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Settings · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Settings (03-pages/06). Grouped sub-navigation, per-section saves, deep links to every section, phone setup, developer keys and webhooks, danger zones.">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/settings.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- Settings (03-pages/06): one frame, every page and section a URL. Routes are hashes in this single-file prototype:
+     settings.html#<page>[/<section>][?view-state], e.g. #phone/caller-id, #organization?invite=1, #api-keys?create=1.
+     Files: settings-data.js (page data) · settings.js (frame, router, nav, header, sections) · settings-ui.js (dialogs,
+     Confirm it’s you, OneTimeSecret, CodeBlock, ServiceMark, fields, validators) · settings-forms.js (save models, save bar,
+     navigation guard) · settings-account.js (Overview, Profile, Notifications) · settings-security.js · settings-org.js
+     (Organization and team) · settings-integrations.js (Integrations, Assistant) · settings-phone.js (Phone setup) ·
+     settings-keys.js (API keys, Embed) · settings-hooks.js (Webhooks, deliveries) · settings-records.js (Activity, Export
+     data, Delete account) · settings-proto.js (prototype-only states). Namespace: window.VaaniSettings. -->
+<script src="pages/settings-data.js" defer></script>
+<script src="pages/settings.js" defer></script>
+<script src="pages/settings-ui.js" defer></script>
+<script src="pages/settings-forms.js" defer></script>
+<script src="pages/settings-account.js" defer></script>
+<script src="pages/settings-security.js" defer></script>
+<script src="pages/settings-org.js" defer></script>
+<script src="pages/settings-integrations.js" defer></script>
+<script src="pages/settings-phone.js" defer></script>
+<script src="pages/settings-keys.js" defer></script>
+<script src="pages/settings-hooks.js" defer></script>
+<script src="pages/settings-records.js" defer></script>
+<script src="pages/settings-proto.js" defer></script>
+</head>
+<body data-page="settings">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <!-- SettingsLayout (§3.2): SettingsNav 200 beside the page at ≥ 1024; below 1024 the Overview is the index and each
+         page drills in with one "‹ Settings" back link in the TopBar. Only the page column swaps between Settings pages. -->
+    <main id="main" class="app-main settings-main" tabindex="-1" data-focus-target data-width="form">
+      <!-- ConnectionBar (O §10.3): the only app-wide bar; shown while offline. -->
+      <div class="settings-cbar" id="settings-cbar" hidden></div>
+      <div class="settings-side">
+        <!-- SettingsNav (§3.3): links (Cmd/Ctrl-click opens a new tab), one list per group, aria-current on the current page. Filled from config by settings.js. -->
+        <nav class="settings-nav" id="settings-nav" aria-label="Settings"></nav>
+      </div>
+      <div class="settings-pane" id="settings-pane">
+        <!-- PageHeader nested (§3.2): breadcrumb "Settings", H1 = the page label, meta = the page’s computed status, at most one primary. -->
+        <div class="ph settings-ph" id="settings-ph">
+          <div class="ph-title">
+            <nav class="crumbs settings-crumbs" id="settings-crumbs" aria-label="Breadcrumb" hidden><a href="#" data-crumb>Settings</a><i data-icon="chevron-right" data-size="sm"></i></nav>
+            <!-- Tablet only (768–1023): the shared TopBar hides its back link there, so the one "‹ Settings" link lives here. -->
+            <a class="btn btn--link settings-back" id="settings-back" href="#overview" hidden><i data-icon="chevron-left" data-size="sm"></i><span>Settings</span></a>
+            <h1 id="page-title">Settings</h1>
+            <span class="ph-meta" id="settings-meta"></span>
+          </div>
+          <div class="ph-actions settings-ph-acts">
+            <!-- Prototype-only states control (not part of the design). It lives in the PageHeader, as on assistant.html, so
+                 it never covers content; icon-only below 1280. The popover (#settings-proto-pop) is at the end of the body. -->
+            <button class="btn btn--sm btn--tertiary has-lead settings-proto-btn proto-btn proto-btn--fold" type="button" id="settings-proto-btn" aria-label="Prototype states" data-popover="settings-proto-pop" data-placement="bottom-end" aria-haspopup="dialog" aria-expanded="false" data-tooltip="For reviewers: every state in the spec. Not part of the product."><i data-icon="sliders-horizontal" data-size="sm"></i><span class="settings-proto-l">Prototype states</span></button>
+            <!-- The page’s own actions, rendered per page by settings.js (display: contents, so they sit in the same row) -->
+            <div class="settings-acts" id="settings-actions"></div>
+          </div>
+        </div>
+        <!-- The page column: form width (720) or data width (fluid to 1280). Each page renders its sections here. -->
+        <div class="settings-col" id="settings-col">
+          <div class="settings-page" id="settings-page" aria-busy="true"></div>
+          <!-- UnsavedChangesBar (O §18.3, §4.3): the off-screen reminder of dirty sections; always shown on phones while anything is dirty. -->
+          <div class="savebar settings-savebar" id="settings-savebar" role="region" aria-label="Unsaved changes" hidden></div>
+        </div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ============ PAGE OVERLAYS ============ -->
+<!-- "Confirm it’s you" (ReauthDialog, §5.3): Dialog sm; a success is remembered for 10 minutes. Filled by settings-ui.js. -->
+<div class="dlg dlg--sm" id="st-reauth" role="dialog" aria-modal="true" aria-labelledby="st-reauth-t" aria-describedby="st-reauth-d" hidden></div>
+
+<!-- Prototype-only states popover (not part of the design): every state the spec lists, reachable without a backend. Its
+     trigger is the first PageHeader action. -->
+<div class="pop settings-proto-pop" id="settings-proto-pop" aria-labelledby="settings-proto-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="settings-proto-t">Prototype states <span class="tag tag--outline">Prototype only</span></h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body settings-proto-body" id="settings-proto-body"></div>
+</div>
+</body>
+</html>
