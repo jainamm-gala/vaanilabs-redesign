@@ -1,0 +1,793 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flow canvas reference</title>
+<meta name="description" content="Vaani Labs (Sutradhar) reference mock for spec/04-flow-designer/01-canvas-and-nodes.md: the Flow Designer layout, Trigger, Logic, Action and Outcome steps, connectors, palette, canvas controls, large-flow tools, new-flow templates and every breakpoint. Sample data only.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<script>try{var t=new URLSearchParams(location.search).get('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="../components/components.css">
+<script src="../components/shell-partials.js"></script>
+<style>
+/* Mock only: stands in for next/font's variable and the self-hosted rupee face. */
+:root{--font-hanken:"Hanken Grotesk","Noto Sans";}
+html{scrollbar-width:none} html::-webkit-scrollbar{display:none} /* mock only: frame 1 is exactly 1440 wide */
+body{font:var(--type-body-14);margin:0;background:var(--bg);color:var(--text)}
+*,*::before,*::after{box-sizing:border-box}
+h1,h2,h3,h4,p,ul,ol{margin:0} ul,ol{padding:0;list-style:none}
+button{font:inherit;color:inherit;cursor:pointer}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap}
+.mono{font:var(--type-mono-13)} .m12{font:var(--type-mono-12)}
+.t2{color:var(--text-2)} .t3{color:var(--text-3)} .sp{flex:1 1 auto}
+
+/* ---------- Document chrome (not product UI) ---------- */
+.doc-h{padding:40px 40px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.doc-h h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking)}
+.doc-h p{margin-top:6px;color:var(--text-2);max-width:88ch}
+.sec{padding:40px;border-bottom:1px solid var(--border)}
+.sec-h{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:24px;margin-bottom:20px;max-width:1360px}
+.sec-h h2{font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking)}
+.sec-h .ids{font:var(--type-meta-12);color:var(--text-3);margin-top:4px}
+.sec-h p{color:var(--text-2)}
+.fl{font:var(--type-label-12);color:var(--text-3);margin-bottom:8px}
+.fl b{color:var(--text-2);font-weight:500}
+.row{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.scroll{overflow-x:auto;max-width:100%}
+.dev{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:var(--radius-12);background:var(--bg);box-shadow:var(--e2);flex:none}
+.cap{font:var(--type-meta-12);color:var(--text-3);margin-top:8px;max-width:320px}
+.cap b{color:var(--text-2);font-weight:500}
+.stage{position:relative;overflow:visible;background-color:var(--canvas);background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1.2px);background-size:16px 16px;background-position:8px 8px;border:1px solid var(--border);border-radius:var(--radius-8)}
+
+/* ---------- Shared primitives (owned by component specs; minimal here) ---------- */
+.vr{width:1px;height:20px;background:var(--border);flex:none}
+.inp{display:flex;align-items:center;gap:6px;height:var(--control-h);padding:0 10px;border:1px solid var(--control);border-radius:var(--radius-6);background:var(--surface);font:var(--type-body-14);color:var(--text);min-width:0}
+.var{font:var(--type-mono-12);background:var(--accent-soft);color:var(--accent-soft-text);border-radius:var(--radius-4);padding:0 4px}
+.pop{position:absolute;background:var(--surface-raised);border:1px solid var(--border-overlay);border-radius:var(--radius-8);box-shadow:var(--e2);z-index:6}
+.menu-i{display:flex;align-items:center;gap:8px;height:32px;padding:0 8px;border-radius:var(--radius-2);font:var(--type-data-13);color:var(--text)}
+.mh{font:var(--type-label-12);color:var(--text-3);padding:8px 8px 4px}
+
+.app{display:grid;grid-template-columns:var(--size-rail) minmax(0,1fr);background:var(--bg);overflow:hidden;position:relative}
+
+/* ---------- Flow Designer frame ---------- */
+.fd{display:grid;grid-template-rows:var(--size-flow-header) var(--size-phase-ruler) minmax(0,1fr) var(--size-problems-bar);min-width:0;min-height:0}
+.fh{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--surface);border-bottom:1px solid var(--border);min-width:0}
+.crumb{font:var(--type-data-13);color:var(--text-3)}
+.fname{display:inline-flex;align-items:center;gap:4px;font:var(--type-title-14);color:var(--text);white-space:nowrap;padding:0 6px;height:28px;border-radius:var(--radius-6)}
+.fb{display:grid;grid-template-columns:var(--size-tool-rail) auto minmax(0,1fr) auto;min-height:0}
+.trl{background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;align-items:center;padding:8px 0;gap:4px}
+.lp{width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.lph{display:flex;align-items:center;gap:8px;padding:12px 12px 8px 16px}
+.lph h3{font:var(--type-title-16);flex:1}
+.insp{width:320px;background:var(--surface);border-left:1px solid var(--border);display:flex;flex-direction:column;min-height:0}
+.pb{display:flex;align-items:center;gap:10px;padding:0 12px;background:var(--surface);border-top:1px solid var(--border);font:var(--type-data-13);white-space:nowrap;min-width:0}
+.pb a{color:var(--accent-text);font-weight:500}
+.lg{display:inline-flex;align-items:center;gap:6px;font:var(--type-meta-12);color:var(--text-3)}
+.lg svg{width:24px;height:8px}
+
+
+.inp .plh{color:var(--text-3)}
+.menu-i.hi{background:var(--surface-2)} .menu-i > span:last-child:not(:first-child){margin-left:auto}
+.cv{min-width:0}
+.pr{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--surface);border-bottom:1px solid var(--border);min-width:0;white-space:nowrap}
+.live{display:flex;align-items:center;gap:8px;font:var(--type-data-13);color:var(--text-2);min-width:0;overflow:hidden}
+.live a{color:var(--accent-text);font-weight:500;flex:none}
+.lt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.findbar .inp{flex:1;height:28px;border-color:var(--focus);outline:2px solid var(--focus);outline-offset:1px}
+mark{background:var(--text-selection);color:inherit;border-radius:2px}
+/* Page layout for the canvas demos (component rules live in ../components/components.css §17) */
+.cc-note{font:var(--type-meta-12);color:var(--text-3)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-phone-in" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M16 2v6h6M22 2l-6 6"/></symbol>
+<symbol id="i-phone-fwd" viewBox="0 0 24 24"><use href="#i-phone"/><path d="m18 2 4 4-4 4M14 6h8"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+<symbol id="i-webhook" viewBox="0 0 24 24"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2M6 17l3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06M12 6l3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"/></symbol>
+<symbol id="i-diamond" viewBox="0 0 24 24"><path d="M12 2.5 21.5 12 12 21.5 2.5 12Z"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-msgc" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-calp" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8M3 10h18M16 19h6M19 16v6"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-tree" viewBox="0 0 24 24"><path d="M21 12h-8M21 6H8M21 18h-8M3 6v4c0 1.1.9 2 2 2h3M3 10v6c0 1.1.9 2 2 2h3"/></symbol>
+<symbol id="i-braces" viewBox="0 0 24 24"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+<symbol id="i-tidy" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-cx" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+<symbol id="i-ca" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-cd" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-cu" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+<symbol id="i-cr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-cl" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-ar" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+<symbol id="i-cols" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18"/></symbol>
+<symbol id="i-al" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M14.1 5.9 9.9 3.8a2 2 0 0 0-1.8 0L3.6 6.1A1 1 0 0 0 3 7v12.8a1 1 0 0 0 1.4.9l4.1-2.1a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V4.2a1 1 0 0 0-1.4-.9l-4.1 2.1a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></symbol>
+<symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></symbol>
+<symbol id="i-frame" viewBox="0 0 24 24"><path d="M22 6H2M22 18H2M6 2v20M18 2v20"/></symbol>
+<symbol id="i-unlink" viewBox="0 0 24 24"><path d="m18.8 12.7 1.7-1.7a5 5 0 0 0-7.1-7.1l-1.7 1.7M5.2 11.3 3.5 13a5 5 0 0 0 7.1 7.1l1.7-1.7M8 2v3M2 8h3M16 22v-3M22 16h-3"/></symbol>
+<symbol id="i-corner" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+<symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8A2 2 0 0 1 17.4 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9Z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 15 15 9"/></symbol>
+<symbol id="i-missed" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M22 2l-6 6M16 2l6 6"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-lchk" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+<style>.sk.o{top:42px}</style>
+
+<!-- ============ 1. Desktop 1440 x 900: the full editor (hero) ============ -->
+<div class="app" id="hero" style="width:100%;min-width:1280px;height:900px">
+  <nav class="rail" aria-label="Main">
+    <svg class="mark" role="img" aria-label="Vaani Labs"><use href="#vl-mark"/></svg>
+    <span class="rail-item"><svg class="ic"><use href="#i-activity"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-bot"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-head"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-video"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-lchk"/></svg></span>
+    <span class="rail-sep"></span><span class="rail-item" aria-current="page"><svg class="ic"><use href="#i-workflow"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-book-open"/></svg></span>
+    <span class="rail-sep"></span><span class="rail-item"><svg class="ic"><use href="#i-users"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-file"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-chart"/></svg></span>
+    <span class="rail-sep"></span><span class="rail-item"><svg class="ic"><use href="#i-wallet"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-sliders"/></svg></span>
+  </nav>
+  <div class="fd">
+    <div class="fh">
+      <span class="crumb">Flows /</span>
+      <span class="fname" translate="no">Site-visit qualifier<svg class="ic ic--sm t3"><use href="#i-cd"/></svg></span>
+      <span class="chip">Draft · 3 changes<svg class="ic ic--sm"><use href="#i-cd"/></svg></span>
+      <span class="chip chip--quiet"><svg class="ic ic--sm" style="color:var(--success-text)"><use href="#i-check"/></svg>Saved 11:24 am</span>
+      <span class="chip chip--live"><span class="live-dot"></span>Live v7</span>
+      <span class="vr"></span>
+      <span class="ibtn ibtn--sm" aria-label="Undo"><svg class="ic"><use href="#i-undo"/></svg></span>
+      <span class="ibtn ibtn--sm" aria-label="Redo" style="color:var(--text-dis)"><svg class="ic"><use href="#i-redo"/></svg></span>
+      <span class="btn btn--sm btn--tertiary"><svg class="ic"><use href="#i-tidy"/></svg>Tidy</span>
+      <span class="sp"></span>
+      <span class="chip" style="border-color:var(--border)"><svg class="ic ic--sm"><use href="#i-wallet"/></svg><span class="num">₹2,340.50</span></span>
+      <span class="vr"></span>
+      <span class="chip chip--warn"><svg class="ic"><use href="#i-alert"/></svg>1 warning</span>
+      <span class="btn btn--sm"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test</span>
+      <span class="btn btn--sm btn--primary">Publish v8…</span>
+      <span class="ibtn ibtn--sm" aria-label="More flow actions"><svg class="ic"><use href="#i-more"/></svg></span>
+    </div>
+    <div class="pr" role="toolbar" aria-label="Phases">
+      <span class="phase-bar"><span class="phase-seg"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span>Trigger <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>Logic <b>1</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span>Action <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span>Outcome <b>4</b></span></span><span class="ibtn ibtn--sm phase-cols" role="button" aria-pressed="false" aria-label="Phase columns" title="Phase columns"><svg class="ic"><use href="#i-cols"/></svg></span>
+      <span class="sp"></span>
+      <span class="live"><span class="live-dot"></span><span class="lt"><b style="font-weight:500;color:var(--text)">Live v7</b> answers <span class="mono">+91 80 •••• 2210</span> since 12 Sep. Callers hear v7 until you publish.</span><a>Compare with live</a></span>
+    </div>
+    <div class="fb">
+      <div class="trl" role="toolbar" aria-orientation="vertical" aria-label="Flow tools">
+        <span class="ibtn" aria-label="Add step"><svg class="ic"><use href="#i-plus"/></svg></span><span class="rail-sep"></span>
+        <span class="ibtn" aria-label="Outline"><svg class="ic"><use href="#i-tree"/></svg></span>
+        <span class="ibtn" aria-label="Variables"><svg class="ic"><use href="#i-braces"/></svg></span>
+        <span class="ibtn" aria-label="Find"><svg class="ic"><use href="#i-search"/></svg></span>
+        <span class="ibtn" aria-label="Version history"><svg class="ic"><use href="#i-history"/></svg></span>
+        <span class="ibtn" aria-label="Flow settings"><svg class="ic"><use href="#i-sliders"/></svg></span>
+      </div>
+      <div></div>
+      <div class="canvas cv" id="cv-hero" role="region" aria-label="Canvas, Site-visit qualifier, 9 steps" data-e='[["h-t1","h-l3i",{"mx":28}],["h-t2","h-l3i",{"mx":28}],["h-yes","h-a4i",{"mx":14,"c":"con"}],["h-later","h-o7i",{"mx":26,"c":"con","l":"Later"}],["h-no","h-a5i",{"mx":14,"c":"con"}],["h-nr","h-o9i",{"mx":26,"fb":1,"c":"con","l":"No reply"}],["h-bk","h-o6i",{}],["h-nb","h-o7i",{"mx":40,"fb":1}],["h-a5o","h-o8i",{}]]'>
+        <svg class="edges"></svg>
+        <div class="nl" style="--z:.75">
+          <div class="node node--trigger" style="left:8px;top:170px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-list"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#1</span></div><div class="node-title">Outbound batch</div><div class="node-meta">Weekend follow-ups · 10 am to 7 pm IST</div></div></div><span class="sock sock--head" id="h-t1"></span></div>
+          <div class="node node--trigger" style="left:8px;top:290px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#2</span></div><div class="node-title">Inbound call</div><div class="node-meta"><span class="m12">+91 80 •••• 2210</span></div></div></div><span class="sock sock--head" id="h-t2"></span></div>
+          <div class="node is-selected" style="left:376px;top:120px;width:256px"><span class="sock sock--in" id="h-l3i"></span>
+            <div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question · Edited</span><span class="node-no">#3</span></div><div class="node-title">Ask about a site visit</div><div class="node-sum"><span class="node-var">{{lead_name}}</span> ji, would you like to visit the site this week?</div><div class="node-meta">Hinglish · waits 6 s</div></div></div>
+            <div class="ans"><span class="ans-label">Yes</span><span class="ans-ex">haan, zaroor · <span lang="hi">हाँ</span></span><span class="sock sock--active" id="h-yes"></span></div>
+            <div class="ans"><span class="ans-label">Later</span><span class="ans-ex">baad mein, next week</span><span class="sock sock--active" id="h-later"></span></div>
+            <div class="ans"><span class="ans-label">No</span><span class="ans-ex">nahi, not now</span><span class="sock sock--active" id="h-no"></span></div>
+            <div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s · asks again once</span><span class="sock sock--active" id="h-nr"></span></div>
+          </div>
+          <div class="node node--warning" style="left:744px;top:40px;width:240px"><span class="node-badges"><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1 warning</span></span><span class="sock sock--in" id="h-a4i"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Book meeting · New</span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div><div class="node-meta">Calendar, then WhatsApp</div></div></div>
+            <div class="res-row"><svg class="ic"><use href="#i-check"/></svg><span class="res-label">Booked</span><span class="sock" id="h-bk"></span></div>
+            <div class="res-row res-row--fallback"><svg class="ic"><use href="#i-x"/></svg><span class="res-label">Not booked</span><span class="sock" id="h-nb"></span></div></div>
+          <div class="node is-focus" style="left:744px;top:356px;width:240px"><span class="sock sock--in" id="h-a5i"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#7</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head" id="h-a5o"></span></div>
+          <div class="node node--outcome" style="left:1112px;top:96px;width:240px"><span class="sock sock--in" id="h-o6i"></span><div class="node-head"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#5</span></div><div class="node-title">Visit booked</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Interested</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:212px;width:240px"><span class="sock sock--in" id="h-o7i"></span><div class="node-head"><span class="gt gt--warning"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#6</span></div><div class="node-title">Callback set</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Callback due</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:356px;width:240px"><span class="sock sock--in" id="h-o8i"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#8</span></div><div class="node-title">Not interested</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Not interested</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:480px;width:240px"><span class="sock sock--in" id="h-o9i"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#9</span></div><div class="node-title">No answer</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Not reached</b></div></div></div></div>
+        </div>
+        <div class="canvas-ctl"><span class="canvas-ctl-group"><span aria-label="Zoom out"><svg class="ic"><use href="#i-minus"/></svg></span><span class="num" style="min-width:52px">75%</span><span aria-label="Zoom in"><svg class="ic"><use href="#i-plus"/></svg></span></span><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-fit"/></svg>Fit</span></span><span class="canvas-ctl-group"><span aria-label="Hide minimap" style="background:var(--surface-3);color:var(--text)"><svg class="ic"><use href="#i-map"/></svg></span><span aria-label="View options"><svg class="ic"><use href="#i-more"/></svg></span></span></div>
+        <div class="minimap" aria-hidden="true"><i class="is-trigger" style="left:10px;top:44px;width:24px;height:8px"></i><i class="is-trigger" style="left:10px;top:58px;width:24px;height:8px"></i><i style="left:44px;top:34px;width:30px;height:28px;background:var(--accent-mark)"></i><i style="left:84px;top:22px;width:28px;height:9px"></i><i style="left:84px;top:62px;width:28px;height:9px"></i><i style="left:120px;top:22px;width:24px;height:9px"></i><i style="left:120px;top:40px;width:24px;height:9px"></i><i style="left:120px;top:62px;width:24px;height:9px"></i><i style="left:120px;top:80px;width:24px;height:9px"></i><span class="minimap-vp" style="left:6px;top:12px;width:160px;height:92px"></span></div>
+      </div>
+      <aside class="insp" aria-label="Step inspector">
+        <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 8px 12px 16px">
+          <span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>
+          <div style="flex:1;min-width:0"><div class="t3" style="font:var(--type-phase-12)">Logic · Question · #3</div><div style="font:var(--type-title-16)">Ask about a site visit</div></div>
+          <span class="ibtn ibtn--sm" aria-label="Step actions"><svg class="ic"><use href="#i-more"/></svg></span><span class="ibtn ibtn--sm" aria-label="Close inspector"><svg class="ic"><use href="#i-x"/></svg></span>
+        </div>
+        <div style="display:flex;gap:16px;padding:0 16px;border-bottom:1px solid var(--border);font:var(--type-label-13)"><span style="padding:10px 0;box-shadow:inset 0 -2px 0 var(--accent-mark)">Configure</span><span class="t2" style="padding:10px 0">Test data</span><span class="t2" style="padding:10px 0">Issues <span class="t3 num">0</span></span></div>
+        <div style="padding:16px;display:grid;gap:16px;overflow:hidden">
+          <div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Label</label><span class="inp">Ask about a site visit</span></div>
+          <div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Agent asks</label><div class="inp" style="height:auto;padding:8px 10px;display:block;line-height:20px"><span class="var">{{lead_name}}</span> ji, would you like to visit the site this week? We have Saturday and Sunday slots.</div><span class="t3" style="font:var(--type-meta-12)">Type {{ to add a variable.</span></div>
+          <div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Answers to listen for</label>
+            <div style="border:1px solid var(--border-strong);border-radius:var(--radius-6);overflow:hidden">
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border)"><svg class="ic ic--sm t3"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div style="font:var(--type-label-13)">Yes</div><div class="t3" style="font:var(--type-meta-12)">haan, zaroor · <span lang="hi">हाँ</span></div></div><span class="inp" style="height:28px;font:var(--type-data-13);width:128px;justify-content:space-between">Book site visit<svg class="ic ic--sm"><use href="#i-cd"/></svg></span></div>
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border)"><svg class="ic ic--sm t3"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div style="font:var(--type-label-13)">Later</div><div class="t3" style="font:var(--type-meta-12)">baad mein, next week</div></div><span class="inp" style="height:28px;font:var(--type-data-13);width:128px;justify-content:space-between">Callback set<svg class="ic ic--sm"><use href="#i-cd"/></svg></span></div>
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid var(--border)"><svg class="ic ic--sm t3"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div style="font:var(--type-label-13)">No</div><div class="t3" style="font:var(--type-meta-12)">nahi, not now</div></div><span class="inp" style="height:28px;font:var(--type-data-13);width:128px;justify-content:space-between">Polite close<svg class="ic ic--sm"><use href="#i-cd"/></svg></span></div>
+              <div style="display:flex;align-items:center;gap:8px;padding:6px 8px 6px 30px;background:var(--surface-2)"><div style="flex:1;min-width:0"><div style="font:var(--type-label-13)">No reply</div><div class="t3" style="font:var(--type-meta-12)">after 6 s · required</div></div><span class="inp" style="height:28px;font:var(--type-data-13);width:128px;justify-content:space-between">No answer<svg class="ic ic--sm"><use href="#i-cd"/></svg></span></div>
+            </div>
+            <span class="btn btn--sm btn--tertiary" style="justify-self:start;margin-left:-8px"><svg class="ic ic--sm"><use href="#i-plus"/></svg>Add answer</span>
+          </div>
+        </div>
+        <div class="sp"></div>
+        <div style="display:flex;gap:8px;align-items:center;padding:10px 16px;border-top:1px solid var(--border);background:var(--surface-2);font:var(--type-meta-12);color:var(--text-2)"><svg class="ic ic--sm"><use href="#i-info"/></svg>Edits save to the draft. Callers hear v7 until you publish.</div>
+      </aside>
+    </div>
+    <div class="pb">
+      <span class="chip chip--warn"><svg class="ic ic--sm"><use href="#i-alert"/></svg>1 warning</span>
+      <span class="t2" style="overflow:hidden;text-overflow:ellipsis">Book site visit: WhatsApp template "visit_confirm" is pending approval.</span><a>Go to step</a>
+      <span class="sp"></span>
+      <span class="lg"><svg viewBox="0 0 24 8"><path d="M0 4H24" stroke="var(--edge)" stroke-width="1.5"/></svg>Path</span>
+      <span class="lg"><svg viewBox="0 0 24 8"><path d="M0 4H24" stroke="var(--edge)" stroke-width="1.5" stroke-dasharray="5 4"/></svg>Fallback</span>
+      <span class="vr"></span>
+      <span class="btn btn--sm btn--tertiary"><svg class="ic ic--sm"><use href="#i-tree"/></svg>Outline</span><span class="btn btn--sm btn--tertiary"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test panel</span>
+    </div>
+  </div>
+</div>
+
+<style>
+.cells{display:flex;flex-wrap:wrap;gap:28px 32px;align-items:flex-start;padding:28px 24px}
+.cells .cap{max-width:256px}
+.sgrid{display:grid;grid-template-columns:repeat(4,240px);gap:36px 40px;padding:32px 28px}
+.lod{display:flex;gap:24px;align-items:flex-start}
+.lod .stage{overflow:hidden}
+</style>
+
+<header class="doc-h">
+  <h1>Flow Designer · canvas and nodes · reference mock</h1>
+  <p>Companion to <b>spec/04-flow-designer/01-canvas-and-nodes.md</b>. Sutradhar tokens from spec/tokens/tokens.css. Every flow, number and lead here is fictional. Frame 1 above is the desktop editor at 1440 × 900 (Baseline hidden, rail forced, inspector docked, zoom 85 %). Add <b>?theme=dark</b> to the URL for the dark theme.</p>
+</header>
+
+<!-- ============ 2. Grammar: the four phases ============ -->
+<section class="sec" aria-labelledby="s2">
+  <div class="sec-h"><div><h2 id="s2">Trigger, Logic, Action, Outcome</h2><p class="ids">Spec §4 and §5 · F-FLOW-007, F-FLOW-027, F-FLOW-020, F-FLOW-029</p></div>
+  <p>Silhouette and glyph tile carry the phase; colour carries only state. Capsules enter and leave the call, rectangles do the work. Every Logic output is a labelled answer row (what the caller says, with bilingual examples); an Action that can fail shows result rows (what the tool did: a check or x glyph and a plain label, no examples). The fallback row is the only one that draws a dashed edge. Outcomes name the lead status they write in a plain status line, not a chip. Shown at 100 %.</p></div>
+  <div class="stage"><div class="cells">
+    <div class="cell"><div class="nl nl--static"><div class="node node--trigger" style="width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#1</span></div><div class="node-title">Inbound call</div><div class="node-meta"><span class="m12">+91 80 •••• 2210</span></div></div></div><span class="sock sock--head"></span></div></div>
+      <p class="cap"><b>Trigger</b> · capsule start, solid ink tile. When a call starts. One output, no input. Inbound call, Outbound batch, API or webhook, Browser test.</p></div>
+    <div class="cell"><div class="nl nl--static"><div class="node" style="width:256px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#3</span></div><div class="node-title">Ask about budget</div><div class="node-sum">What budget are you looking at for the flat?</div></div></div>
+      <div class="ans"><span class="ans-label">Under ₹80 L</span><span class="ans-ex">80 tak, kam budget</span><span class="sock"></span></div><div class="ans"><span class="ans-label">₹80 L to ₹1 Cr</span><span class="ans-ex">ek crore tak</span><span class="sock"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s</span><span class="sock"></span></div></div></div>
+      <p class="cap"><b>Logic</b> · rectangle, outlined diamond tile. Listen and decide. Named answers with bilingual examples, plus a required No reply (Question) or Else (Branch).</p></div>
+    <div class="cell"><div class="nl nl--static"><div class="node" style="width:240px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-db"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · CRM lookup</span><span class="node-no">#5</span></div><div class="node-title">Find the lead's project</div><div class="node-meta">By phone number · Sample CRM</div></div></div>
+      <div class="res-row"><svg class="ic"><use href="#i-check"/></svg><span class="res-label">Found</span><span class="sock"></span></div><div class="res-row res-row--fallback"><svg class="ic"><use href="#i-x"/></svg><span class="res-label">Not found</span><span class="sock"></span></div></div></div>
+      <p class="cap"><b>Action</b> · rectangle, tinted tool tile. Do something for the caller. One output; lookups, Book meeting and Transfer show result rows (Found and a Not found fallback), never answer rows, so "did" never looks like "decides".</p></div>
+    <div class="cell"><div class="nl nl--static"><div class="node node--outcome" style="width:240px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#9</span></div><div class="node-title">Visit booked</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Interested</b></div></div></div></div></div>
+      <p class="cap"><b>Outcome</b> · capsule end, tile in the soft tone of the status it writes. How the call ended. No output. The status line "Lead → Interested" is plain text; the tile carries the tone.</p></div>
+  </div></div>
+  <div class="row" style="margin-top:28px">
+    <div><p class="fl"><b>Phase ruler</b> · one connected bar; arrow-right between phases (never chevrons, which belong to the breadcrumb); the Phase columns toggle sits at its end</p>
+      <div class="pr" style="height:48px;border:1px solid var(--border);border-radius:var(--radius-8);width:max-content"><span class="phase-bar"><span class="phase-seg"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span>Trigger <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg" aria-pressed="true"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>Logic <b>1</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span>Action <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span>Outcome <b>3</b></span></span><span class="ibtn ibtn--sm phase-cols" role="button" aria-pressed="true" aria-label="Phase columns" title="Phase columns"><svg class="ic"><use href="#i-cols"/></svg></span></div>
+      <p class="cap" style="max-width:520px">Logic is pressed: the other phases lose emphasis (surface-2 fill; their tiles, sockets and connectors at 40 %; their words stay at full contrast).</p></div>
+    <div><p class="fl"><b>Phase columns</b> · a view option, off by default: Tidy's layers as alternating bands, each headed with the phases it holds. Nothing moves; the draft is not changed.</p>
+      <div class="canvas cv" style="width:744px;height:250px;border:1px solid var(--border);border-radius:var(--radius-8)" data-e='[["pc-t","pc-li",{"mx":20,"c":"dim"}],["pc-y","pc-ai",{"mx":14}],["pc-nr","pc-o2i",{"mx":20,"fb":1,"l":"No reply"}],["pc-ao","pc-o1i",{"c":"dim"}]]'>
+        <div class="phase-bands"><div class="phase-band" style="left:0;width:186px"><div class="phase-band-head"><b>Trigger</b> 1</div></div><div class="phase-band" style="left:186px;width:186px"><div class="phase-band-head"><b>Logic</b> 1</div></div><div class="phase-band" style="left:372px;width:186px"><div class="phase-band-head"><b>Action</b> 1</div></div><div class="phase-band" style="left:558px;width:186px"><div class="phase-band-head"><b>Outcome</b> 2</div></div></div>
+        <svg class="edges"></svg>
+        <div class="nl" style="--z:.5">
+          <div class="node node--trigger node--compact node--dim" style="left:40px;top:150px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span></div><div class="node-title">Inbound call</div></div></div><span class="sock sock--head" style="top:56px" id="pc-t"></span></div>
+          <div class="node node--compact" style="left:398px;top:110px;width:256px"><span class="sock sock--in" style="top:56px" id="pc-li"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask about a site visit</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="sock" id="pc-y"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="sock" id="pc-nr"></span></div></div>
+          <div class="node node--compact node--dim" style="left:766px;top:120px;width:240px"><span class="sock sock--in" style="top:56px" id="pc-ai"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Book site visit</div></div></div><span class="sock sock--head" style="top:56px" id="pc-ao"></span></div>
+          <div class="node node--outcome node--compact node--dim" style="left:1134px;top:120px;width:240px"><span class="sock sock--in" style="top:56px" id="pc-o1i"></span><div class="node-head"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span></div><div class="node-title">Visit booked</div></div></div></div>
+          <div class="node node--outcome node--compact node--dim" style="left:1134px;top:330px;width:240px"><span class="sock sock--in" style="top:56px" id="pc-o2i"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span></div><div class="node-title">No answer</div></div></div></div>
+        </div>
+      </div>
+      <p class="cap" style="max-width:744px">Shown at 50 % (Compact band) with Logic emphasised. Bands follow Tidy's last layout; real flows mix phases inside a layer, so a band header can read "Logic 2 · Action 1". Off by default, so the layout rule (no phase columns in the layout) still holds.</p></div>
+  </div>
+</section>
+
+<!-- ============ 3. Node states ============ -->
+<section class="sec" aria-labelledby="s3">
+  <div class="sec-h"><div><h2 id="s3">Step states</h2><p class="ids">Spec §5.4 · F-A11Y-007, F-FLOW-010, F-FLOW-036, F-FLOW-029, F-FLOW-016</p></div>
+  <p>Focus is an offset outline; selection is an accent-soft header, an accent border and accent sockets. Both show together. Issue badges carry a word, an icon and a count. Nothing that holds text is ever made transparent: unreachable and de-emphasised steps change their fill and dim only their tile, sockets and connectors. Only one issue badge per step: errors outrank warnings; the tooltip lists everything.</p></div>
+  <div class="stage"><div class="sgrid">
+    <div><div class="nl nl--static"><div class="node"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>Default</b> · surface, 1 px border-strong, e1</p></div>
+    <div><div class="nl nl--static"><div class="node is-hover"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span><span class="sock-add" style="left:calc(100% + 2px)"><svg class="ic ic--sm"><use href="#i-plus"/></svg></span></div></div><p class="cap"><b>Hover</b> · border becomes control; a free socket shows "+" to add the next step</p></div>
+    <div><div class="nl nl--static"><div class="node is-selected"><span class="sock sock--in sock--active"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head sock--active"></span></div></div><p class="cap"><b>Selected</b> · accent-soft header, accent-mark border and inner ring, e2</p></div>
+    <div><div class="nl nl--static"><div class="node is-focus"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>Keyboard focus</b> · 2 px focus outline, 3 px offset</p></div>
+    <div><div class="nl nl--static"><div class="node is-selected is-focus"><span class="sock sock--in sock--active"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head sock--active"></span></div></div><p class="cap"><b>Focused and selected</b> · both treatments at once</p></div>
+    <div><div class="nl nl--static"><div class="node node--error"><span class="node-badges"><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-cx"/></svg>2 errors</span></span><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msgc"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Send WhatsApp</span><span class="node-no">#6</span></div><div class="node-title">Send brochure</div><div class="node-meta" style="color:var(--danger-text)">No template chosen</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>Errors</b> · danger border and badge; blocks Publish</p></div>
+    <div><div class="nl nl--static"><div class="node node--warning"><span class="node-badges"><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1 warning</span></span><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Book meeting</span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div><div class="node-meta">Calendar, then WhatsApp</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>Warning</b> · warning border and badge; Publish asks for a tick</p></div>
+    <div><div class="nl nl--static"><div class="node node--unreachable node--error"><span class="node-badges"><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-unlink"/></svg>Not connected</span></span><span class="sock sock--in sock--free"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-book-open"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Knowledge lookup</span><span class="node-no">#11</span></div><div class="node-title">Price sheet lookup</div><div class="node-meta">price-sheet.pdf</div></div></div><div class="res-row"><svg class="ic"><use href="#i-check"/></svg><span class="res-label">Found</span><span class="sock sock--free"></span></div><div class="res-row res-row--fallback"><svg class="ic"><use href="#i-x"/></svg><span class="res-label">Not found</span><span class="sock sock--free"></span></div></div></div><p class="cap"><b>Unreachable</b> · surface-2 fill, every word at full contrast; only the tile and sockets dim; hollow input; an error</p></div>
+    <div><div class="nl nl--static"><div class="node node--dim"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>De-emphasised</b> (phase emphasis, Find) · surface-2 fill; tile, sockets and connectors at 40 %; text never dims</p></div>
+    <div><div class="nl nl--static"><div class="node"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak · Edited</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>Changed since live</b> · the word Edited or New in the phase line, never a colour</p></div>
+    <div><div class="nl nl--static"><div class="node node--now"><span class="node-badges"><span class="tag tag--info"><svg class="ic ic--xs"><use href="#i-play"/></svg>Now</span></span><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Speak</span><span class="node-no">#5</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head"></span></div></div><p class="cap"><b>In a test run</b> · 3 px inset accent bar and a Now tag; steps already passed carry a Reached tag with a check</p></div>
+    <div><div class="nl nl--static"><div class="node node--error"><span class="node-badges"><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-cx"/></svg>1 error</span></span><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line" style="border-style:solid"><svg class="ic"><use href="#i-help"/></svg></span><div class="node-text"><div class="node-phase"><span>Unsupported step</span><span class="node-no">#14</span></div><div class="node-title">Call ambulance</div><div class="node-meta">Type "ambulance_call" isn't supported</div></div></div><div class="ans" style="padding-right:12px"><span class="btn btn--sm" style="height:22px;font-size:var(--f12)">Convert to…<svg class="ic ic--xs"><use href="#i-cd"/></svg></span></div></div></div><p class="cap"><b>Unsupported</b> · replaces React Flow's blank default box; an error, so it takes the error border</p></div>
+    <div><div class="nl nl--static"><div class="node node--error"><span class="node-badges"><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-cx"/></svg>1 error</span></span><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#7</span></div><div class="node-title">Confirm the site</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="ans-ex">haan</span><span class="sock"></span></div><div class="ans ans--open"><span class="ans-label">No</span><span class="ans-ex">Not connected</span><span class="sock sock--open"><span class="sock-stub"></span></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s</span><span class="sock"></span></div></div></div><p class="cap"><b>Required answer not connected</b> · amber socket, stub and words mark where; the step counts it as an error</p></div>
+  </div></div>
+</section>
+
+<!-- ============ 4. Level of detail ============ -->
+<section class="sec" aria-labelledby="s4">
+  <div class="sec-h"><div><h2 id="s4">Level of detail and the 12 px floor</h2><p class="ids">Spec §5.5 · F-FLOW-008, F-A11Y-008</p></div>
+  <p>Step text is set in flow units, so it would shrink with zoom. Each band shows only what fits, and every text role is clamped with <span class="mono">max(role, 12px / zoom)</span> inside a fixed line box, so at rest nothing renders under 12 CSS px and boxes never re-flow while zooming. The glyph tile and phase word survive every band, so Logic and Action never collapse into identical boxes.</p></div>
+  <div class="lod">
+    <div><p class="fl"><b>Full</b> · 0.75 and up (shown at 100 %)</p><div class="stage" style="width:300px;height:190px"><div class="nl" style="--z:1"><div class="node" style="left:20px;top:20px;width:256px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#3</span></div><div class="node-title">Ask about budget</div><div class="node-sum">What budget are you looking at?</div></div></div><div class="ans"><span class="ans-label">Under ₹80 L</span><span class="ans-ex">80 tak</span><span class="sock"></span></div><div class="ans"><span class="ans-label">₹80 L to ₹1 Cr</span><span class="ans-ex">ek crore tak</span><span class="sock"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">6 s</span><span class="sock"></span></div></div></div></div></div>
+    <div><p class="fl"><b>Compact</b> · 0.5 to 0.75 (shown at 60 %)</p><div class="stage" style="width:200px;height:190px"><div class="nl" style="--z:.6"><div class="node node--compact" style="left:30px;top:30px;width:256px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask about budget</div></div></div><div class="ans"><span class="ans-label">Under ₹80 L</span><span class="sock"></span></div><div class="ans"><span class="ans-label">₹80 L to ₹1 Cr</span><span class="sock"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="sock"></span></div></div></div></div></div>
+    <div><p class="fl"><b>Block</b> · below 0.5 (shown at 40 %)</p><div class="stage" style="width:210px;height:190px;overflow:hidden"><div class="nl" style="--z:.4"><div class="node node--block" style="left:40px;top:40px;width:256px"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><span class="node-blocklabel" aria-hidden="true"><i>#3</i>Ask about budget</span><span class="sock" style="top:24%"></span><span class="sock" style="top:50%"></span><span class="sock" style="top:76%"></span></div><div class="node node--block" style="left:40px;top:160px;width:240px"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><span class="node-blocklabel" aria-hidden="true"><i>#7</i>Polite close</span></div><div class="node node--block node--outcome" style="left:40px;top:280px;width:240px"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><span class="node-blocklabel" aria-hidden="true"><i>#5</i>Visit booked</span></div></div></div></div>
+    <div style="max-width:360px"><p class="fl"><b>What each band keeps</b></p><ul class="t2" style="display:grid;gap:8px;font:var(--type-data-13)">
+      <li><b style="font-weight:600;color:var(--text)">Full:</b> phase line with type and #, title, 2-line summary, meta, answer rows with examples, badges with words.</li>
+      <li><b style="font-weight:600;color:var(--text)">Compact:</b> tile, phase word, one-line title, answer labels; badges become icon + count.</li>
+      <li><b style="font-weight:600;color:var(--text)">Block:</b> silhouette and tile in the box; the title becomes a Block label (#n + title, 140 px, two lines) that may run into the gap; sockets stay as stubs; edge labels hide.</li>
+      <li><b style="font-weight:600;color:var(--text)">Zooming:</b> during a pinch text simply scales; the 12 px clamp is re-applied once, when the gesture ends.</li>
+      <li>Band changes swap instantly with 0.03 hysteresis, never animated.</li></ul></div>
+  </div>
+</section>
+
+<style>
+.cgrid{display:grid;grid-template-columns:repeat(3,420px);gap:28px 24px}
+.cgrid .stage{width:420px;height:190px;overflow:visible}
+.mini{width:150px}
+.hit{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);border:1px solid var(--accent-mark);right:-12px;top:50%;margin-top:-12px;z-index:1}
+.pi{display:flex;align-items:center;gap:10px;min-height:44px;padding:4px 8px;border-radius:var(--radius-6)}
+.pi .nm{font:var(--type-label-13);color:var(--text)}.pi .ds{font:var(--type-meta-12);color:var(--text-3)}
+.pi.hi{background:var(--surface-2)}
+.pg{display:flex;align-items:center;gap:8px;padding:10px 8px 4px}
+.pg b{font:var(--type-label-13);font-weight:600}.pg span{font:var(--type-meta-12);color:var(--text-3)}
+.pg .pgc{margin-left:auto;color:var(--text-3)}
+.ru{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 8px 0 4px;border:1px solid var(--border-strong);border-radius:var(--radius-6);font:var(--type-label-12);background:var(--surface)}
+</style>
+
+<!-- ============ 5. Connectors and sockets ============ -->
+<section class="sec" aria-labelledby="s5">
+  <div class="sec-h"><div><h2 id="s5">Connectors and sockets</h2><p class="ids">Spec §6 and §7 · F-FLOW-011, F-FLOW-020, F-A11Y-001, F-A11Y-023, F-A11Y-022, F-A11Y-028</p></div>
+  <p>One neutral routed line, one arrowhead, one meaning for dashes (the fallback path). Colour changes only for interaction (hover, selection) and state (invalid, taken in a test). Labels appear on long branch edges, on hover and on selection; short edges rely on the answer row beside the socket. Edges never animate at rest.</p></div>
+  <div class="cgrid">
+    <div><div class="stage" data-e='[["c1a","c1b",{}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:30px"><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Greet</div></div></div><span class="sock sock--head" id="c1a"></span></div><div class="node mini" style="left:250px;top:70px"><span class="sock sock--in" id="c1b"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div></div></div></div>
+      <p class="cap"><b>Path</b> · 1.5 px edge, orthogonal, 8 px corners, 8 px arrowhead into the input port.</p></div>
+    <div><div class="stage" data-e='[["c2y","c2b",{"c":"hov","l":"Yes","mx":20}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:14px"><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="sock" id="c2y"></span></div><div class="ans"><span class="ans-label">No</span><span class="sock"></span></div></div><div class="node mini" style="left:250px;top:84px"><span class="sock sock--in" id="c2b"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Book visit</div></div></div></div></div></div>
+      <p class="cap"><b>Hover</b> · edge-hover at 2 px, the label shows, and a tooltip names both ends.</p></div>
+    <div><div class="stage" data-e='[["c3y","c3b",{"c":"sel","l":"Yes","lc":"sel","mx":20}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:14px"><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="sock" id="c3y"></span></div><div class="ans"><span class="ans-label">No</span><span class="sock"></span></div></div><div class="node mini" style="left:250px;top:10px"><span class="sock sock--in" id="c3b"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Book visit</div></div></div></div></div>
+      <div class="pop" style="left:232px;top:80px;width:180px;padding:4px"><div class="menu-i hi"><svg class="ic"><use href="#i-plus"/></svg>Insert step…</div><div class="menu-i"><svg class="ic"><use href="#i-corner"/></svg>Change target…<span class="kbd">C</span></div><div class="menu-i" style="color:var(--danger-text)"><svg class="ic"><use href="#i-trash"/></svg>Delete connection</div></div></div>
+      <p class="cap"><b>Selected</b> · edge-active at 2 px, label in the selection treatment, and a popover with insert, change target and delete.</p></div>
+    <div><div class="stage" data-e='[["c4n","c4b",{"fb":1,"mx":16}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:14px"><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="sock"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="sock" id="c4n"></span></div></div><div class="node node--outcome mini" style="left:250px;top:82px;width:160px"><span class="sock sock--in" id="c4b"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span></div><div class="node-title">No answer</div></div></div></div></div></div>
+      <p class="cap"><b>Fallback</b> · the only dashed line in the product (5 / 4 on edge). No reply, Else, Not found, Not booked and Didn't connect. A short edge carries no label: the row beside the socket says it.</p></div>
+    <div><div class="stage" data-e='[["c5a","c5b",{"c":"bad","l":"Unsupported target","lc":"bad"}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:30px"><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Greet</div></div></div><span class="sock sock--head" id="c5a"></span></div><div class="node node--error mini" style="left:250px;top:70px"><span class="sock sock--in" id="c5b"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-help"/></svg></span><div class="node-text"><div class="node-phase"><span>Unsupported</span></div><div class="node-title">Call ambulance</div></div></div></div></div></div>
+      <p class="cap"><b>Invalid</b> · danger stroke and a labelled reason. Only imported or AI-drafted flows can contain one; the canvas refuses invalid drops.</p></div>
+    <div><div class="stage" data-e='[["c6a","c6b",{"c":"tk"}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:30px"><span class="node-badges"><span class="tag"><svg class="ic ic--xs"><use href="#i-check"/></svg>Reached</span></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Greet</div></div></div><span class="sock sock--head" id="c6a"></span></div><div class="node node--now mini" style="left:250px;top:70px"><span class="node-badges"><span class="tag tag--info"><svg class="ic ic--xs"><use href="#i-play"/></svg>Now</span></span><span class="sock sock--in" id="c6b"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div></div></div></div>
+      <p class="cap"><b>Taken in a test</b> · one 480 ms trace along the edge, then it stays edge-active. Reduced motion: no trace, the path is simply marked.</p></div>
+    <div><div class="stage" data-e='[["c7a",null,{"c":"gh","tx":262,"ty":118,"mx":40}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:20px;top:30px"><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Greet</div></div></div><span class="sock sock--head" id="c7a"></span></div><div class="node mini" style="left:270px;top:76px;border-color:var(--accent-mark)"><span class="sock sock--in" style="width:14px;height:14px;left:-7px;margin-top:-7px;background:var(--surface);border:2px solid var(--accent-mark);box-shadow:none"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div></div></div></div>
+      <p class="cap"><b>Connecting</b> · a solid ghost at drag opacity; valid input ports grow to 14 px with an accent ring. Dropping on empty canvas opens Add step there, already connected.</p></div>
+    <div><div class="stage" data-e='[["c8a","c8b",{}],["c8c","c8d",{"back":1,"drop":34,"c":"hov"}]]'><svg class="edges"></svg><div class="nl"><div class="node mini" style="left:30px;top:20px"><span class="sock sock--in" id="c8d"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div><span class="sock sock--head" id="c8a"></span></div><div class="node mini" style="left:250px;top:20px"><span class="sock sock--in" id="c8b"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Explain prices</div></div></div><span class="sock sock--head" id="c8c"></span></div></div></div>
+      <p class="cap"><b>Back edge</b> · a connection to an earlier step routes below both steps and enters from the left. Self-loops are not drawn: retries are a setting on the fallback row.</p></div>
+    <div><div class="stage" data-e='[["c9a","c9c",{"mx":30}],["c9b","c9c",{"mx":30}]]'><svg class="edges"></svg><div class="nl"><div class="node node--trigger mini" style="left:20px;top:6px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-list"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span></div><div class="node-title">Outbound</div></div></div><span class="sock sock--head" id="c9a"></span></div><div class="node node--trigger mini" style="left:20px;top:86px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span></div><div class="node-title">Inbound</div></div></div><span class="sock sock--head" id="c9b"></span></div><div class="node mini" style="left:250px;top:46px"><span class="sock sock--in" id="c9c"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask budget</div></div></div></div></div></div>
+      <p class="cap"><b>Fan-in</b> · connections into one input share their last run, so 12 edges into one step read as one trunk.</p></div>
+  </div>
+
+  <div class="row" style="margin-top:32px">
+    <div><p class="fl"><b>Sockets</b> · 10 px visual, 24 px hit area (44 px on coarse pointers), each a real button</p>
+    <div class="stage" style="width:520px;height:210px"><div class="nl"><div class="node" style="left:40px;top:24px;width:256px"><span class="sock sock--in sock--free"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#3</span></div><div class="node-title">Ask about budget</div></div></div>
+      <div class="ans"><span class="ans-label">Under ₹80 L</span><span class="ans-ex">connected</span><span class="sock"></span></div>
+      <div class="ans"><span class="ans-label">₹80 L to ₹1 Cr</span><span class="ans-ex">free, hovered</span><span class="hit"></span><span class="sock sock--free" style="z-index:2"></span><span class="sock-add"><svg class="ic ic--sm"><use href="#i-plus"/></svg></span></div>
+      <div class="ans"><span class="ans-label">Above ₹1 Cr</span><span class="ans-ex">free, keyboard focus</span><span class="sock sock--free is-focus"></span></div>
+      <div class="ans ans--fallback ans--open"><span class="ans-label">No reply</span><span class="ans-ex">Not connected</span><span class="sock sock--open"><span class="sock-stub"></span></span></div></div></div>
+      <div class="pop" style="left:338px;top:118px;width:170px;padding:6px 8px;font:var(--type-meta-12);color:var(--text-2)">Above ₹1 Cr: free. <span class="kbd">C</span> Connect to… <span class="kbd">A</span> Add step</div></div></div>
+    <div style="max-width:560px"><p class="fl"><b>Socket states</b></p><ul class="t2" style="display:grid;gap:8px;font:var(--type-data-13)">
+      <li><b style="color:var(--text);font-weight:600">Connected:</b> filled socket colour with a 2 px surface ring; on a selected step, accent-mark.</li>
+      <li><b style="color:var(--text);font-weight:600">Free:</b> hollow, 1.5 px control border (≥ 3:1). Hover or focus adds the "+" Add step button 12 px beyond it.</li>
+      <li><b style="color:var(--text);font-weight:600">Focused:</b> the global 2 px focus outline, offset 2. Enter selects its connection; C opens Connect to…; Delete removes the connection.</li>
+      <li><b style="color:var(--text);font-weight:600">Required, not connected:</b> warning-soft fill, warning border, a 20 px stub and the words "Not connected". The step's error badge and Issues tab carry the fix.</li>
+      <li><b style="color:var(--text);font-weight:600">Input port:</b> left edge on the title line. Hollow while nothing reaches the step; arrowheads stop 2 px short of it.</li>
+      <li>The shaded circle marks the 24 px hit area for review only; it is never drawn in the product.</li></ul></div>
+  </div>
+</section>
+
+<!-- ============ 6. Palette and adding steps ============ -->
+<section class="sec" aria-labelledby="s6">
+  <div class="sec-h"><div><h2 id="s6">Add step: palette, drag, drop on an edge, and "+" from a socket</h2><p class="ids">Spec §8 · F-FLOW-009, F-FLOW-035, F-FLOW-026, F-FLOW-027, F-A11Y-001</p></div>
+  <p>One list, grouped by phase, each type named once with a one-line description. Click or Enter inserts after the selected step and connects it; drag places it; dropping on a connection inserts between its two steps. The "+" beside a free socket opens the same list as a search-first picker. Nothing ever lands on top of another step.</p></div>
+  <div class="scroll"><div class="dev app" style="width:1000px;height:640px;grid-template-columns:48px 280px minmax(0,1fr)">
+    <div class="trl" style="border-right:1px solid var(--border)"><span class="ibtn" aria-pressed="true" aria-label="Add step"><svg class="ic"><use href="#i-plus"/></svg></span><span class="rail-sep"></span><span class="ibtn"><svg class="ic"><use href="#i-tree"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-braces"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-search"/></svg></span></div>
+    <div class="lp" style="width:280px;overflow:hidden">
+      <div class="lph"><h3>Add step</h3><span class="ibtn ibtn--sm" aria-label="Close Add step"><svg class="ic"><use href="#i-x"/></svg></span></div>
+      <div style="padding:0 12px 8px"><span class="inp" style="height:32px"><svg class="ic t3"><use href="#i-search"/></svg><span class="plh" style="flex:1">Search steps…</span><span class="kbd">/</span></span></div>
+      <div style="padding:4px 16px 8px"><div class="fl" style="margin-bottom:6px">Recently used</div><div style="display:flex;gap:6px;flex-wrap:nowrap;overflow:hidden"><span class="ru"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span>Speak</span><span class="ru"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>Question</span><span class="ru"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span>Book</span></div></div>
+      <div style="padding:0 8px;border-top:1px solid var(--border)">
+        <div class="pg"><span class="gt gt--ink gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-phone-in"/></svg></span><b>Trigger</b><span>When a call starts</span><svg class="ic ic--sm pgc"><use href="#i-cr"/></svg></div>
+        <div class="pg"><span class="gt gt--line gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span><b>Logic</b><span>Listen and decide</span><svg class="ic ic--sm pgc"><use href="#i-cd"/></svg></div>
+        <div class="pi"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div><div class="nm">Question</div><div class="ds">Ask, then follow the answer</div></div></div>
+        <div class="pi"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div><div class="nm">Branch</div><div class="ds">Decide from what you know</div></div></div>
+        <div class="pi"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div><div class="nm">Verify caller</div><div class="ds">Check who is calling</div></div></div>
+        <div class="pg"><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-msg"/></svg></span><b>Action</b><span>Do something for the caller</span><svg class="ic ic--sm pgc"><use href="#i-cd"/></svg></div>
+        <div class="pi"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div><div class="nm">Speak</div><div class="ds">Say a line</div></div></div>
+        <div class="pi"><span class="gt gt--tint"><svg class="ic"><use href="#i-book-open"/></svg></span><div><div class="nm">Knowledge lookup</div><div class="ds">Answer from your documents</div></div></div>
+        <div class="pi"><span class="gt gt--tint"><svg class="ic"><use href="#i-db"/></svg></span><div><div class="nm">CRM lookup</div><div class="ds">Fetch a record from your CRM</div></div></div>
+        <div class="pi hi" style="opacity:var(--opacity-drag)"><span class="gt gt--tint"><svg class="ic"><use href="#i-msgc"/></svg></span><div><div class="nm">Send WhatsApp</div><div class="ds">Send an approved template</div></div></div>
+        <div class="pi"><span class="gt gt--tint"><svg class="ic"><use href="#i-phone-fwd"/></svg></span><div><div class="nm">Transfer to a person</div><div class="ds">Hand the call to a person</div></div></div>
+        <div class="pg"><span class="gt gt--neutral gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span><b>Outcome</b><span>How the call ended</span><svg class="ic ic--sm pgc"><use href="#i-cr"/></svg></div>
+      </div>
+    </div>
+    <div class="canvas cv" data-e='[["p1o","p2i",{"c":"sel"}],["p3y","p4i",{"mx":16}]]'>
+      <svg class="edges"></svg>
+      <div class="nl" style="--z:.85">
+        <div class="node" style="left:24px;top:24px;width:240px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Book meeting</span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div><div class="node-meta">Calendar</div></div></div><div class="res-row"><svg class="ic"><use href="#i-check"/></svg><span class="res-label">Booked</span><span class="sock" id="p1o"></span></div><div class="res-row res-row--fallback"><svg class="ic"><use href="#i-x"/></svg><span class="res-label">Not booked</span><span class="sock sock--free"></span></div></div>
+        <div class="node node--outcome" style="left:520px;top:40px;width:240px"><span class="sock sock--in" id="p2i"></span><div class="node-head"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#6</span></div><div class="node-title">Visit booked</div><div class="node-status">Lead<svg class="ic"><use href="#i-ar"/></svg><b>Interested</b></div></div></div></div>
+        <div class="node" style="left:270px;top:152px;width:240px;opacity:var(--opacity-drag);box-shadow:var(--e2)"><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msgc"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Send WhatsApp</span></div><div class="node-title">Send WhatsApp 2</div></div></div></div>
+        <div class="node" style="left:24px;top:330px;width:256px"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#3</span></div><div class="node-title">Ask about a site visit</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="ans-ex">haan, zaroor</span><span class="sock" id="p3y"></span></div><div class="ans"><span class="ans-label">Later</span><span class="ans-ex">baad mein</span><span class="sock sock--free is-focus"></span><span class="sock-add" style="border-color:var(--accent-mark);color:var(--accent-text)"><svg class="ic ic--sm"><use href="#i-plus"/></svg></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s</span><span class="sock"></span></div></div>
+        <div class="node" style="left:470px;top:250px;width:240px"><span class="sock sock--in" id="p4i"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Book meeting</span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div></div></div><div class="res-row"><svg class="ic"><use href="#i-check"/></svg><span class="res-label">Booked</span><span class="sock sock--free"></span></div><div class="res-row res-row--fallback"><svg class="ic"><use href="#i-x"/></svg><span class="res-label">Not booked</span><span class="sock sock--free"></span></div></div>
+      </div>
+      <span class="tag tag--info" style="position:absolute;left:236px;top:98px;z-index:3"><svg class="ic ic--xs"><use href="#i-plus"/></svg>Insert between Book site visit and Visit booked</span>
+      <div class="pop" style="left:268px;top:366px;width:300px;padding:6px">
+        <span class="inp" style="height:32px;border-color:var(--focus);outline:2px solid var(--focus);outline-offset:1px"><svg class="ic t3"><use href="#i-search"/></svg><span class="plh">Add after "Later"…</span></span>
+        <div class="mh" style="padding-top:10px">Suggested</div>
+        <div class="menu-i hi"><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-msg"/></svg></span>Speak</div>
+        <div class="menu-i"><span class="gt gt--warning gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>End as Callback</div>
+        <div class="menu-i"><span class="gt gt--line gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Question</div>
+        <div class="menu-i"><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-corner"/></svg></span>Connect to an existing step…<span class="kbd">C</span></div>
+        <div style="border-top:1px solid var(--border);margin-top:4px;padding:8px 8px 4px;font:var(--type-meta-12);color:var(--text-3)">Adds the step after "Later", already connected. <span class="kbd">↑</span> <span class="kbd">↓</span> to choose, Enter to add.</div>
+      </div>
+      <div class="canvas-ctl"><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-minus"/></svg></span><span class="num">85%</span><span><svg class="ic"><use href="#i-plus"/></svg></span></span></div>
+    </div>
+  </div></div>
+</section>
+
+<!-- ============ 7. Large flows ============ -->
+<section class="sec" aria-labelledby="s7">
+  <div class="sec-h"><div><h2 id="s7">Large flows: overview, Outline, Find and frames</h2><p class="ids">Spec §5.5, §9.2, §12 · F-FLOW-008, F-FLOW-017, F-FLOW-021, F-FLOW-023, F-FLOW-012, F-A11Y-028</p></div>
+  <p>A 23-step flow at Fit (32 %, 1360 × 780 frame) in the Block band. Each step keeps its silhouette and tile; its title is a Block label: the stable number, then up to two lines at 12 px, 140 px wide, stopping 8 px short of the next column where a step sits beside it. Because the flow has more than 20 steps, it opened with the Outline docked. Find de-emphasises everything that doesn't match (surface-2 fill, dimmed tiles and connectors; words stay readable) and walks the matches. Frames group work (Booking is collapsed into one block with its exits).</p></div>
+  <div class="scroll"><div class="dev app" style="width:1360px;height:780px">
+    <nav class="rail"><svg class="mark" role="img" aria-label="Vaani Labs"><use href="#vl-mark"/></svg><span class="rail-item"><svg class="ic"><use href="#i-activity"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-bot"/></svg></span><span class="rail-sep"></span><span class="rail-item" aria-current="page"><svg class="ic"><use href="#i-workflow"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-book-open"/></svg></span><span class="rail-sep"></span><span class="rail-item"><svg class="ic"><use href="#i-users"/></svg></span></nav>
+    <div class="fd">
+      <div class="fh"><span class="crumb">Flows /</span><span class="fname">Project enquiry, Pune</span><span class="chip chip--live"><span class="live-dot"></span>Live v12</span><span class="chip chip--quiet"><svg class="ic ic--sm" style="color:var(--success-text)"><use href="#i-check"/></svg>Saved 10:02 am</span><span class="vr"></span><span class="btn btn--sm btn--tertiary"><svg class="ic"><use href="#i-tidy"/></svg>Tidy</span><span class="sp"></span><span class="chip chip--warn"><svg class="ic"><use href="#i-alert"/></svg>1 warning</span><span class="btn btn--sm"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test</span><span class="btn btn--sm btn--primary" title="Nothing to publish" aria-disabled="true">Publish…</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-more"/></svg></span></div>
+      <div class="pr"><span class="phase-bar"><span class="phase-seg"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span>Trigger <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>Logic <b>6</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span>Action <b>10</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span>Outcome <b>5</b></span></span><span class="ibtn ibtn--sm phase-cols" role="button" aria-pressed="false" aria-label="Phase columns"><svg class="ic"><use href="#i-cols"/></svg></span><span class="sp"></span><span class="live t3">No unpublished changes</span></div>
+      <div class="fb" style="grid-template-columns:48px var(--size-left-panel,280px) minmax(0,1fr)">
+        <div class="trl"><span class="ibtn"><svg class="ic"><use href="#i-plus"/></svg></span><span class="rail-sep"></span><span class="ibtn" aria-pressed="true"><svg class="ic"><use href="#i-tree"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-braces"/></svg></span><span class="ibtn" aria-pressed="true"><svg class="ic"><use href="#i-search"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-history"/></svg></span></div>
+        <div class="lp" id="outline" style="overflow:hidden;width:auto"><div class="lph"><h3>Outline</h3><span class="t3" style="font:var(--type-meta-12)">23 steps</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-x"/></svg></span></div><div style="padding:0 16px 8px;display:flex;align-items:center;gap:8px;font:var(--type-data-13);color:var(--text-2)"><span style="width:16px;height:16px;border:1px solid var(--control);border-radius:var(--radius-4)"></span>Only steps with issues</div><div id="otree" role="tree" aria-label="Call path" style="padding:0 8px"></div></div>
+        <div class="canvas cv" id="cv-big" data-e='[]'><svg class="edges"></svg><div class="nl" id="big" style="--z:.32"></div>
+          <div class="findbar"><span class="inp"><svg class="ic t3"><use href="#i-search"/></svg><span>visit</span></span><span class="t3 num" style="font:var(--type-meta-12);padding:0 4px;white-space:nowrap">2 of 3</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-cu"/></svg></span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-cd"/></svg></span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-x"/></svg></span></div>
+          <div class="canvas-ctl"><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-minus"/></svg></span><span class="num" style="min-width:52px">32%</span><span><svg class="ic"><use href="#i-plus"/></svg></span></span><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-fit"/></svg>Fit</span></span><span class="canvas-ctl-group"><span style="background:var(--surface-3);color:var(--text)"><svg class="ic"><use href="#i-map"/></svg></span><span><svg class="ic"><use href="#i-more"/></svg></span></span></div>
+          <div class="minimap" id="mm-big" aria-hidden="true"><span class="minimap-vp" style="left:4px;top:6px;width:166px;height:98px"></span></div>
+        </div>
+      </div>
+      <div class="pb"><span class="chip chip--warn"><svg class="ic ic--sm"><use href="#i-alert"/></svg>1 warning</span><span class="t2">#15 Send brochure (in Booking): WhatsApp template is pending approval.</span><a>Go to step</a><span class="sp"></span><span class="btn btn--sm btn--tertiary" aria-pressed="true"><svg class="ic ic--sm"><use href="#i-tree"/></svg>Outline</span><span class="btn btn--sm btn--tertiary"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test panel</span></div>
+    </div>
+  </div></div>
+</section>
+<script>
+(function(){
+  /* Tidy geometry (spec §9.4): every layer is at least 240 wide + a 128 rank gap = a 368 flow px column. */
+  var Z=.32,PITCH=368,X=function(c){return 40+c*PITCH},Y=function(r){return 180+r*150};
+  var tile={t:['gt--ink','i-list'],t2:['gt--ink','i-phone-in'],l:['gt--line','i-diamond'],a:['gt--tint','i-msg'],db:['gt--tint','i-db'],o:['gt--neutral','i-flag'],ok:['gt--success','i-flag'],wn:['gt--warning','i-flag']};
+  /* id, type, column, row, title, outputs, state, stable number */
+  var S=[['T1','t',0,1,'Outbound batch',1,'','1'],['T2','t2',0,3,'Inbound call',1,'','2'],['A3','a',1,2,'Greet the caller',1,'','3'],['L4','l',2,2,'Good time to talk right now?',3,'','4'],
+    ['L5','l',3,1,'Ask about budget',3,'','5'],['A8','db',3,3,'Find the buyer\u2019s project',2,'','8'],['A18','a',3,5,'Offer a callback',1,'','18'],['L6','l',4,0,'Ask preferred area',2,'','6'],['L7','l',4,2,'Ask flat size and floor',2,'','7'],['A9','a',4,3,'Explain the price range',1,'','9'],
+    ['L10','l',5,2,'Ready to book a site visit?',3,'cur','10'],['A17','a',6,3,'Polite close',1,'','17'],
+    ['O19','ok',7,0,'Visit booked',0,'m','19'],['O23','o',7,1,'Transferred',0,'','23'],['O21','o',7,3,'Not interested',0,'','21'],['O20','wn',7,4,'Callback set',0,'','20'],['O22','o',7,5,'No answer',0,'','22']];
+  var big=document.getElementById('big'),h='';
+  var fr=[['Greeting','neel',1,2,2,2,'2 steps'],['Qualification','teal',3,0,4,3,'6 steps']];
+  fr.forEach(function(f){var x=X(f[2])-40,y=Y(f[3])-130,w=X(f[4])+256+40-x,hh=Y(f[5])+90+40-y;h+='<div class="flow-frame flow-frame--'+f[1]+'" style="left:'+x+'px;top:'+y+'px;width:'+w+'px;height:'+hh+'px"><div class="flow-frame-head" style="height:84px;font-size:calc(12px / '+Z+');gap:12px;padding:0 16px"><svg class="ic" style="width:32px;height:32px"><use href="#i-cd"/></svg>'+f[0]+'<span style="margin-left:'+(12/Z)+'px">'+f[6]+'</span></div></div>';});
+  var occ={};S.forEach(function(s){occ[s[2]+':'+s[3]]=1;});
+  var colPx=PITCH*Z, full=140, stopped=Math.floor(colPx-8-60*Z);
+  S.forEach(function(s){var t=tile[s[1]],out=s[1].charAt(0)==='o'||s[1]==='ok'||s[1]==='wn',tr=s[1].charAt(0)==='t';
+    var match=!!s[6];
+    var cls='node node--block'+(out?' node--outcome':'')+(tr?' node--trigger':'')+(s[6]==='cur'?' is-focus':'')+(match?'':' node--dim');
+    var y0=Y(s[3]),blocked=occ[(s[2]+1)+':'+s[3]]||fr.some(function(f){var fx0=X(f[2])-40,fx1=X(f[4])+296,fy0=Y(f[3])-130,fy1=Y(f[5])+130,nx=X(s[2]+1);return nx+10>fx0&&X(s[2])+60+140/Z>fx0&&nx<fx1&&y0+130>fy0&&y0<fy1;});
+    var bw=blocked?stopped:full;
+    h+='<div class="'+cls+'" style="left:'+X(s[2])+'px;top:'+Y(s[3])+'px;width:'+(tr?208:240)+'px">'+(tr?'':'<span class="sock sock--in" style="top:50%" id="b'+s[0]+'i"></span>')+'<span class="gt '+t[0]+'"><svg class="ic"><use href="#'+t[1]+'"/></svg></span><span class="node-blocklabel" aria-hidden="true" style="--bw:'+bw+'px"><i>#'+s[7]+'</i>'+(match?'<mark>'+s[4]+'</mark>':s[4])+'</span>';
+    var n=s[5];for(var i=0;i<n;i++)h+='<span class="sock" style="top:'+(100*(i+1)/(n+1))+'%" id="b'+s[0]+'o'+i+'"></span>';h+='</div>';});
+  h+='<div class="node node--block" style="left:'+X(6)+'px;top:'+(Y(0)+10)+'px;width:240px;height:250px;display:block;background:var(--frame-ochre);border-color:var(--frame-ochre-border)"><div style="display:flex;align-items:center;gap:12px;font-size:calc(12px / '+Z+');font-weight:600;line-height:64px"><svg class="ic" style="width:32px;height:32px"><use href="#i-cr"/></svg>Booking</div><div class="t3" style="font-size:calc(12px / '+Z+');line-height:44px">6 steps · <mark>1 match</mark></div><span class="sock sock--in" style="top:128px" id="bBKi"></span><span class="sock" style="top:92px" id="bBKo0"></span><span class="sock" style="top:190px" id="bBKo1"></span></div>';
+  h+='<div class="cnote" style="left:'+X(1)+'px;top:'+(Y(4)+20)+'px;width:560px;padding:20px 24px"><div class="cnote-head" style="font-size:calc(12px / '+Z+');line-height:40px"><svg class="ic" style="width:28px;height:28px"><use href="#i-note"/></svg>Note · Asha · 2 days ago</div><p style="font-size:calc(12px / '+Z+');line-height:48px">Weekend batches use the Saturday script.</p></div>';
+  big.innerHTML=h;
+  var E=[['T1o0','A3i'],['T2o0','A3i'],['A3o0','L4i'],['L4o0','L5i'],['L4o1','A18i'],['L4o2','O22i',1],['L5o0','L6i'],['L5o1','L7i'],['L5o2','A8i',1],['L6o0','L10i'],['L6o1','L10i'],['L7o0','L10i'],['L7o1','A9i'],['A8o0','A9i'],['A8o1','L10i',1],['A9o0','L10i'],['L10o0','BKi'],['L10o1','A17i'],['L10o2','A18i',1],['BKo0','O19i'],['BKo1','O23i'],['A17o0','O21i'],['A18o0','O20i']];
+  document.getElementById('cv-big').setAttribute('data-e',JSON.stringify(E.map(function(e){var hit=/L10|BK|O19/.test(e[0]+e[1]);return ['b'+e[0],'b'+e[1],{fb:e[2]?1:0,mx:14,c:hit?'':'dim'}];})));
+  var mm=document.getElementById('mm-big'),mh='';S.forEach(function(s){mh+='<i class="'+(s[1].charAt(0)==='t'?'is-trigger':'')+'" style="left:'+(8+s[2]*20)+'px;top:'+(10+s[3]*16)+'px;width:15px;height:6px"></i>';});mm.insertAdjacentHTML('afterbegin',mh+'<i style="left:128px;top:8px;width:15px;height:28px;background:var(--frame-ochre-border)"></i>');
+  var O=[[0,'ink','i-list','Outbound batch','#1',1],[1,'tint','i-msg','Greet the caller','#3'],[1,'line','i-diamond','Good time to talk right now?','#4',1],[2,'','','If Yes'],[3,'line','i-diamond','Ask about budget','#5',1],[4,'','','If Under ₹80 L'],[5,'line','i-diamond','Ask preferred area','#6'],[4,'','','If ₹80 L to ₹1 Cr'],[5,'line','i-diamond','Ask flat size and floor','#7'],[4,'','','If No reply'],[5,'tint','i-db','Find the buyer\u2019s project','#8'],[3,'line','i-diamond','Ready to book a site visit?','#10',0,1],[4,'','','If Yes'],[5,'','','Booking · 6 steps','',0,0,'wn'],[2,'','','If Later'],[3,'tint','i-msg','Offer a callback','#18'],[4,'wn','i-flag','Callback set','#20'],[2,'','','If No reply'],[3,'nu','i-flag','No answer','#22'],[0,'ink','i-phone-in','Inbound call','#2'],[1,'','','Continues at #3 Greet the caller']];
+  var oh='';O.forEach(function(o){var pad=8+o[0]*14;if(!o[1]){oh+='<div style="display:flex;align-items:center;gap:6px;height:28px;padding-left:'+pad+'px;font:var(--type-label-12);color:var(--text-3)"><svg class="ic ic--sm"><use href="#i-corner"/></svg>'+o[3]+(o[7]?' <span class="tag tag--warning" style="margin-left:auto;margin-right:8px"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1</span>':'')+'</div>';return;}
+    oh+='<div role="treeitem" style="display:flex;align-items:center;gap:8px;height:32px;padding:0 8px 0 '+pad+'px;border-radius:var(--radius-6);font:var(--type-data-13);'+(o[6]?'background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent-mark)':'')+'"><span class="gt gt--sm gt--'+({ink:'ink',tint:'tint',line:'line',wn:'warning',nu:'neutral'}[o[1]])+'"><svg class="ic ic--xs"><use href="#'+o[2]+'"/></svg></span><span style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+o[3]+'</span><span class="t3 num" style="font:var(--type-meta-12)">'+o[4]+'</span></div>';});
+  document.getElementById('otree').innerHTML=oh;
+})();
+</script>
+<style>.lp .lph .t3{margin-left:auto}</style>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="i-square-pen" viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/></symbol><symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol></svg>
+
+<style>
+.tg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+.tc{background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-8);padding:12px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--e1)}
+.tc h4{font:var(--type-title-14)}.tc p{font:var(--type-data-13);color:var(--text-2)}.tc .mtl{font:var(--type-meta-12);color:var(--text-3)}
+.strip{display:flex;align-items:center;gap:4px;padding:8px;background:var(--surface-2);border-radius:var(--radius-6);font:var(--type-label-12);color:var(--text-2)}
+.strip .sa{color:var(--text-3)}
+.es a{white-space:nowrap}
+.es{position:absolute;background:var(--surface);border:1px solid var(--border-strong);border-radius:var(--radius-8);box-shadow:var(--e1);padding:16px;width:352px;z-index:3}
+.es h4{font:var(--type-title-16)}.es p{font:var(--type-body-14);color:var(--text-2);margin:6px 0 14px}
+.rc{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-6);flex:1}
+.rc.on{border-color:var(--accent-mark);background:var(--accent-soft)}
+.rd{width:16px;height:16px;border-radius:50%;border:1px solid var(--control);flex:none;margin-top:2px;background:var(--surface)}
+.needs{margin-top:6px;font:var(--type-meta-12);color:var(--text-3)}
+.rc.on .rd{border:5px solid var(--accent)}
+</style>
+<!-- ============ 8. New flow ============ -->
+<section class="sec" aria-labelledby="s8">
+  <div class="sec-h"><div><h2 id="s8">New flow: phase strips, preview, and the blank canvas</h2><p class="ids">Spec §13 · F-FLOW-013, F-FLOW-037 · page layout owned by part 2 §15.3</p></div>
+  <p>New flow is a page, not a hidden menu item next to Reset. Part 2 owns the form; this part owns how each starting point is drawn: a phase strip of real glyph tiles and step names, and a read-only canvas preview. A blank flow starts as a Trigger connected to an Outcome, with one sentence and two buttons on the connection telling you what to add first.</p></div>
+  <div class="scroll"><div class="dev" style="width:1100px;background:var(--bg)">
+    <div style="display:flex;align-items:center;gap:12px;height:56px;padding:0 24px;border-bottom:1px solid var(--border)"><div style="font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking)">New flow</div><span class="t3" style="font:var(--type-data-13)">Nothing goes live until you publish.</span><span class="sp"></span><span class="btn btn--tertiary">Cancel</span></div>
+    <div style="max-width:720px;padding:20px 24px 24px;display:grid;gap:16px">
+      <div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Name</label><span class="inp" style="border-color:var(--focus);outline:2px solid var(--focus);outline-offset:2px">Site visit follow-up</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px"><div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Languages</label><span class="inp"><span class="tag tag--outline"><span lang="hi">अ</span> Hindi</span><span class="tag tag--outline">A English</span><span class="plh">Add…</span></span></div><div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Voice</label><span class="inp" style="justify-content:space-between"><span>Vaani · Hindi + English</span><svg class="ic"><use href="#i-cd"/></svg></span></div></div>
+      <div style="display:grid;gap:8px"><span style="font:var(--type-label-13)">Start from</span>
+        <div class="rc"><span class="rd"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline"><b style="font:var(--type-label-13)">Blank</b><span class="t3" style="font:var(--type-meta-12)">A trigger and an ending. You add everything between.</span></div><div class="strip" style="margin-top:6px"><span class="gt gt--ink"><svg class="ic ic--xs"><use href="#i-phone-in"/></svg></span>Inbound call<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--neutral"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>End with outcome</div></div></div>
+        <div class="rc on"><span class="rd"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline"><b style="font:var(--type-label-13)">Site visit</b><span class="t3" style="font:var(--type-meta-12)">Offer a visit, book a slot, confirm on WhatsApp. 10 steps.</span><span class="sp"></span><a style="color:var(--accent-text);font:var(--type-label-13)">Preview</a></div><div class="strip" style="margin-top:6px;background:var(--surface)"><span class="gt gt--ink"><svg class="ic ic--xs"><use href="#i-phone-in"/></svg></span>Inbound call<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--line"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Ask about a visit<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--tint"><svg class="ic ic--xs"><use href="#i-calp"/></svg></span>Book visit<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--success"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>Visit booked</div><p class="needs">Needs: Google Calendar · an approved WhatsApp template. Without them, visits are offered in set hours and no confirmation is sent.</p></div></div>
+        <div class="rc"><span class="rd"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline"><b style="font:var(--type-label-13)">Lead qualification</b><span class="t3" style="font:var(--type-meta-12)">Interest, budget and timeline, then a callback. 12 steps.</span><span class="sp"></span><a style="color:var(--accent-text);font:var(--type-label-13)">Preview</a></div><div class="strip" style="margin-top:6px"><span class="gt gt--ink"><svg class="ic ic--xs"><use href="#i-list"/></svg></span>Outbound batch<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--line"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Still interested?<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--line"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Ask about budget<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--warning"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>Callback set</div><p class="needs">Works with your workspace as it is.</p></div></div>
+        <div class="rc"><span class="rd"></span><div style="flex:1;min-width:0"><div style="display:flex;gap:8px;align-items:baseline"><b style="font:var(--type-label-13)">EMI reminder</b><span class="t3" style="font:var(--type-meta-12)">Remind the due date, take a promise to pay, transfer disputes. 8 steps.</span><span class="sp"></span><a style="color:var(--accent-text);font:var(--type-label-13)">Preview</a></div><div class="strip" style="margin-top:6px"><span class="gt gt--ink"><svg class="ic ic--xs"><use href="#i-list"/></svg></span>Outbound batch<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--tint"><svg class="ic ic--xs"><use href="#i-msg"/></svg></span>Remind due date<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--line"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Can you pay?<svg class="ic ic--xs sa"><use href="#i-ar"/></svg><span class="gt gt--success"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>Promise to pay</div><p class="needs">Needs: a Rep console queue for disputes. Without it, disputes end as Callback.</p></div></div>
+        <p class="t3" style="font:var(--type-meta-12);padding-left:4px">Also: COD confirmation · Appointment · Support FAQ · Describe it (opens the AI draft textarea, part 2 §6.5)</p>
+      </div>
+      <div style="display:flex;justify-content:flex-end"><span class="btn btn--primary">Create flow</span></div>
+    </div>
+  </div></div>
+
+  <div class="row" style="margin-top:32px">
+    <div><p class="fl"><b>Blank flow</b> · the canvas empty state, on the connection between Trigger and Outcome. Issues chip: <b>No issues</b>. This workspace has no unbound number, so the Trigger is an Outbound batch (part 2 §15.3)</p>
+    <div class="dev" style="width:860px;height:380px"><div class="canvas cv" style="position:absolute;inset:0" data-e='[["bl-t","bl-o",{}]]'><svg class="edges"></svg>
+      <div class="nl" style="--z:1"><div class="node node--trigger" style="left:40px;top:60px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-list"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#1</span></div><div class="node-title">Outbound batch</div><div class="node-meta">No batch linked yet</div></div></div><span class="sock sock--head" id="bl-t"></span></div>
+      <div class="node node--outcome" style="left:580px;top:60px;width:240px"><span class="sock sock--in" id="bl-o"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#2</span></div><div class="node-title">End with outcome</div><div class="node-meta">Choose what this call records</div></div></div></div></div>
+      <span class="sock-add" style="position:absolute;left:404px;top:92px;margin:0;border-color:var(--accent-mark);color:var(--accent-text);z-index:3"><svg class="ic ic--sm"><use href="#i-plus"/></svg></span>
+      <div class="es" style="left:236px;top:150px"><h4>What happens when the call connects?</h4><p>Add the first step. Most flows greet the caller, then ask one question.</p><div style="display:flex;gap:8px;align-items:center"><span class="btn"><svg class="ic ic--sm"><use href="#i-msg"/></svg>Add Speak</span><span class="btn"><svg class="ic ic--sm"><use href="#i-diamond"/></svg>Add Question</span><a style="color:var(--accent-text);font:var(--type-label-13)">All steps</a></div></div>
+      <div class="canvas-ctl"><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-minus"/></svg></span><span class="num">100%</span><span><svg class="ic"><use href="#i-plus"/></svg></span></span></div>
+    </div></div></div>
+  </div>
+</section>
+
+<!-- ============ 9. Selecting and arranging ============ -->
+<section class="sec" aria-labelledby="s9">
+  <div class="sec-h"><div><h2 id="s9">Selecting, aligning and snapping</h2><p class="ids">Spec §9 and §10 · F-FLOW-021, F-FLOW-024, F-FLOW-026</p></div>
+  <p>Shift-drag draws a marquee that selects everything it touches; Shift or Ctrl click toggles. The selection bar counts and acts on the whole selection. While a step is dragged, 1 px guides appear when edges or centres line up, and it snaps to the 16 px grid on release (hold Alt to place freely).</p></div>
+  <div class="scroll"><div class="dev" style="width:900px;height:360px"><div class="canvas cv" style="position:absolute;inset:0" data-e='[["q1o","q2i",{}],["q2o","q3i",{}]]'><svg class="edges"></svg>
+    <div style="position:absolute;left:36px;top:52px;width:560px;height:132px;border:1px solid var(--accent-mark);background:var(--accent-soft);opacity:.6;border-radius:var(--radius-2);z-index:1"></div>
+    <div class="nl" style="--z:1;z-index:2">
+      <div class="node is-selected" style="left:48px;top:84px;width:160px"><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span><span class="node-no">#3</span></div><div class="node-title">Greet</div></div></div><span class="sock sock--head sock--active" id="q1o"></span></div>
+      <div class="node is-selected" style="left:248px;top:84px;width:160px"><span class="sock sock--in sock--active" id="q2i"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span><span class="node-no">#4</span></div><div class="node-title">Good time?</div></div></div><span class="sock sock--head sock--active" id="q2o"></span></div>
+      <div class="node is-selected" style="left:448px;top:84px;width:160px"><span class="sock sock--in sock--active" id="q3i"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span><span class="node-no">#5</span></div><div class="node-title">Ask budget</div></div></div><span class="sock sock--head sock--active"></span></div>
+      <div class="node" style="left:680px;top:84px;width:160px;opacity:var(--opacity-drag);box-shadow:var(--e2)"><span class="sock sock--in"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-db"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span><span class="node-no">#8</span></div><div class="node-title">Find project</div></div></div></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:84px;border-top:1px solid var(--accent-mark);z-index:3"></div>
+    <span class="tag tag--info" style="position:absolute;left:690px;top:52px;z-index:3">Top aligned · snaps to grid</span>
+    <div class="bulk" style="bottom:var(--space-12)"><span class="bulk-count">3 steps selected</span><span class="btn btn--sm btn--tertiary"><svg class="ic ic--sm"><use href="#i-frame"/></svg>Frame</span><span class="btn btn--sm btn--tertiary">Align<svg class="ic ic--sm"><use href="#i-cd"/></svg></span><span class="btn btn--sm btn--tertiary"><svg class="ic ic--sm"><use href="#i-copy"/></svg>Duplicate</span><span class="ibtn ibtn--sm" aria-label="More for 3 steps"><svg class="ic"><use href="#i-more"/></svg></span><span class="vr"></span><span class="ibtn ibtn--sm" aria-label="Clear selection"><svg class="ic"><use href="#i-x"/></svg></span></div>
+  </div></div></div>
+</section>
+
+<style>
+.ol{display:flex;align-items:center;gap:10px;padding:0 12px;border-radius:var(--radius-6);font:var(--type-data-13)}
+.ost2{display:inline-flex;align-items:center;gap:3px;font:var(--type-meta-12);color:var(--text-3);white-space:nowrap}.ost2 b{font-weight:400;color:var(--text-2)}
+.ol .olt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.olb{display:flex;align-items:center;gap:6px;font:var(--type-label-12);color:var(--text-3)}
+</style>
+<!-- ============ 10. Breakpoints ============ -->
+<section class="sec" aria-labelledby="s10">
+  <div class="sec-h"><div><h2 id="s10">Every breakpoint, designed</h2><p class="ids">Spec §3 and §17 · F-RWD-003, F-RWD-014, F-FLOW-022, F-FLOW-023, F-RWD-001</p></div>
+  <p>Edit from 1024. At 1024–1279 the inspector overlays the canvas from the right and pans the selection into view; the minimap is off. At 768–1023 the designer is a review surface: Outline and a read-only canvas side by side, with Test and Publish never clipped. Below 768 the Outline nested by branch is the page, with Test and Publish in a sticky bar above the phone tabs.</p></div>
+
+  <p class="fl"><b>Laptop 1024 × 700</b> · rail, inspector as overlay, minimap off</p>
+  <div class="scroll"><div class="dev app" style="width:1024px;height:700px">
+    <nav class="rail"><svg class="mark" role="img" aria-label="Vaani Labs"><use href="#vl-mark"/></svg><span class="rail-item"><svg class="ic"><use href="#i-activity"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-bot"/></svg></span><span class="rail-sep"></span><span class="rail-item" aria-current="page"><svg class="ic"><use href="#i-workflow"/></svg></span><span class="rail-item"><svg class="ic"><use href="#i-book-open"/></svg></span></nav>
+    <div class="fd">
+      <div class="fh"><span class="fname" style="max-width:170px;overflow:hidden">Site-visit qualifier<svg class="ic ic--sm t3"><use href="#i-cd"/></svg></span><span class="chip">Draft · 3<svg class="ic ic--sm"><use href="#i-cd"/></svg></span><span class="chip chip--quiet"><svg class="ic ic--sm" style="color:var(--success-text)"><use href="#i-check"/></svg>Saved</span><span class="chip chip--live"><span class="live-dot"></span>Live v7</span><span class="vr"></span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-undo"/></svg></span><span class="ibtn ibtn--sm" style="color:var(--text-dis)"><svg class="ic"><use href="#i-redo"/></svg></span><span class="sp"></span><span class="chip chip--warn"><svg class="ic"><use href="#i-alert"/></svg>1</span><span class="btn btn--sm"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test</span><span class="btn btn--sm btn--primary">Publish v8…</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-more"/></svg></span></div>
+      <div class="pr"><span class="phase-bar"><span class="phase-seg"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span>Trigger <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span>Logic <b>1</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span>Action <b>2</b></span><span class="phase-arrow"><svg class="ic"><use href="#i-ar"/></svg></span><span class="phase-seg"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span>Outcome <b>4</b></span></span><span class="sp"></span><span class="live"><span class="lt">Callers hear v7 until you publish.</span><a>Compare</a></span></div>
+      <div class="fb" style="grid-template-columns:48px minmax(0,1fr)">
+        <div class="trl"><span class="ibtn"><svg class="ic"><use href="#i-plus"/></svg></span><span class="rail-sep"></span><span class="ibtn"><svg class="ic"><use href="#i-tree"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-braces"/></svg></span><span class="ibtn"><svg class="ic"><use href="#i-search"/></svg></span></div>
+        <div class="canvas cv" data-e='[["l-t","l-li",{}],["l-y","l-ai",{"mx":14}]]'><svg class="edges"></svg>
+          <div class="nl" style="--z:.85">
+            <div class="node node--trigger" style="left:24px;top:220px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#2</span></div><div class="node-title">Inbound call</div></div></div><span class="sock sock--head" id="l-t"></span></div>
+            <div class="node is-selected" style="left:300px;top:130px;width:256px"><span class="sock sock--in sock--active" id="l-li"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic · Question</span><span class="node-no">#3</span></div><div class="node-title">Ask about a site visit</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="ans-ex">haan, zaroor</span><span class="sock sock--active" id="l-y"></span></div><div class="ans"><span class="ans-label">Later</span><span class="ans-ex">baad mein</span><span class="sock sock--active"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s</span><span class="sock sock--active"></span></div></div>
+            <div class="node" style="left:640px;top:60px;width:240px"><span class="sock sock--in" id="l-ai"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action · Book meeting</span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div></div></div></div>
+          </div>
+          <aside class="insp" style="position:absolute;right:0;top:0;bottom:0;z-index:5;box-shadow:var(--e3);border-left:1px solid var(--border-overlay)">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 8px 12px 16px"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div style="flex:1"><div class="t3" style="font:var(--type-phase-12)">Logic · Question · #3</div><div style="font:var(--type-title-16)">Ask about a site visit</div></div><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-x"/></svg></span></div>
+            <div style="display:flex;gap:16px;padding:0 16px;border-bottom:1px solid var(--border);font:var(--type-label-13)"><span style="padding:10px 0;box-shadow:inset 0 -2px 0 var(--accent-mark)">Configure</span><span class="t2" style="padding:10px 0">Test data</span><span class="t2" style="padding:10px 0">Issues</span></div>
+            <div style="padding:16px;display:grid;gap:14px"><div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Label</label><span class="inp">Ask about a site visit</span></div><div style="display:grid;gap:6px"><label style="font:var(--type-label-13)">Agent asks</label><div class="inp" style="height:auto;padding:8px 10px;display:block;line-height:20px"><span class="var">{{lead_name}}</span> ji, would you like to visit the site this week?</div></div></div>
+          </aside>
+          <div class="canvas-ctl"><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-minus"/></svg></span><span class="num">85%</span><span><svg class="ic"><use href="#i-plus"/></svg></span></span><span class="canvas-ctl-group"><span><svg class="ic"><use href="#i-fit"/></svg>Fit</span></span></div>
+        </div>
+      </div>
+      <div class="pb"><span class="chip chip--warn"><svg class="ic ic--sm"><use href="#i-alert"/></svg>1 warning</span><span class="t2" style="overflow:hidden;text-overflow:ellipsis">Book site visit: template pending approval.</span><a>Go to step</a><span class="sp"></span><span class="ibtn ibtn--sm"><svg class="ic ic--sm"><use href="#i-tree"/></svg></span><span class="ibtn ibtn--sm"><svg class="ic ic--sm"><use href="#i-play"/></svg></span></div>
+    </div>
+  </div></div>
+
+  <div class="row" style="margin-top:32px">
+    <div><p class="fl"><b>Tablet 834 × 760</b> · review mode: Outline and read-only canvas</p>
+    <div class="dev" style="width:834px;height:760px;display:flex;flex-direction:column">
+      <div data-vl="topbar" data-vl-mode="tablet" data-vl-title="Site-visit qualifier" data-vl-chips="wallet" data-vl-tag="h3" data-vl-translate="no"></div>
+      <div class="fh" style="height:48px;flex:none"><span class="chip">Draft · 3 changes<svg class="ic ic--sm"><use href="#i-cd"/></svg></span><span class="chip chip--live"><span class="live-dot"></span>Live v7</span><span class="chip chip--warn"><svg class="ic"><use href="#i-alert"/></svg>1 warning</span><span class="sp"></span><span class="btn btn--sm"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test</span><span class="btn btn--sm btn--primary">Publish v8…</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-more"/></svg></span></div>
+      <div style="padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border)"><div class="notice notice--info"><svg class="ic" style="margin-top:2px"><use href="#i-info"/></svg><span class="notice-body">Editing steps needs a screen at least 1024 px wide. You can review, test and publish here.</span></div></div>
+      <div style="display:grid;grid-template-columns:var(--size-left-panel-tablet,320px) minmax(0,1fr);flex:1;min-height:0">
+        <div style="background:var(--surface);border-right:1px solid var(--border);padding:8px;overflow:hidden">
+          <div class="ol" style="height:36px"><span class="gt gt--ink gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-list"/></svg></span><span class="olt">Outbound batch</span><span class="t3 num">#1</span></div>
+          <div class="ol" style="height:36px;background:var(--accent-soft);box-shadow:inset 2px 0 0 var(--accent-mark)"><span class="gt gt--line gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span><span class="olt">Ask about a site visit</span><span class="t3 num">#3</span></div>
+          <div class="olb" style="padding-left:26px;height:28px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If Yes</div>
+          <div class="ol" style="height:36px;padding-left:40px"><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-calp"/></svg></span><span class="olt">Book site visit</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1</span><span class="t3 num">#4</span></div>
+          <div class="ol" style="height:36px;padding-left:54px"><span class="gt gt--success gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span><span class="olt">Visit booked</span><span class="t3 num">#5</span></div>
+          <div class="olb" style="padding-left:26px;height:28px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If Later</div>
+          <div class="ol" style="height:36px;padding-left:40px"><span class="gt gt--warning gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span><span class="olt">Callback set</span><span class="t3 num">#6</span></div>
+          <div class="olb" style="padding-left:26px;height:28px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If No</div>
+          <div class="ol" style="height:36px;padding-left:40px"><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-msg"/></svg></span><span class="olt">Polite close</span><span class="t3 num">#7</span></div>
+          <div class="ol" style="height:36px;padding-left:54px"><span class="gt gt--neutral gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span><span class="olt">Not interested</span><span class="t3 num">#8</span></div>
+          <div class="olb" style="padding-left:26px;height:28px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If No reply</div>
+          <div class="ol" style="height:36px;padding-left:40px"><span class="gt gt--neutral gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span><span class="olt">No answer</span><span class="t3 num">#9</span></div>
+          <div class="ol" style="height:36px"><span class="gt gt--ink gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-phone-in"/></svg></span><span class="olt">Inbound call</span><span class="t3 num">#2</span></div>
+          <div class="olb" style="padding-left:26px;height:28px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>Continues at #3 Ask about a site visit</div>
+        </div>
+        <div class="canvas cv" data-e='[["tb-t","tb-l",{}],["tb-y","tb-a",{"mx":14}]]'><svg class="edges"></svg><div class="nl" style="--z:.6">
+          <div class="node node--trigger node--compact" style="left:30px;top:260px;width:208px"><div class="node-head"><span class="gt gt--ink"><svg class="ic"><use href="#i-list"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span></div><div class="node-title">Outbound batch</div></div></div><span class="sock sock--head" style="top:56px" id="tb-t"></span></div>
+          <div class="node node--compact is-selected" style="left:310px;top:200px;width:256px"><span class="sock sock--in sock--active" style="top:56px" id="tb-l"></span><div class="node-head"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic</span></div><div class="node-title">Ask about a site visit</div></div></div><div class="ans"><span class="ans-label">Yes</span><span class="sock sock--active" id="tb-y"></span></div><div class="ans"><span class="ans-label">Later</span><span class="sock sock--active"></span></div><div class="ans"><span class="ans-label">No</span><span class="sock sock--active"></span></div><div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="sock sock--active"></span></div></div>
+          <div class="node node--compact node--warning" style="left:640px;top:100px;width:240px"><span class="sock sock--in" style="top:56px" id="tb-a"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action</span></div><div class="node-title">Book site visit</div></div></div></div>
+        </div><span class="tag tag--outline" style="position:absolute;right:12px;top:12px;z-index:4;background:var(--surface)"><svg class="ic ic--xs"><use href="#i-eye"/></svg>Read only</span></div>
+      </div>
+    </div></div>
+
+    <div><p class="fl"><b>Phone 390 × 800</b> · Outline nested by branch</p>
+    <div class="dev" style="width:390px;height:800px;display:flex;flex-direction:column">
+      <div data-vl="topbar" data-vl-mode="phone" data-vl-back="Flows" data-vl-title="Site-visit qualifier" data-vl-chips="wallet" data-vl-tag="h3" data-vl-translate="no"></div>
+      <div style="display:flex;gap:6px;align-items:center;padding:8px 12px;background:var(--surface);border-bottom:1px solid var(--border);flex-wrap:wrap"><span class="chip chip--live"><span class="live-dot"></span>Live v7</span><span class="chip">Draft · 3 changes<svg class="ic ic--sm"><use href="#i-cd"/></svg></span><span class="chip chip--warn"><svg class="ic ic--sm"><use href="#i-alert"/></svg>1 warning</span></div>
+      <div style="padding:10px 12px;background:var(--surface)"><div style="display:grid;grid-template-columns:1fr 1fr;gap:2px;padding:2px;height:44px;border:1px solid var(--border);border-radius:var(--radius-6);background:var(--surface-2)"><span style="display:grid;place-items:center;background:var(--surface);border:1px solid var(--control);border-radius:var(--radius-4);font:var(--type-button-14)">Outline</span><span class="t2" style="display:grid;place-items:center;font:var(--type-button-14)">Canvas</span></div></div>
+      <div style="flex:1;min-height:0;overflow:hidden;background:var(--surface);padding:0 8px">
+        <div class="ol" style="height:48px"><span class="gt gt--ink"><svg class="ic"><use href="#i-list"/></svg></span><span class="olt">Outbound batch</span><span class="t3 num">#1</span></div>
+        <div class="ol" style="height:48px"><span class="gt gt--line"><svg class="ic"><use href="#i-diamond"/></svg></span><span class="olt">Ask about a site visit</span><span class="t3 num">#3</span><svg class="ic t3"><use href="#i-cr"/></svg></div>
+        <div class="olb" style="padding-left:24px;height:32px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If Yes · haan, zaroor</div>
+        <div class="ol" style="height:48px;padding-left:36px"><span class="gt gt--tint"><svg class="ic"><use href="#i-calp"/></svg></span><span class="olt">Book site visit</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1</span></div>
+        <div class="ol" style="height:48px;padding-left:52px"><span class="gt gt--success"><svg class="ic"><use href="#i-flag"/></svg></span><span class="olt">Visit booked</span><span class="ost2">Lead<svg class="ic ic--xs"><use href="#i-ar"/></svg><b>Interested</b></span><span class="t3 num">#5</span></div>
+        <div class="olb" style="padding-left:24px;height:32px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If Later · baad mein</div>
+        <div class="ol" style="height:48px;padding-left:36px"><span class="gt gt--warning"><svg class="ic"><use href="#i-flag"/></svg></span><span class="olt">Callback set</span><span class="ost2">Lead<svg class="ic ic--xs"><use href="#i-ar"/></svg><b>Callback due</b></span><span class="t3 num">#6</span></div>
+        <div class="olb" style="padding-left:24px;height:32px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If No · nahi</div>
+        <div class="ol" style="height:48px;padding-left:36px"><span class="gt gt--tint"><svg class="ic"><use href="#i-msg"/></svg></span><span class="olt">Polite close</span><span class="t3 num">#7</span></div>
+        <div class="olb" style="padding-left:24px;height:32px"><svg class="ic ic--sm"><use href="#i-corner"/></svg>If No reply · after 6 s</div>
+        <div class="ol" style="height:48px;padding-left:36px"><span class="gt gt--neutral"><svg class="ic"><use href="#i-flag"/></svg></span><span class="olt">No answer</span><span class="ost2">Lead<svg class="ic ic--xs"><use href="#i-ar"/></svg><b>Not reached</b></span><span class="t3 num">#9</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:6px 12px;background:var(--surface);border-top:1px solid var(--border)"><span class="btn" style="height:44px"><svg class="ic ic--sm"><use href="#i-play"/></svg>Test</span><span class="btn btn--primary" style="height:44px">Publish v8…</span></div>
+      <div data-vl="bottombar" data-vl-current="flows"></div>
+    </div></div>
+  </div>
+</section>
+
+<style>
+.ks{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 32px}
+.ks h4{font:var(--type-label-12);color:var(--text-3);grid-column:1/-1;margin-top:12px}
+.kr{display:flex;align-items:center;gap:8px;height:32px;border-bottom:1px solid var(--border);font:var(--type-data-13)}
+.kr span:first-child{flex:1}
+.kr .one{font:var(--type-meta-12);color:var(--text-3)}
+.leg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 24px;font:var(--type-data-13);color:var(--text-2)}
+.leg div{display:flex;align-items:center;gap:10px}
+.cap-t{width:36px;height:18px;border:1px solid var(--border-strong);background:var(--surface)}
+</style>
+<!-- ============ 11. Shortcuts and legend ============ -->
+<section class="sec" aria-labelledby="s11">
+  <div class="sec-h"><div><h2 id="s11">Keyboard shortcuts and legend (the ? sheet, Flow Designer section)</h2><p class="ids">Spec §11 · F-FLOW-024, F-A11Y-027, F-A11Y-004, F-FLOW-017</p></div>
+  <p>The shared shortcuts sheet (Dialog lg) opens on the Flow Designer section when called from the designer. Keys follow the platform (Ctrl here) and come from the one canvas key map (06-accessibility §9.6), generated from the shortcut registry. Single-key shortcuts carry a "single key" mark and stop working when the account setting turns them off. The legend teaches the shape grammar and the one dashed line.</p></div>
+  <div class="scroll"><div class="dev" style="width:960px;border-radius:var(--radius-12);background:var(--surface-overlay);border-color:var(--border-overlay);box-shadow:var(--e3)">
+    <div style="display:flex;align-items:center;gap:12px;padding:20px 20px 12px"><div style="font:var(--type-title-16);flex:1">Keyboard shortcuts</div><span style="display:inline-flex;align-items:center;gap:8px;font:var(--type-label-13)"><span style="width:32px;height:18px;border-radius:999px;background:var(--accent);position:relative"><span style="position:absolute;right:2px;top:2px;width:14px;height:14px;border-radius:50%;background:var(--on-accent)"></span></span>Single-key shortcuts</span><span class="ibtn ibtn--sm"><svg class="ic"><use href="#i-x"/></svg></span></div>
+    <div style="display:flex;gap:16px;padding:0 20px;border-bottom:1px solid var(--border);font:var(--type-label-13)"><span class="t2" style="padding:8px 0">Everywhere</span><span class="t2" style="padding:8px 0">Lists and tables</span><span style="padding:8px 0;box-shadow:inset 0 -2px 0 var(--accent-mark)">Flow Designer</span><span class="t2" style="padding:8px 0">Legend</span></div>
+    <div style="padding:8px 20px 20px" class="ks">
+      <h4>Navigate</h4>
+      <div class="kr"><span>Enter the canvas at the first trigger</span><span class="kbd">Tab</span></div>
+      <div class="kr"><span>Follow a connection forward or back</span><span class="kbd">→</span><span class="kbd">←</span></div>
+      <div class="kr"><span>Next or previous answer, or sibling step</span><span class="kbd">↑</span><span class="kbd">↓</span></div>
+      <div class="kr"><span>Open the step in the inspector</span><span class="kbd">Enter</span><span class="kbd">F2</span></div>
+      <div class="kr"><span>Find a step (title or #9)</span><span class="kbd">Ctrl</span><span class="kbd">F</span></div>
+      <div class="kr"><span>Next · previous issue</span><span class="kbd">Alt</span><span class="kbd">.</span><span class="kbd">Alt</span><span class="kbd">,</span></div>
+      <div class="kr"><span>Outline · Variables · Test panel</span><span class="one">single key</span><span class="kbd">O</span><span class="kbd">V</span><span class="kbd">T</span></div>
+      <h4>Edit</h4>
+      <div class="kr"><span>Add a step after this one, connected</span><span class="one">single key</span><span class="kbd">A</span></div>
+      <div class="kr"><span>Connect to…</span><span class="one">single key</span><span class="kbd">C</span></div>
+      <div class="kr"><span>Delete (Undo in the toast)</span><span class="kbd">Delete</span></div>
+      <div class="kr"><span>Duplicate with connections</span><span class="kbd">Ctrl</span><span class="kbd">D</span></div>
+      <div class="kr"><span>Move the selection 16 px (Shift: 64 px)</span><span class="kbd">Alt</span><span class="kbd">←↑→↓</span></div>
+      <div class="kr"><span>Move mode (arrows, then Enter)</span><span class="one">single key</span><span class="kbd">M</span></div>
+      <div class="kr"><span>Undo · Redo</span><span class="kbd">Ctrl</span><span class="kbd">Z</span><span class="kbd">Ctrl</span><span class="kbd">Y</span></div>
+      <h4>Select</h4>
+      <div class="kr"><span>Select only the focused step</span><span class="kbd">Space</span></div>
+      <div class="kr"><span>Add or remove the focused step</span><span class="kbd">Shift</span><span class="kbd">Space</span></div>
+      <div class="kr"><span>Select all</span><span class="kbd">Ctrl</span><span class="kbd">A</span></div>
+      <div class="kr"><span>Frame the selection</span><span class="kbd">Ctrl</span><span class="kbd">G</span></div>
+      <h4>View</h4>
+      <div class="kr"><span>Fit the whole flow · fit the selection</span><span class="kbd">Shift</span><span class="kbd">1</span><span class="kbd">Shift</span><span class="kbd">2</span></div>
+      <div class="kr"><span>Zoom to 100 %</span><span class="kbd">Shift</span><span class="kbd">0</span></div>
+      <div class="kr"><span>Zoom in · out (canvas focused)</span><span class="one">single key</span><span class="kbd">+</span><span class="kbd">−</span></div>
+      <div class="kr"><span>Step menu</span><span class="kbd">Shift</span><span class="kbd">F10</span></div>
+    </div>
+    <div style="padding:16px 20px 20px;border-top:1px solid var(--border)"><div class="fl"><b>Legend</b></div><div class="leg">
+      <div><span class="cap-t" style="border-radius:999px 6px 6px 999px"></span><span class="gt gt--ink gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-phone-in"/></svg></span>Trigger · how a call starts</div>
+      <div><span class="cap-t" style="border-radius:6px"></span><span class="gt gt--line gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-diamond"/></svg></span>Logic · listens and decides</div>
+      <div><span class="cap-t" style="border-radius:6px"></span><span class="gt gt--tint gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-msg"/></svg></span>Action · does something</div>
+      <div><span class="cap-t" style="border-radius:6px 999px 999px 6px"></span><span class="gt gt--success gt--sm" style="width:20px;height:20px"><svg class="ic ic--xs"><use href="#i-flag"/></svg></span>Outcome · how the call ended</div>
+      <div><svg viewBox="0 0 36 8" style="width:36px;height:8px"><path d="M0 4H36" stroke="var(--edge)" stroke-width="1.5"/></svg>Path between steps</div>
+      <div><svg viewBox="0 0 36 8" style="width:36px;height:8px"><path d="M0 4H36" stroke="var(--edge)" stroke-width="1.5" stroke-dasharray="5 4"/></svg>Fallback: No reply, Else, Not found, Not booked, Didn't connect</div>
+      <div><span style="display:inline-flex;align-items:center;justify-content:center;color:var(--text-3);width:36px"><svg class="ic ic--xs"><use href="#i-check"/></svg></span>Result row (Action): what the tool did; no examples</div>
+      <div><span style="display:inline-flex;align-items:center;font:var(--type-meta-12);color:var(--text-3);width:36px">Lead</span>Outcome status line: "Lead → Interested", plain text</div>
+    </div></div>
+  </div></div>
+</section>
+
+<script>
+/* Mock only: draws orthogonal connectors with rounded corners between sockets.
+   Edges are drawn in screen space, so the stroke stays 1.5 px at any zoom (spec §7.1: non-scaling stroke). */
+(function(){
+  var ns='http://www.w3.org/2000/svg';
+  function rp(pts,r){
+    var d='M'+pts[0][0]+' '+pts[0][1];
+    for(var i=1;i<pts.length-1;i++){
+      var p0=pts[i-1],p1=pts[i],p2=pts[i+1];
+      var l1=Math.hypot(p1[0]-p0[0],p1[1]-p0[1]),l2=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]);
+      var rr=Math.min(r,l1/2,l2/2);
+      if(rr<0.5){d+=' L'+p1[0]+' '+p1[1];continue;}
+      var ax=p1[0]-(p1[0]-p0[0])/l1*rr,ay=p1[1]-(p1[1]-p0[1])/l1*rr,bx=p1[0]+(p2[0]-p1[0])/l2*rr,by=p1[1]+(p2[1]-p1[1])/l2*rr;
+      d+=' L'+ax+' '+ay+' Q'+p1[0]+' '+p1[1]+' '+bx+' '+by;
+    }
+    var e=pts[pts.length-1];return d+' L'+e[0]+' '+e[1];
+  }
+  function draw(cv){
+    var svg=null;for(var k=0;k<cv.children.length;k++){if(cv.children[k].classList&&cv.children[k].classList.contains('edges')){svg=cv.children[k];break;}}
+    if(!svg)return;
+    svg.innerHTML='';
+    Array.prototype.slice.call(cv.children).forEach(function(c){if(c.classList.contains('elb'))c.remove();});
+    var cr=cv.getBoundingClientRect(),id=cv.id||('cv'+Math.random().toString(36).slice(2,7));cv.id=id;
+    var defs=document.createElementNS(ns,'defs');
+    [['e','var(--edge)'],['h','var(--edge-hover)'],['a','var(--edge-active)'],['d','var(--danger)']].forEach(function(m){
+      var mk=document.createElementNS(ns,'marker');mk.setAttribute('id','m'+m[0]+id);mk.setAttribute('viewBox','0 0 8 8');mk.setAttribute('refX','8');mk.setAttribute('refY','4');
+      mk.setAttribute('markerWidth','8');mk.setAttribute('markerHeight','8');mk.setAttribute('markerUnits','userSpaceOnUse');mk.setAttribute('orient','auto');
+      var p=document.createElementNS(ns,'path');p.setAttribute('d','M0 .5 8 4 0 7.5Z');p.style.fill=m[1];mk.appendChild(p);defs.appendChild(mk);
+    });
+    svg.appendChild(defs);
+    var list=[];try{list=JSON.parse(cv.getAttribute('data-e')||'[]');}catch(err){}
+    list.forEach(function(it){
+      var s=it[0],t=it[1],o=it[2]||{};
+      var se=document.getElementById(s);if(!se)return;
+      var a=se.getBoundingClientRect(),sx=a.left+a.width/2-cr.left,sy=a.top+a.height/2-cr.top,tx,ty;
+      if(t){var te=document.getElementById(t);if(!te)return;var b=te.getBoundingClientRect();tx=b.left+b.width/2-cr.left-7;ty=b.top+b.height/2-cr.top;}
+      else{tx=o.tx;ty=o.ty;}
+      var x0=sx+5,pts;
+      if(o.back){var yb=Math.max(sy,ty)+(o.drop||48);pts=[[x0,sy],[x0+16,sy],[x0+16,yb],[tx-18,yb],[tx-18,ty],[tx,ty]];}
+      else if(Math.abs(ty-sy)<1.5){pts=[[x0,sy],[tx,sy]];}
+      else{var mx=x0+(o.mx!=null?o.mx:Math.min(24,(tx-x0)/2));pts=[[x0,sy],[mx,sy],[mx,ty],[tx,ty]];}
+      var p=document.createElementNS(ns,'path');p.setAttribute('d',rp(pts,8));
+      var c=o.c||'',FE={hov:'fe--hover',sel:'fe--active',tk:'fe--active',bad:'fe--error',gh:'fe--ghost',dim:'fe--dim',con:'fe--connected'};p.setAttribute('class','fe'+(c&&FE[c]?' '+FE[c]:'')+(o.fb?' fe--fallback':''));
+      var mk=/sel|tk|gh/.test(c)?'a':/bad/.test(c)?'d':/hov|con/.test(c)?'h':'e';
+      if(t&&!/gh/.test(c)&&!o.noarrow)p.setAttribute('marker-end','url(#m'+mk+id+')');
+      svg.appendChild(p);
+      if(o.l){
+        var best=null,bl=0;
+        for(var i=0;i<pts.length-1;i++){var q1=pts[i],q2=pts[i+1];if(Math.abs(q1[1]-q2[1])<1){var L=Math.abs(q2[0]-q1[0]);if(L>bl){bl=L;best=[(q1[0]+q2[0])/2,q1[1]];}}}
+        if(o.lx!=null)best=[o.lx,o.ly];
+        if(best){var d=document.createElement('span');d.className='elb'+(o.lc==='sel'?' elb--active':o.lc==='bad'?' elb--error':'');d.textContent=o.l;d.style.left=best[0]+'px';d.style.top=best[1]+'px';cv.appendChild(d);}
+      }
+    });
+  }
+  function all(){Array.prototype.forEach.call(document.querySelectorAll('[data-e]'),draw);}
+  window.__drawEdges=all;
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){requestAnimationFrame(all);});
+  window.addEventListener('load',function(){requestAnimationFrame(all);});
+  window.addEventListener('resize',all);
+  try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',all);}catch(e){}
+})();
+</script>
+</body>
+</html>
