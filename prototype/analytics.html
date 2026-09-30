@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Analytics · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Analytics, a report of call volume, answer rate, talk time, sentiment, drop-off, intents and call hours, where every number opens its calls.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/analytics.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/call-reports-data.js" defer></script>
+<script src="pages/call-reports-query.js" defer></script>
+<script src="pages/analytics-charts.js" defer></script>
+<script src="pages/analytics-sections.js" defer></script>
+<script src="pages/analytics-range.js" defer></script>
+<script src="pages/analytics.js" defer></script>
+</head>
+<body data-page="analytics">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main an-main" tabindex="-1" data-focus-target>
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title" tabindex="-1" data-focus-target>Analytics</h1>
+          <span class="ph-meta" id="an-meta"><span class="sk sk--meta an-sk-meta" aria-hidden="true"></span><span class="sr-only">Loading…</span></span>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn--tertiary btn--sm an-proto proto-btn" type="button" aria-haspopup="menu" aria-controls="an-proto-menu" aria-expanded="false" data-placement="bottom-end" aria-label="Prototype states"><i data-icon="sliders-horizontal"></i><span class="an-proto-l">Prototype states</span></button>
+          <div class="seg an-range an-range--head" role="radiogroup" aria-label="Range" id="an-range">
+            <button type="button" role="radio" aria-checked="false" data-value="7d">7 days</button><button type="button" role="radio" aria-checked="true" data-value="30d">30 days</button><button type="button" role="radio" aria-checked="false" data-value="90d">90 days</button>
+          </div>
+          <button class="btn btn--tertiary ph-fold" type="button" id="an-custom" aria-haspopup="dialog" aria-expanded="false"><i data-icon="calendar"></i><span id="an-custom-l">Custom…</span></button>
+          <button class="ibtn" type="button" id="an-more" aria-label="More actions" aria-haspopup="menu" aria-controls="an-more-menu" aria-expanded="false" data-placement="bottom-end"><i data-icon="ellipsis"></i></button>
+        </div>
+      </div>
+      <div class="an-rangebar" id="an-rangebar">
+        <div class="seg seg--full an-range" role="radiogroup" aria-label="Range" id="an-range-phone">
+          <button type="button" role="radio" aria-checked="false" data-value="7d">7 days</button><button type="button" role="radio" aria-checked="true" data-value="30d">30 days</button><button type="button" role="radio" aria-checked="false" data-value="90d">90 days</button>
+        </div>
+      </div>
+      <div class="an-cbar" id="an-cbar" hidden></div>
+
+      <div class="l-container l-page an-page" id="an-page">
+        <div class="an-state" id="an-state" hidden></div>
+        <section class="an-overview" id="an-overview" aria-labelledby="an-ov-h">
+          <h2 class="sr-only" id="an-ov-h">Overview</h2>
+          <div class="kstrip an-strip" id="an-strip"></div>
+          <p class="an-scope" id="an-scope"></p>
+        </section>
+        <div class="an-grid" id="an-grid">
+          <section class="an-sec" id="an-s-calls" aria-labelledby="an-h-calls"></section>
+          <section class="an-sec" id="an-s-sent" aria-labelledby="an-h-sent"></section>
+          <section class="an-sec" id="an-s-drop" aria-labelledby="an-h-drop"></section>
+          <section class="an-sec" id="an-s-why" aria-labelledby="an-h-why"></section>
+          <section class="an-sec" id="an-s-hour" aria-labelledby="an-h-hour"></section>
+          <section class="an-sec" id="an-s-num" aria-labelledby="an-h-num"></section>
+        </div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- PAGE OVERLAYS -->
+<div class="menu" id="an-more-menu" role="menu" aria-label="More actions" hidden>
+  <button class="menu-item an-only-narrow" role="menuitem" type="button" data-act="custom"><i data-icon="calendar"></i><span class="menu-text"><span>Custom range…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="csv"><i data-icon="download"></i><span class="menu-text"><span>Export CSV</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="pdf"><i data-icon="file-text"></i><span class="menu-text"><span>Export PDF report</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item" role="menuitemcheckbox" type="button" aria-checked="false" data-act="test" id="an-test-item"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>Include test calls</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="refresh"><i data-icon="refresh-cw"></i><span class="menu-text"><span>Refresh</span></span></button>
+</div>
+<div class="menu" id="an-proto-menu" role="menu" aria-label="Prototype states (prototype only)" hidden></div>
+<!-- DateRangePicker (core §7.1, page §3.7): presets on the left, typeable dd/mm/yyyy segments, the RangeCalendar
+     (two months at ≥ 1024, one below, a bottom sheet with 44 px cells on phones). Drawn by pages/analytics-range.js. -->
+<div class="pop an-drp" id="an-range-pop" aria-labelledby="an-range-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="an-range-t">Custom range</h2><button type="button" class="ibtn ibtn--sm" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body an-drp-body">
+    <div class="an-drp-presets" id="an-drp-presets" role="group" aria-label="Presets"></div>
+    <div class="an-drp-main">
+      <div class="an-drp-fields">
+        <div class="field"><span class="field-label" id="an-from-l">From (IST)</span><div class="input input--sm an-df" role="group" aria-labelledby="an-from-l" aria-describedby="an-drp-sum" data-df="from"></div></div>
+        <div class="field"><span class="field-label" id="an-to-l">To (IST)</span><div class="input input--sm an-df" role="group" aria-labelledby="an-to-l" aria-describedby="an-drp-sum" data-df="to"></div></div>
+      </div>
+      <p class="field-hint an-drp-sum" id="an-drp-sum"></p>
+      <p class="field-error" id="an-drp-err" hidden></p>
+      <div class="an-drp-cals" id="an-drp-cals"></div>
+      <p class="cal-foot" id="an-range-why">IST · the last 180 days, up to today · compared with the previous period of the same length</p>
+      <p class="sr-only" aria-live="polite" id="an-drp-live"></p>
+    </div>
+  </div>
+  <div class="pop-foot"><button type="button" class="btn btn--sm btn--tertiary" data-popover-close>Cancel</button><button type="button" class="btn btn--sm btn--primary" id="an-range-apply">Apply range</button></div>
+</div>
+</body>
+</html>

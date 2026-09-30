@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Call reports · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Call reports, the ledger of every conversation with the call detail sheet, recording, transcript, summary and captured fields.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/call-reports.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/call-reports-data.js" defer></script>
+<script src="pages/call-reports-query.js" defer></script>
+<script src="pages/call-reports.js" defer></script>
+<script src="pages/call-reports-table.js" defer></script>
+<script src="pages/call-reports-filters.js" defer></script>
+<script src="pages/call-reports-sheet.js" defer></script>
+<script src="pages/call-reports-player.js" defer></script>
+<script src="pages/call-reports-review.js" defer></script>
+<script src="pages/call-reports-boot.js" defer></script>
+</head>
+<body data-page="call-reports">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame cr-main" tabindex="-1" data-focus-target>
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title" tabindex="-1" data-focus-target>Call reports</h1>
+          <span class="ph-meta" id="cr-meta"><span class="sk sk--meta cr-sk-meta" aria-hidden="true"></span><span class="sr-only">Loading totals…</span></span>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn--tertiary btn--sm cr-proto proto-btn" type="button" aria-haspopup="menu" aria-controls="cr-proto-menu" aria-expanded="false" data-placement="bottom-end" aria-label="Prototype states"><i data-icon="sliders-horizontal"></i><span class="cr-proto-l">Prototype states</span></button>
+          <button class="btn btn--tertiary ph-fold" type="button" id="cr-refresh"><i data-icon="refresh-cw"></i><span id="cr-refresh-label">Refresh</span></button>
+          <button class="btn btn--tertiary ph-fold" type="button" id="cr-export-btn" aria-haspopup="dialog" aria-expanded="false"><i data-icon="download"></i>Export…</button>
+          <button class="ibtn ph-more" type="button" aria-label="More actions" aria-haspopup="menu" aria-controls="cr-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+        </div>
+      </div>
+      <div class="menu" id="cr-more-menu" role="menu" aria-label="More actions" hidden>
+        <button class="menu-item" role="menuitem" type="button" data-act="refresh"><i data-icon="refresh-cw"></i><span class="menu-text"><span>Refresh</span></span></button>
+        <button class="menu-item" role="menuitem" type="button" data-act="export"><i data-icon="download"></i><span class="menu-text"><span>Export…</span></span></button>
+      </div>
+
+      <div class="cr-cbar" id="cr-cbar" hidden></div>
+      <div class="cr-notice" id="cr-notice" hidden></div>
+
+      <div class="vtabs cr-views" id="cr-views">
+        <div class="vtabs-list" role="tablist" aria-label="Views" data-activation="manual" id="cr-tablist"></div>
+        <button class="vtab vtab--add" type="button" id="cr-saveview"><i data-icon="plus" data-size="sm"></i>Save view</button>
+      </div>
+
+      <div class="tb cr-tb" id="cr-tb">
+        <div class="cr-viewsel" id="cr-viewsel-wrap">
+          <span class="sr-only" id="cr-viewsel-l">View</span>
+          <button type="button" class="select select--sm select--auto" data-select id="cr-viewsel" aria-controls="cr-viewsel-lb" aria-labelledby="cr-viewsel-l cr-viewsel-v"><span class="select-value" id="cr-viewsel-v">View: All</span><i data-icon="chevron-down" data-size="sm"></i></button>
+          <div class="listbox" id="cr-viewsel-lb" role="listbox" aria-labelledby="cr-viewsel-l" hidden></div>
+        </div>
+        <form class="search cr-search" role="search" aria-label="Search calls" id="cr-search-form">
+          <i data-icon="search"></i>
+          <input type="search" id="cr-q" aria-label="Search calls" placeholder="Search calls and transcripts…" autocomplete="off" data-page-search>
+          <kbd class="kbd" data-single-key>/</kbd>
+          <button type="button" class="search-clear" id="cr-q-clear" aria-label="Clear search" hidden><i data-icon="x" data-size="sm"></i></button>
+        </form>
+        <div class="tb-group tb-scroll" role="group" aria-label="Filters" id="cr-filters">
+          <button class="btn" type="button" id="cr-filter-btn" aria-haspopup="dialog" aria-expanded="false"><i data-icon="list-filter"></i>Filter<span class="cr-fc"><span class="fcount" id="cr-fcount" hidden></span></span></button>
+          <span class="cr-tokens" id="cr-tokens"></span>
+          <button class="btn btn--sm btn--tertiary" type="button" id="cr-clear" hidden>Clear</button>
+        </div>
+        <span class="tb-spacer"></span>
+        <button class="tb-count" type="button" id="cr-count" aria-haspopup="dialog" aria-expanded="false"><span class="sk sk--meta cr-sk-count" aria-hidden="true"></span><span class="sr-only">Loading calls…</span></button>
+        <span class="cr-testsw u-hide-phone" id="cr-testsw-wrap">
+          <button type="button" class="switch" role="switch" id="cr-test" aria-checked="false" aria-label="Show test calls" data-tooltip="Includes test calls and browser tests" data-manual><span class="switch-thumb"></span></button>
+          <span aria-hidden="true">Test calls</span>
+        </span>
+        <button class="btn btn--tertiary u-hide-phone cr-colbtn" type="button" id="cr-cols-btn" aria-haspopup="menu" aria-controls="cr-cols-menu" aria-expanded="false" aria-label="Columns"><i data-icon="columns-3"></i><span class="cr-colbtn-l" aria-hidden="true">Columns</span></button>
+        <div class="seg seg--sm" role="radiogroup" aria-label="Density" id="cr-density" data-density-for="#cr-work" data-density-key="call-reports"><button type="button" role="radio" aria-checked="true" data-value="standard">Standard</button><button type="button" role="radio" aria-checked="false" data-value="compact">Compact</button></div>
+      </div>
+
+      <div class="with-sheet cr-work" id="cr-work">
+        <div class="cr-left">
+          <div class="cr-scroll" id="cr-scroll" data-shortcut-scope="cr-table">
+            <div class="dt-wrap cr-dtwrap" id="cr-dtwrap">
+              <table class="dt" id="cr-table" role="grid" aria-labelledby="page-title" aria-describedby="cr-caption">
+                <caption class="sr-only" id="cr-caption">Calls, sorted by When, newest first</caption>
+                <thead id="cr-thead"></thead>
+                <tbody id="cr-tbody"></tbody>
+              </table>
+            </div>
+            <ul class="cr-list" id="cr-list" aria-label="Calls"></ul>
+            <div class="cr-empty" id="cr-empty" hidden></div>
+          </div>
+          <div class="pager cr-pager" id="cr-pager" role="navigation" aria-label="Pages"></div>
+        </div>
+
+        <div class="sheet sheet--detail cr-sheet" id="cr-sheet" role="dialog" aria-labelledby="cs-title" data-dockable data-shortcut-scope="cr-sheet" hidden>
+          <div class="cs-phonebar">
+            <a class="topbar-back sheet-back" href="call-reports.html" id="cs-back"><i data-icon="chevron-left"></i>Back to Call reports</a>
+            <button class="ibtn" type="button" id="cs-more-phone" aria-label="More actions for this call" aria-haspopup="menu" aria-controls="cs-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+          </div>
+          <div class="sheet-head">
+            <div class="sheet-heading"><h2 class="sheet-title" id="cs-title" tabindex="-1" data-focus-target data-tooltip-overflow>Call details</h2></div>
+            <div class="sheet-actions cs-actions">
+              <button class="ibtn" type="button" id="cs-prev" aria-label="Previous call" data-kbd="k"><i data-icon="chevron-up"></i></button>
+              <button class="ibtn" type="button" id="cs-next" aria-label="Next call" data-kbd="j"><i data-icon="chevron-down"></i></button>
+              <button class="ibtn" type="button" id="cs-link" aria-label="Copy link to this call"><i data-icon="link"></i></button>
+              <button class="ibtn" type="button" id="cs-more" aria-label="More actions for this call" aria-haspopup="menu" aria-controls="cs-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+              <button class="ibtn sheet-close" type="button" id="cs-close" aria-label="Close call details"><i data-icon="x"></i></button>
+            </div>
+          </div>
+          <div class="cs-glance" id="cs-glance"></div>
+          <div class="vtabs vtabs--panel cs-tabs" id="cs-tabs">
+            <div class="vtabs-list" role="tablist" aria-label="Call details" id="cs-tablist">
+              <button class="vtab" role="tab" type="button" id="cs-t-transcript" aria-controls="cs-p-transcript" aria-selected="true" data-value="transcript">Transcript</button>
+              <button class="vtab" role="tab" type="button" id="cs-t-summary" aria-controls="cs-p-summary" aria-selected="false" data-value="summary">Summary</button>
+              <button class="vtab" role="tab" type="button" id="cs-t-captured" aria-controls="cs-p-captured" aria-selected="false" data-value="captured">Captured <span class="vtab-count" id="cs-capcount"></span></button>
+            </div>
+          </div>
+          <div class="sheet-body cs-body" id="cs-body">
+            <div class="cs-bnotice" id="cs-bnotice" hidden></div>
+            <div role="tabpanel" id="cs-p-transcript" aria-labelledby="cs-t-transcript" class="cs-panel"></div>
+            <div role="tabpanel" id="cs-p-summary" aria-labelledby="cs-t-summary" class="cs-panel" hidden></div>
+            <div role="tabpanel" id="cs-p-captured" aria-labelledby="cs-t-captured" class="cs-panel" hidden></div>
+            <div class="cs-done" id="cs-done" hidden></div>
+          </div>
+          <div class="cs-ierr" id="cs-ierr" hidden></div>
+          <div class="sheet-foot cs-foot" id="cs-foot"></div>
+        </div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- PAGE OVERLAYS -->
+<div class="menu" id="cr-proto-menu" role="menu" aria-label="Prototype states (prototype only)" hidden></div>
+<div class="pop cr-pop-totals" id="cr-totals" aria-labelledby="cr-totals-t" hidden><div class="pop-head"><h2 class="pop-title" id="cr-totals-t">Totals for this view</h2></div><div class="pop-body" id="cr-totals-body"></div></div>
+<div class="pop cr-pop-export" id="cr-export" aria-labelledby="cr-export-t" hidden></div>
+<div class="pop cr-pop-filter" id="cr-filter" aria-labelledby="cr-filter-t" hidden></div>
+<div class="pop pop--wide cr-pop-tokens" id="cr-tokens-pop" aria-labelledby="cr-tokens-t" hidden><div class="pop-head"><h2 class="pop-title" id="cr-tokens-t">Filters</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="cr-tokens-body"></div><div class="pop-foot"><button class="btn btn--sm" type="button" id="cr-addfilter"><i data-icon="plus"></i>Add filter</button></div></div>
+<div class="menu" id="cr-cols-menu" role="menu" aria-label="Columns" hidden></div>
+<div class="menu" id="cr-row-menu" role="menu" aria-label="Call actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-act="open"><i data-icon="file-text"></i><span class="menu-text"><span>Open call</span></span><span class="menu-end">Enter</span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="lead"><i data-icon="user"></i><span class="menu-text"><span>Open lead</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="link"><i data-icon="link"></i><span class="menu-text"><span>Copy link</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="reanalyse"><i data-icon="refresh-cw"></i><span class="menu-text"><span>Re-analyse call</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="txt"><i data-icon="download"></i><span class="menu-text"><span>Download transcript (.txt)</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-act="csv"><i data-icon="file"></i><span class="menu-text"><span>Export call (CSV)</span></span></button>
+</div>
+<div class="menu" id="cs-more-menu" role="menu" aria-label="Call actions" hidden></div>
+<div class="menu" id="cs-speed-menu" role="menu" aria-label="Playback speed" hidden>
+  <button class="menu-item" role="menuitemradio" aria-checked="true" type="button" data-value="1"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>1×</span></span></button>
+  <button class="menu-item" role="menuitemradio" aria-checked="false" type="button" data-value="1.25"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>1.25×</span></span></button>
+  <button class="menu-item" role="menuitemradio" aria-checked="false" type="button" data-value="1.5"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>1.5×</span></span></button>
+  <button class="menu-item" role="menuitemradio" aria-checked="false" type="button" data-value="2"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>2×</span></span></button>
+</div>
+<div class="gate cr-gate" id="cr-gate" role="dialog" aria-modal="true" aria-labelledby="cr-gate-t" hidden></div>
+<div class="dlg" id="cr-suggest" role="dialog" aria-modal="true" aria-labelledby="cr-suggest-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="cr-suggest-t">Suggest knowledge from this call</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body">
+    <div class="field"><label class="field-label" for="cr-suggest-text">Passage to propose</label>
+      <textarea class="textarea" id="cr-suggest-text" rows="4" aria-describedby="cr-suggest-h"></textarea>
+      <span class="field-hint" id="cr-suggest-h">Pre-selected from the transcript. Admins review suggestions in Knowledge › Proposals.</span></div>
+  </div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Cancel</button><button type="button" class="btn btn--primary" id="cr-suggest-send">Send suggestion</button></div>
+</div>
+<div class="dlg dlg--sm" id="cr-saveview-dlg" role="dialog" aria-modal="true" aria-labelledby="cr-saveview-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="cr-saveview-t">Save view</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body">
+    <div class="field"><label class="field-label" for="cr-saveview-name">Name</label><div class="input"><input id="cr-saveview-name" autocomplete="off" data-autofocus></div>
+      <span class="field-hint" id="cr-saveview-scope"></span></div>
+  </div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Cancel</button><button type="button" class="btn btn--primary" id="cr-saveview-ok">Save view</button></div>
+</div>
+</body>
+</html>

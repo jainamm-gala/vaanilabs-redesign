@@ -1,0 +1,168 @@
+/* Vaani Labs prototype · Call reports (spec 03-pages/04 §2) · page layout and page-owned parts. Tokens only.
+   Reserved component classes are placed here (layout properties only); page parts use the .cr- and .cs- prefixes. */
+
+/* ---------- frame: header, notice, views and toolbar span the column; the work area holds the list and the sheet ---------- */
+.cr-cbar, .cr-notice { flex: none; }
+.cr-notice { padding: var(--space-8) var(--page-margin); background: var(--surface); border-bottom: var(--bw-hairline) solid var(--border); }
+.cr-views { flex: none; }
+.cr-tb { flex: none; }
+.cr-work { flex: 1 1 auto; min-height: 0; }
+.cr-left { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.cr-scroll { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; overflow: hidden; }
+.cr-dtwrap { flex: 1 1 auto; min-height: 0; }
+.cr-empty { flex: 1 1 auto; min-height: 0; overflow: auto; padding: var(--space-24) var(--page-margin); background: var(--surface); }
+.cr-err { margin-inline: auto; max-width: var(--size-container-form); }
+.cr-pager { flex: none; }
+
+/* ---------- toolbar parts ---------- */
+/* ≥ 1024 the toolbar stays one row. The search keeps its placeholder width (components .tb .search); the fit in
+   call-reports-filters.js folds density, the Columns label and the Test calls switch and moves tokens behind "+n filters"
+   (data-nav §6.7); only if nothing else fits does the filter group scroll sideways. */
+@media (min-width: 1024px) {
+  .cr-tb { flex-wrap: nowrap; }
+  .cr-search { flex-shrink: 20; }
+  #cr-filters { flex: 0 0.2 auto; min-width: 0; overflow-x: auto; scrollbar-width: none; padding: var(--space-2); margin: calc(-1 * var(--space-2)); }
+}
+.cr-viewsel { display: none; }
+.cr-tokens { display: contents; }
+.cr-fc { display: none; }
+.cr-testsw { display: inline-flex; align-items: center; gap: var(--space-8); font: var(--type-label-13); color: var(--text-2); white-space: nowrap; }
+.cr-sk-meta { display: inline-block; width: calc(var(--space-40) * 5); vertical-align: middle; }
+.cr-sk-count { display: inline-block; width: calc(var(--space-40) * 2); }
+.cr-sk-tab { display: inline-block; width: var(--space-20); }
+.cr-sk-tag { height: var(--tag-h); }
+.cr-newcalls { color: var(--text-2); }
+@media (max-width: 1279.98px) { .cr-colbtn-l { display: none; } }
+/* Tokens past the inline limit (3, or 2 below 1280) or past the room left wait behind "+n filters". */
+.cr-moretok { flex: none; }
+.cr-tb--nodensity .seg { display: none; }
+.cr-tb--nocolslabel .cr-colbtn-l { display: none; }
+.cr-tb--notest .cr-testsw { display: none; }   /* the switch is then in the Filter popover, as on phones (§2.11) */
+.cr-tokens-stack { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+@media (max-width: 1023.98px) { .cr-tb .seg { display: none; } }
+/* Compact height (≤ 720): the views fold into a "View: All" Select in the toolbar (data-nav §3.7). */
+@media (min-width: 1024px) and (min-height: 600px) and (max-height: 720px) {
+  .cr-views { display: none; }
+  .cr-viewsel { display: block; }
+}
+
+/* ---------- table cells ---------- */
+.cr-dir { display: inline-flex; align-items: center; gap: var(--space-6); }
+.cr-flowlink { display: inline-block; max-width: 22ch; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; color: inherit; text-decoration: none; }
+/* 1280–1439: nine columns share about 1,050 px, so cells use the compact inline padding. */
+@media (min-width: 1280px) and (max-width: 1439.98px) { .cr-work { --cell-px: var(--space-8); } .cr-flowlink { max-width: 16ch; } }
+.cr-flowlink:hover { text-decoration: underline; }
+.cr-cap { max-width: 32ch; }
+.cr-sum { max-width: 48ch; }
+.cr-rowrev { display: inline-flex; align-items: center; gap: var(--space-6); margin-inline-end: var(--space-8); vertical-align: middle; }
+.dt .cr-pin1 { left: var(--cr-pin1, 0); }
+.cr-sent { display: inline-block; min-width: max-content; vertical-align: middle; }
+/* Docked sheet (≥ 1440): the table column is 648 px wide, so cells tighten and the row ⋯ steps aside (the sheet's ⋯ acts on the open call). */
+.cr-docked { --cell-px: var(--space-8); }
+.cr-docked .row-actions { display: none; }
+.dt td .tag + .tag, .cr-dir + .tag { margin-inline-start: var(--space-6); }
+
+/* ---------- phone list (ListRow, data-nav §7.13) ---------- */
+.cr-list { display: none; margin: 0; padding: 0; list-style: none; }
+.cr-li { cursor: pointer; }
+.cr-li:hover { background: var(--row-hover); }
+.cr-li[aria-current="true"] { background: var(--row-hover); box-shadow: inset var(--bw-strong) 0 0 var(--row-selected-bar); }
+.cr-li-trail { display: inline-flex; justify-self: end; align-items: center; }
+.cr-li .li-title .tag { flex: none; }
+
+/* ---------- popovers ---------- */
+.cr-pop-totals { width: min(calc(var(--space-40) * 9), calc(100vw - 2 * var(--space-8))); }
+.cr-pop-export { width: min(var(--size-popover-gate), calc(100vw - 2 * var(--space-8))); }
+.cr-pop-filter { width: min(calc(var(--space-40) * 9), calc(100vw - 2 * var(--space-8))); }
+.cr-scope, .cr-note { margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.cr-trends { align-self: flex-start; font: var(--type-label-13); color: var(--accent-text); }
+.cr-why { margin-inline-end: auto; font: var(--type-meta-12); color: var(--text-2); }
+.cr-flist { display: grid; margin: 0; padding: 0; list-style: none; }
+.cr-fbody { gap: var(--space-8); }
+.cr-fback { margin-inline-start: calc(-1 * var(--space-8)); }
+.cr-fhours { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.cr-fdates { margin-top: var(--space-4); }
+.cr-fsw { margin-bottom: var(--space-4); }
+
+/* ---------- the call detail sheet ---------- */
+.cs-phonebar { display: none; }
+.cs-glance { display: grid; gap: var(--space-8); flex: none; padding: var(--space-12) var(--space-panel-pad-lg); border-bottom: var(--bw-hairline) solid var(--border); }
+.cs-glance-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6) var(--space-12); min-width: 0; }
+.cs-meta { font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; gap: var(--space-6) var(--space-8); }
+.cs-sumrow { display: flex; flex-wrap: wrap; align-items: baseline; column-gap: var(--space-8); }
+.cs-full { font: var(--type-body-14); }
+.cs-sum { margin: 0; font: var(--type-body-14); color: var(--text-2); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.cs-sum--none { color: var(--text-3); }
+.cs-tabs { flex: none; }
+.cs-body { gap: var(--space-16); }
+.cs-sticky { position: sticky; top: calc(-1 * var(--space-panel-pad-lg)); z-index: var(--z-raised); margin: calc(-1 * var(--space-panel-pad-lg)) calc(-1 * var(--space-panel-pad-lg)) 0; padding: var(--space-12) var(--space-panel-pad-lg); background: var(--surface-overlay); border-bottom: var(--bw-hairline) solid var(--border); }
+.cr-sheet.is-docked .cs-sticky { background: var(--surface); }
+.cs-panel { display: flex; flex-direction: column; gap: var(--space-16); min-width: 0; }
+.cs-panel[hidden] { display: none; }
+.cs-feed { container-type: inline-size; margin-inline: calc(-1 * var(--space-panel-pad-lg)); }
+.cs-feed-head { display: flex; align-items: center; gap: var(--space-8); padding: 0 var(--space-12) var(--space-8) var(--space-panel-pad-lg); }
+.cs-feed-head h3 { margin: 0; font: var(--type-title-14); color: var(--text); }
+.cs-ts { display: flex; align-items: center; gap: var(--space-4); padding: 0 var(--space-12) var(--space-8) var(--space-panel-pad-lg); }
+.cs-ts .input { flex: 1 1 auto; }
+.cs-ts-n { min-width: calc(var(--space-40) * 2); font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; text-align: end; }
+.cs-turns { margin: 0; padding: 0; list-style: none; border-top: var(--bw-hairline) solid var(--border); }
+.cs-end { display: flex; align-items: center; gap: var(--space-6); margin: 0; padding: var(--space-12) var(--space-panel-pad-lg) 0; font: var(--type-meta-12); color: var(--text-3); }
+.cs-follow { bottom: calc(var(--space-64) + var(--space-8)); }
+.cs-sec { display: grid; gap: var(--space-4); min-width: 0; }
+.cs-h { margin: 0; font: var(--type-title-14); color: var(--text); }
+.cs-h4 { margin: var(--space-12) 0 var(--space-4); font: var(--type-label-13); color: var(--text-2); }
+.cs-kv-stack { grid-template-columns: minmax(0, 1fr); gap: var(--space-2); }
+.cs-read { font: var(--type-body-14); color: var(--text); }
+.cs-sug { display: grid; gap: var(--space-6); margin: 0; padding-inline-start: var(--space-16); font: var(--type-body-14); color: var(--text-2); }
+.cs-effect { display: flex; align-items: flex-start; gap: var(--space-6); margin: var(--space-12) 0 0; font: var(--type-meta-12); color: var(--text-3); }
+.cs-effect .ic { flex: none; margin-top: var(--space-1); }
+.cs-alldone { padding-block: var(--space-64); }
+.cs-done { padding-block: var(--space-24); }
+/* A blocked "Call back…" carries its reason inline beside it (02-components-core §1.6, gate §4.4 rule 1); where the footer
+   is too narrow for it and the review action, that action wraps to a second row, so the reason never hides. */
+.cs-foot { flex-wrap: wrap; row-gap: var(--space-8); }
+.cs-cbwhy { flex: 1 1 calc(var(--space-40) * 3); min-width: 0; font: var(--type-meta-12); color: var(--text-2); text-wrap: pretty; }
+/* The modal sheet's footer (< 1024) is the page's bottom chrome while it is open: toasts sit above it (components §27
+   --toast-offset hook; --cr-foot-h is the footer's measured height, set by call-reports-review.js). */
+@media (max-width: 1023.98px) { body:has(#cr-sheet[aria-modal="true"]:not([hidden])) { --toast-offset: var(--cr-foot-h, var(--space-0)); } }
+@media (max-width: 767.98px) { body:has(#cr-sheet[aria-modal="true"]:not([hidden])) { --toast-offset: max(var(--space-0), calc(var(--cr-foot-h, var(--space-0)) - var(--size-bottombar))); } }
+.cs-ierr { flex: none; padding: var(--space-8) var(--space-panel-pad-lg); background: var(--surface); border-top: var(--bw-hairline) solid var(--border); }
+.cs-sk { display: grid; gap: var(--space-12); }
+.cr-sk-player { height: calc(var(--space-40) * 3); }
+.cr-sheet.cs-is-done .cs-glance, .cr-sheet.cs-is-gone .cs-glance { display: none; }
+.cr-sheet.cs-is-gone #cs-prev, .cr-sheet.cs-is-gone #cs-next, .cr-sheet.cs-is-gone #cs-link, .cr-sheet.cs-is-gone #cs-more, .cr-sheet.cs-is-gone #cs-more-phone, .cr-sheet.cs-is-gone .cs-foot { display: none; }
+.cs-wave-wrap { padding-block: var(--space-2); }
+
+/* ---------- tablet (768–1023): one page scroller; the table scrolls sideways with When and Lead pinned ---------- */
+@media (max-width: 1023.98px) {
+  .cr-work { display: block; }
+  .cr-left, .cr-scroll { display: block; overflow: visible; }
+  .cr-empty { overflow: visible; }
+  .cr-tokens { display: none; }
+  .cr-fc { display: contents; }
+}
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .cr-pager { position: sticky; bottom: 0; z-index: var(--z-sticky); }
+}
+
+/* ---------- phone (< 768): full-width sticky search, ListRows, full-screen sheet ---------- */
+@media (max-width: 767.98px) {
+  .cr-tb { position: sticky; top: var(--size-topbar); z-index: var(--z-sticky); }
+  .cr-tb .tb-scroll { width: auto; flex: 1 1 0; min-width: 0; }
+  .cr-tb .tb-spacer { display: none; }
+  .cr-proto-l { display: none; }
+  .cr-tokens { display: contents; }
+  .cr-dtwrap { display: none; }
+  /* ListRow at the Leads height (about 60 px, 04 §2.13: ≥ 8 rows at 360×780): 20 px tags on line 1 even under Touch density,
+     and line 2 at meta-12 with the 14 px sentiment icon (the table keeps its data-13 cell). */
+  .cr-list { display: block; --tag-h: var(--size-tag); }
+  .cs-phonebar { display: flex; align-items: center; justify-content: space-between; flex: none; min-height: var(--size-header); padding: var(--space-4) var(--space-4) var(--space-4) 0; border-bottom: var(--bw-hairline) solid var(--border); }
+  .cs-actions { display: none; }
+  .cs-glance { padding-inline: var(--space-16); }
+  .cs-sticky { padding-inline: var(--space-12); }
+  .cs-openlead { display: none; }
+  .cr-meta-upd { display: none; }
+}
+@media (forced-colors: active) {
+  .cr-li[aria-current="true"] { outline: var(--bw-strong) solid Highlight; }
+}

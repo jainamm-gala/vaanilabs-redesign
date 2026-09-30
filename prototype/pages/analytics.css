@@ -1,0 +1,135 @@
+/* Vaani Labs prototype · Analytics (spec 03-pages/04 §3, §4.6 StatStrip, §4.7 ReportSection/ReportGrid) · tokens only.
+   A report, not a dashboard: one level of containment, hairlines instead of cards, graphite marks, Neel only for the
+   hovered or focused period. Reserved component classes are placed with layout properties only. */
+
+.an-main { background: var(--surface); overflow-x: clip; }
+.an-sk-meta { display: inline-block; width: calc(var(--space-40) * 5); vertical-align: middle; }
+.an-rangebar { display: none; }
+.an-only-narrow { display: none; }
+.an-cbar { position: sticky; top: 0; z-index: var(--z-sticky); }
+.an-state { padding-block: var(--space-24); }
+
+/* ---------- StatStrip ---------- */
+.an-overview { min-width: 0; }
+/* Every track is minmax(0, 1fr) and every item min-width 0, so a long delta wraps inside its cell instead of widening the
+   track past the hairline (§4.6: text wraps, nothing overflows at 320). */
+.an-cell { position: relative; grid-template-columns: minmax(0, 1fr); transition: background-color var(--dur-fast) var(--ease-standard); }
+@media (hover: hover) and (pointer: fine) { .an-cell:hover { background: var(--row-hover); } }
+.an-cell .stat-label, .an-cell .stat-label > span { min-width: 0; }
+.an-cell-link { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: start; gap: var(--space-4); min-width: 0; margin-top: var(--space-2); color: inherit; text-decoration: none; border-radius: var(--radius-4); }
+.an-cell-link > * { max-width: 100%; }
+.an-cell .delta > span { min-width: 0; }
+.an-dl-s { display: none; }
+.an-cell-link:focus-visible { outline-offset: var(--space-2); }
+.an-sk-val { width: 50%; }
+.an-sk-delta { width: 40%; }
+.an-scope { margin: var(--space-8) 0 0; font: var(--type-meta-12); color: var(--text-3); }
+.an-scope a { color: var(--accent-text); }
+.an-trend { width: calc(var(--space-40) * 6); }
+.an-trend-svg { display: block; margin: var(--space-6) 0 var(--space-4); overflow: visible; }
+.an-trend-line { stroke: var(--chart-neutral); stroke-width: var(--icon-stroke); }
+.an-trend-dot { fill: var(--chart-highlight); }
+.an-trend-row { margin: var(--space-2) 0 0; font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+
+/* ---------- ReportGrid and ReportSection ---------- */
+.an-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: var(--space-24); }
+.an-sec { min-width: 0; padding: var(--space-20) var(--space-24) var(--space-32) 0; border-top: var(--bw-hairline) solid var(--border); }
+.an-sec:nth-child(2n) { padding-inline: var(--space-24) 0; border-inline-start: var(--bw-hairline) solid var(--border); }
+.an-sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-4) var(--space-12); min-height: var(--space-32); margin-bottom: var(--space-12); }
+.an-sec-head h2 { margin: 0; font: var(--type-title-16); color: var(--text); }
+.an-sec-meta { font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.an-sub { margin: calc(-1 * var(--space-6)) 0 var(--space-12); font: var(--type-meta-12); color: var(--text-3); }
+.an-foot { margin: var(--space-8) 0 0; font: var(--type-meta-12); color: var(--text-3); }
+.an-foot a { color: var(--accent-text); }
+.an-sec-body { min-width: 0; }
+.an-none { margin: 0; font: var(--type-body-14); color: var(--text-2); }
+.an-numstate { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); margin: 0 0 var(--space-12); font: var(--type-body-14); color: var(--text-2); }
+.an-secerr { padding-block: var(--space-24); }
+.an-skrows { display: grid; gap: var(--space-16); padding-block: var(--space-8); }
+
+/* ---------- plots ---------- */
+.an-plot { height: var(--size-chart-lg); }
+.an-plot:focus-visible { outline-offset: var(--space-4); }
+.an-xfade { animation: vl-fade-in var(--dur-fast) var(--ease-standard); }
+.an-seg-hl { stroke: var(--text); stroke-width: var(--bw-strong); }
+.an-tip { width: max-content; }
+.an-tip-open { display: block; margin-top: var(--space-6); padding-top: var(--space-6); border-top: var(--bw-hairline) solid var(--border); font: var(--type-label-12); color: var(--accent-text); text-decoration: none; }
+.an-tip--touch { pointer-events: auto; }
+.an-tip-hl { color: var(--text); font-weight: var(--fw-medium); }
+.an-legend a { display: inline-flex; align-items: center; gap: var(--space-6); color: inherit; text-decoration: none; border-radius: var(--radius-2); }
+.an-legend a:hover { color: var(--text); text-decoration: underline; }
+/* View as table (.an-tablewrap): a flush DataTable at its full height with no max-height, so the page scrolls as one
+   (§3.4, §4.7) and there is never an inner scroller inside a section. */
+.an-fs { max-width: 100%; }
+
+/* ---------- funnel and intents ---------- */
+.an-funnel .funnel-value a { font: inherit; color: var(--accent-text); text-decoration: underline; text-underline-offset: var(--space-2); }
+.an-largest { font-weight: var(--fw-medium); color: var(--text); }
+.an-int { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: var(--space-12); }
+.an-int > a { color: inherit; text-decoration: none; border-radius: var(--radius-4); }
+.an-int > a:focus-visible .barlist-track > i, .an-int > a:hover .barlist-track > i { background: var(--chart-highlight); }
+.an-ex { font: var(--type-label-12); }
+.an-exlist { display: grid; gap: var(--space-4); grid-column: 1 / -1; margin: var(--space-4) 0 var(--space-8); padding-inline-start: var(--space-16); font: var(--type-meta-12); color: var(--text-2); }
+.an-exlist a { color: var(--text-2); }
+.an-intstatus { margin: 0 0 var(--space-12); }
+
+/* ---------- DateRangePicker (Custom range; core §7.1). The .cal-* parts are the shared calendar; only layout and the
+   range states (start and end carry the selection border, days between are filled with no border) are placed here. ---------- */
+.an-drp { max-width: calc(100vw - 2 * var(--space-8)); }
+.an-drp-body { display: grid; grid-template-columns: auto minmax(0, auto); align-items: start; gap: var(--space-16); }
+.an-drp-presets { display: grid; align-content: start; gap: var(--space-2); padding-inline-end: var(--space-12); border-inline-end: var(--bw-hairline) solid var(--border); }
+.an-preset { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); min-height: var(--control-h); padding-inline: var(--space-8); border: 0; border-radius: var(--radius-4); background: transparent; font: var(--type-data-13); color: var(--text); text-align: start; white-space: nowrap; cursor: pointer; }
+@media (hover: hover) and (pointer: fine) { .an-preset:hover { background: var(--surface-2); } }
+.an-preset[aria-current="true"] { font-weight: var(--fw-medium); }
+.an-drp-main { display: grid; gap: var(--space-8); min-width: 0; }
+.an-drp-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-12); }
+.an-df { gap: 0; }
+.an-df .an-seg { flex: none; width: var(--space-28); height: auto; padding: 0 var(--space-2); border-radius: var(--radius-2); text-align: center; caret-color: transparent; }
+.an-df .an-seg--y { width: var(--space-40); }
+.an-df .an-seg::placeholder { color: var(--text-3); }
+.an-df .an-seg:focus { background: var(--accent-soft); color: var(--accent-soft-text); }
+.an-df-sl { padding-inline: var(--space-2); color: var(--text-3); }
+.an-drp-sum { min-height: var(--space-16); }
+.an-drp-cals { display: flex; align-items: flex-start; gap: var(--space-24); margin-top: var(--space-4); }
+.an-cal { display: grid; align-content: start; gap: var(--space-8); }
+.an-cal-head { display: grid; grid-template-columns: var(--btn-h-sm) minmax(0, 1fr) var(--btn-h-sm); align-items: center; }
+.an-cal-row { display: contents; }
+/* phones: the shell floats the popover as a bottom sheet; presets wrap as a row, the month fills the width, 44 px cells */
+.an-drp.is-sheet .an-drp-body { grid-template-columns: minmax(0, 1fr); }
+.an-drp.is-sheet .an-drp-presets { display: flex; flex-wrap: wrap; gap: var(--space-6); padding: 0 0 var(--space-12); border-inline-end: 0; border-bottom: var(--bw-hairline) solid var(--border); }
+.an-drp.is-sheet .an-preset { min-height: var(--size-hit-touch); padding-inline: var(--space-12); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-full); }
+.an-drp.is-sheet .an-drp-cals, .an-drp.is-sheet .an-cal { display: grid; }
+.an-drp.is-sheet .cal-day { width: 100%; height: var(--size-hit-touch); }
+@media (forced-colors: active) { .an-df .an-seg:focus { outline: var(--bw-hairline) solid Highlight; } }
+
+/* ---------- laptop and tablet ---------- */
+@media (max-width: 1279.98px) { .an-plot { height: var(--size-chart-md); } }
+@media (max-width: 1023.98px) {
+  .an-grid { grid-template-columns: minmax(0, 1fr); }
+  .an-sec, .an-sec:nth-child(2n) { padding-inline: 0; border-inline-start: 0; }
+  .an-only-narrow { display: flex; }
+}
+
+/* ---------- phone: sticky full-width range, 2 × 2 StatStrip, wrapping labels ---------- */
+@media (max-width: 767.98px) {
+  .an-range--head { display: none; }
+  .an-proto-l { display: none; }
+  .an-cell .delta .an-dl-l { display: none; }
+  .an-cell .delta .an-dl-s { display: inline; }
+  .an-rangebar { display: block; position: sticky; top: var(--size-topbar); z-index: var(--z-sticky); padding: var(--space-8) var(--page-margin); background: var(--surface); border-bottom: var(--bw-hairline) solid var(--border); }
+  .an-plot { height: var(--size-chart-sm); }
+  .an-funnel .funnel-value { grid-column: 1 / -1; }
+  .an-fl { white-space: normal; }
+  .an-il { white-space: normal; }
+  .an-meta-upd { display: none; }
+}
+@media print {
+  .sb, .rail, .topbar, .bl, .bbar, .ph-actions, .an-rangebar, .toast-region { display: none; }
+  .an-main { overflow: visible; }
+}
+/* R2D-05 (06 §15 rule 2): on coarse pointers the funnel step links, bar rows, Examples and the number-section links reach 44 */
+@media (pointer: coarse) {
+  .an-fl, .an-ex, .an-cell-link { position: relative; }
+  .an-fl::after, .an-ex::after, .an-cell-link::after { content: ""; position: absolute; left: 50%; top: 50%; width: max(100%, var(--size-hit-touch)); height: var(--size-hit-touch); transform: translate(-50%, -50%); }
+  .barlist-row { min-height: var(--size-hit-touch); }
+}
