@@ -1,0 +1,256 @@
+/* Vaani Labs prototype · pages/agents.css — Meetings and Personal agents (03-pages/07). Tokens only.
+   Layout for the three views (Meetings: main + aside 320 with the dock-swap; Personal agents: data page with a docked
+   task sheet; Agent settings: the 720 form column) and page-owned recipes for the components §3 lists as new and the
+   shared layer does not carry yet: RoomCard (.ag-room), RoomControlRow (.ag-ctl, .ag-ctlf), JoinDetails, AgentProfileCard
+   (.ag-profile), LimitsSummary (.ag-limits), AutonomyRow (.ag-auto-row), ApprovalCard extras (.ag-recips, .ag-passage),
+   template cards (.ag-tpl), ServiceMark tile (.ag-svc). Reported in shared_requests so they can move into components.css. */
+
+/* ---------- frame: scroll column + dockable sheets (with-sheet) ---------- */
+.ag-work { flex: 1 1 auto; min-height: 0; grid-template-rows: minmax(0, 1fr); }
+.ag-scroll { position: relative; min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; background: var(--bg); }
+#pa-scroll { background: var(--surface); }
+.ag-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-24); align-items: start; padding: var(--space-24) var(--page-margin) var(--space-56); }
+.ag-maincol { display: grid; gap: var(--space-section-gap); min-width: 0; container-type: inline-size; }
+.ag-aside { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); align-items: start; min-width: 0; }
+@media (min-width: 1440px) {
+  .ag-layout { grid-template-columns: minmax(0, 1fr) var(--size-inspector); }
+  .ag-aside { grid-template-columns: minmax(0, 1fr); position: sticky; top: var(--space-24); }
+  .ag-work.ag-docked .ag-layout { grid-template-columns: minmax(0, 1fr); }
+  .ag-work.ag-docked .ag-aside { display: none; }
+}
+.ag-sec { display: grid; min-width: 0; }
+.ag-sec-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-4) var(--space-12); margin-bottom: var(--space-12); }
+.ag-sec2 { display: grid; min-width: 0; }
+.ag-mb12 { margin-bottom: var(--space-12); }
+.ag-mt8 { margin-top: var(--space-8); }
+.ag-pad { padding: var(--space-20) var(--page-margin) var(--space-24); }
+.ag-pad-x { padding-inline: var(--page-margin); }
+.ag-pa-top { display: grid; gap: var(--space-24); }
+.ag-pa-top:empty { display: none; }
+.ag-p { margin: 0; }
+.ag-p + .ag-p { margin-top: var(--space-8); }
+.ag-meta { font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.ag-note { display: flex; align-items: center; gap: var(--space-6); margin: 0; font: var(--type-data-13); color: var(--text-2); }
+.ag-note > svg { flex: none; color: var(--text-3); }
+.ag-h3 { margin: 0; font: var(--type-title-14); color: var(--text); }
+.ag-list { display: block; margin: 0; padding-inline-start: var(--space-20); list-style: disc outside; font: var(--type-body-14); color: var(--text-2); }
+.ag-list > li + li { margin-top: var(--space-4); }
+.ag-measure { max-width: var(--size-measure); margin: 0; color: var(--text); }
+.ag-links { display: flex; flex-wrap: wrap; gap: var(--space-4); margin: var(--space-12) 0 0; font: var(--type-data-13); color: var(--text-3); }
+.ag-state { padding-block: var(--space-8); }
+.ag-crumbs { flex-basis: 100%; }
+.ag-code { min-width: 0; overflow: hidden; font: var(--type-mono-13); color: var(--text); text-overflow: ellipsis; white-space: nowrap; }
+.ag-code-12 { font: var(--type-mono-12); color: var(--text-2); overflow-wrap: anywhere; }
+.ag-why { margin-inline-end: auto; }
+
+/* header: "How meetings work" labelled ≥1280, icon-only 1024–1279, in ⋯ below 1024 (ph-fold) */
+.ag-how-icon { display: none; }
+@media (min-width: 1024px) and (max-width: 1279.98px) { .ag-how-label { display: none; } .ag-how-icon { display: inline-grid; } }
+
+/* MetaLine (A.mline): "a · b · c" as flex items. Each item after the first draws its dot in the column gap (::before,
+   silent to screen readers); the line clips its start edge (all but the focus-ring width), so an item that wraps to a
+   new line drops its dot: no line starts with a separator. Used by the PageHeader meta and the ApprovalCard sub-line. */
+.ag-mline { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--space-12); min-width: 0; max-width: 100%;
+  clip-path: inset(calc(-1 * var(--space-48)) calc(-1 * var(--space-48)) calc(-1 * var(--space-48)) calc(-1 * (var(--focus-width) + var(--focus-offset)))); }
+.ag-mi { position: relative; min-width: 0; }
+.ag-mi + .ag-mi::before { content: "·"; content: "·" / ""; position: absolute; top: 0; right: 100%; width: var(--space-12); text-align: center; }
+#ag-meta > .ag-mi { white-space: nowrap; }
+@media (forced-colors: active) { .ag-mi + .ag-mi::before { color: CanvasText; } }
+/* Tablet and phone (H1 in the TopBar): the meta column shrinks to its widest item, so the actions stay on the meta
+   row (03-pages/07 §1.3 / §2.4 header row: meta left, [⋯] [primary] right) and the meta wraps between items instead.
+   Not while a description shows (first use, Agent settings): that paragraph keeps the full row. */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  #ag-ph:not(.ag-ph--desc) > .ph-title { flex: 1 1 0; min-width: auto; }
+}
+
+/* ---------- RoomCard (§1.6) ---------- */
+.ag-rooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(calc(var(--space-80) * 4), 100%), 1fr)); gap: var(--space-12); }
+@container (min-width: 1000px) { .ag-rooms { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.ag-room { display: grid; align-content: start; gap: var(--space-8); }
+.ag-room--stale { border-color: var(--warning-border); }
+.ag-room-title { display: -webkit-box; margin: 0; overflow: hidden; font: var(--type-title-14); color: var(--text); -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.ag-room-title a { color: inherit; text-decoration: none; border-radius: var(--radius-2); }
+.ag-room-title a:hover { text-decoration: underline; text-underline-offset: calc(var(--space-2) + var(--space-1)); }
+.ag-room-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); margin: 0; }
+.ag-room-join { display: flex; align-items: center; gap: var(--space-6); min-width: 0; margin: 0; }
+.ag-ctl { display: grid; gap: var(--space-2); margin: var(--space-2) 0 0; padding-top: var(--space-8); border-top: var(--bw-hairline) solid var(--border); }
+.ag-ctl-row { display: grid; grid-template-columns: calc(var(--space-80) + var(--space-8)) minmax(0, 1fr); align-items: baseline; gap: var(--space-8); min-height: var(--space-24); }
+.ag-ctl-row dt { font: var(--type-data-13); color: var(--text-3); }
+.ag-ctl-row dd { min-width: 0; margin: 0; }
+.ag-room-warn { margin: 0; }
+.ag-room-acts { display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-4); }
+.ag-room-acts > .ibtn { margin-left: auto; }
+.ag-rooms-empty { display: block; }
+.ag-empty-line { padding: var(--space-12) var(--space-16); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); background: var(--surface); }
+
+/* ---------- Past meetings: toolbar, framed table, ListRows ---------- */
+.ag-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); margin-bottom: var(--space-12); }
+.ag-search { flex: 1 1 calc(var(--space-40) * 6); max-width: calc(var(--space-40) * 9); }
+.ag-tools-row { display: flex; align-items: center; gap: var(--space-8); min-width: 0; }
+.ag-tokens { display: flex; align-items: center; gap: var(--space-8); }
+.ag-tokens:empty { display: none; }
+.ag-count { margin-left: auto; font: var(--type-data-13); color: var(--text-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ag-count b { font-weight: var(--fw-medium); color: var(--text-2); }
+.ag-frame { overflow: hidden; background: var(--surface); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); }
+.ag-cell-title, .ag-cell-goal { display: inline-block; max-width: calc(var(--space-40) * 8); overflow: hidden; color: var(--text); text-decoration: none; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.ag-cell-goal { max-width: calc(var(--space-40) * 9); }
+.ag-cell-title:hover, .ag-cell-goal:hover { text-decoration: underline; }
+.ag-cell-prog { max-width: calc(var(--space-40) * 7); white-space: normal; }
+.ag-row-acts { display: inline-flex; align-items: center; justify-content: flex-end; gap: var(--space-4); }
+.ag-rows { display: none; }
+@container (max-width: 779.98px) { .ag-p3 { display: none; } }
+@container (max-width: 919.98px) { #mt-table .ag-cell-title { max-width: calc(var(--space-40) * 5); } }
+@container (max-width: 639.98px) { .ag-p2 { display: none; } }
+#pa-scroll .ag-dt { overflow: visible; }
+@container (max-width: 1099.98px) { #pa-tasks .ag-p3 { display: none; } }
+@container (max-width: 939.98px) { #pa-tasks .ag-p2b { display: none; } #pa-tasks .ag-cell-goal { max-width: calc(var(--space-40) * 5); } #pa-tasks .ag-cell-prog { max-width: calc(var(--space-40) * 5 + var(--space-20)); } }
+@container (max-width: 859.98px) { #pa-tasks .ag-p2 { display: none; } }
+.ag-break { flex-basis: 100%; height: 0; }
+
+/* ---------- aside: AgentProfileCard + This month ---------- */
+.ag-profile-id { display: flex; align-items: center; gap: var(--space-10); margin-bottom: var(--space-8); }
+.ag-profile-who { display: grid; flex: 1 1 auto; min-width: 0; font: var(--type-title-14); color: var(--text); }
+.ag-facts { display: grid; grid-template-columns: minmax(var(--space-64), max-content) minmax(0, 1fr); gap: var(--space-6) var(--space-12); margin: 0; font: var(--type-data-13); }
+.ag-facts dt { color: var(--text-3); }
+.ag-facts dd { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); min-width: 0; margin: 0; color: var(--text); }
+.ag-note + .ag-facts { margin-top: var(--space-12); padding-top: var(--space-12); border-top: var(--bw-hairline) solid var(--border); }
+.pbar + .ag-note { margin-top: var(--space-8); }
+
+/* ---------- Personal agents: readiness, templates, Waiting for you ---------- */
+.ag-ready--line { display: block; }
+.ag-ready-link { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-2) var(--space-4); min-height: var(--space-32); font: var(--type-data-13); color: var(--text-2); text-decoration: none; border-radius: var(--radius-4); }
+.ag-ready-a { color: var(--accent-text); text-decoration: underline; text-underline-offset: calc(var(--space-2) + var(--space-1)); }
+.ag-ready-link:hover .ag-ready-a { color: var(--link-hover); }
+.ag-before-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--space-4) var(--space-12); margin-bottom: var(--space-8); }
+.ag-templates { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(calc(var(--space-40) * 6), 100%), 1fr)); gap: var(--space-12); }
+.ag-templates > li { display: flex; min-width: 0; }
+.ag-tpl { display: grid; align-content: start; gap: var(--space-6); width: 100%; font: inherit; text-align: left; }
+.ag-tpl-title { font: var(--type-title-14); color: var(--text); }
+.ag-tpl-desc { font: var(--type-body-14); color: var(--text-2); }
+.ag-tpl-go { display: inline-flex; align-items: center; gap: var(--space-4); margin-top: var(--space-4); font: var(--type-label-13); color: var(--accent-text); }
+.ag-cards { display: grid; gap: var(--space-12); }
+.ag-approval { width: auto; max-width: calc(var(--size-container-form) + var(--space-96)); }
+.ag-recips { display: grid; gap: var(--space-2); }
+.ag-recips > li { display: flex; align-items: center; justify-content: space-between; gap: var(--space-12); min-height: var(--space-24); font: var(--type-data-13); color: var(--text); }
+.ag-recip-l { min-width: 0; }
+.ag-recip-r { flex: none; color: var(--text-2); }
+.ag-more-link { justify-self: start; font: var(--type-data-13); }
+.ag-passage { margin: 0; padding: var(--space-8) var(--space-12); border-inline-start: var(--bw-strong) solid var(--border-strong); border-radius: var(--radius-4); background: var(--surface-2); font: var(--type-body-14); color: var(--text); }
+.ag-decided { margin: 0; padding: var(--space-12) var(--space-16); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); background: var(--surface); }
+.ag-decided:focus-visible { outline-offset: var(--focus-offset); }
+.ag-tasks { min-width: 0; }
+.ag-tabs-status { display: inline-flex; align-items: center; margin-left: auto; padding-inline: var(--space-8); }
+.ag-table-state { max-width: none; padding: var(--space-48) var(--page-margin); }
+
+/* ---------- sheets: room, meeting, task ---------- */
+.ag-ssec { display: grid; gap: var(--space-8); }
+.ag-ssec + .ag-ssec { padding-top: var(--space-16); border-top: var(--bw-hairline) solid var(--border); }
+.ag-ctlf-list { display: grid; }
+.ag-ctlf { display: grid; grid-template-columns: calc(var(--space-80) + var(--space-8)) minmax(0, 1fr) auto; align-items: center; gap: var(--space-4) var(--space-8); min-height: var(--space-48); padding-block: var(--space-6); border-bottom: var(--bw-hairline) solid var(--border); font: var(--type-data-13); color: var(--text); }
+.ag-ctlf:last-child { border-bottom: 0; }
+.ag-ctlf-l { font: var(--type-label-13); color: var(--text); }
+.ag-ctlf-s { min-width: 0; }
+.ag-agent-line { display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: start; gap: var(--space-8); }
+.ag-people { display: grid; }
+.ag-person { display: flex; align-items: center; gap: var(--space-10); min-height: var(--space-40); }
+.ag-person-main { display: grid; flex: 1 1 auto; min-width: 0; }
+.ag-person-name { font: var(--type-data-13); color: var(--text); }
+.ag-left-toggle { justify-self: start; font: var(--type-data-13); }
+.ag-tr { flex: none; }
+.ag-tr-search { flex: 0 1 calc(var(--space-40) * 5); min-width: 0; height: var(--control-h-sm); }
+.ag-items { display: grid; gap: var(--space-12); }
+.ag-item { display: grid; gap: var(--space-4); padding-bottom: var(--space-12); border-bottom: var(--bw-hairline) solid var(--border); }
+.ag-item-text { margin: 0; font: var(--type-data-13); color: var(--text); }
+.ag-item-meta { margin: 0; }
+.ag-item-hand { justify-self: start; }
+.ag-mtg-panel { display: flex; flex-direction: column; gap: var(--space-16); padding: var(--space-20) var(--space-panel-pad-lg); }
+
+/* ---------- gate sheets and forms ---------- */
+.ag-rcards-1 { display: grid; gap: var(--space-8); }
+.ag-indent { margin-inline-start: var(--space-24); }
+.ag-before { display: grid; gap: var(--space-8); padding-top: var(--space-16); border-top: var(--bw-hairline) solid var(--border); }
+.ag-before .ag-before-head { margin-bottom: 0; }
+.ag-acts { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--space-4) var(--space-12); }
+.ag-startfrom { display: grid; gap: var(--space-6); }
+.ag-limits { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-12); padding: var(--space-10) var(--space-12); border-radius: var(--radius-6); background: var(--surface-2); }
+.ag-limits-s { flex: 1 1 calc(var(--space-40) * 6); margin: 0; font: var(--type-data-13); color: var(--text); font-variant-numeric: tabular-nums; }
+.ag-lim-fields { margin-top: var(--space-8); }
+.ag-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-field-gap); }
+.ag-limits-form { display: grid; gap: var(--space-12); }
+.ag-deck-opts { display: grid; gap: var(--space-8); }
+.ag-deck-prev { align-self: center; flex: none; margin-left: auto; }
+.ag-svc { display: grid; place-items: center; flex: none; width: var(--size-avatar); height: var(--size-avatar); border-radius: var(--radius-6); background: var(--surface-3); color: var(--text); }
+
+/* ---------- Agent settings: AutonomyRow, legend, save bar ---------- */
+/* the 720 form column starts at the page margin, aligned with the nested PageHeader above it (07 §2.11; ST acceptance
+   "aligned with their header"): l-container's auto side margins would centre it away from the breadcrumb and H1 */
+.ag-settings > .ag-ps { margin-inline: 0; }
+.ag-sec-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); min-width: 0; }
+.ag-sec-status { display: inline-flex; align-items: center; min-height: var(--space-20); margin-left: auto; }
+.ag-sec-status:empty { display: none; }
+.ag-auto-group { display: grid; margin-top: var(--space-8); container-type: inline-size; }
+.ag-auto-group > .ag-h3 { padding-block: var(--space-8) var(--space-4); }
+.ag-auto-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-8) var(--space-16); padding-block: var(--space-10); border-bottom: var(--bw-hairline) solid var(--border); }
+.ag-auto-text { display: grid; gap: var(--space-2); min-width: 0; }
+.ag-auto-name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); font: var(--type-label-13); color: var(--text); }
+.ag-auto-desc { font: var(--type-meta-12); color: var(--text-3); }
+.ag-auto-note { grid-column: 1 / -1; }
+@container (max-width: 559.98px) { .ag-auto-seg { grid-column: 1 / -1; width: 100%; } .ag-auto-seg > button { flex: 1 1 0; } }
+.ag-legend { padding: var(--space-8) var(--space-12); border-radius: var(--radius-6); background: var(--surface-2); }
+.ag-savebar { margin-top: var(--space-24); }
+
+/* ---------- skeleton bars (static, no shimmer) ---------- */
+.ag-sk-40 { width: 40%; }
+.ag-sk-60 { width: 60%; }
+.ag-sk-70 { width: 70%; }
+.ag-sk-80 { width: 80%; }
+.ag-sk-tag { width: var(--space-64); height: var(--size-tag); }
+.ag-sk-bar { height: var(--space-4); }
+.ag-sk-meta { display: inline-block; width: calc(var(--space-40) * 4); vertical-align: middle; }
+
+/* ---------- prototype-only states control (not product UI) ----------
+   The first PageHeader action (as on assistant.html), so it never covers rows, pagers, room controls, the Agent settings
+   form or its UnsavedChangesBar. Tertiary, and icon-only below 1280 (aria-label and tooltip keep the name). #ag-actions
+   (the view's own actions, re-rendered per view) is display: contents so its buttons share the .ph-actions row and gap. */
+.ag-acts { display: contents; }
+/* Agent settings (title block with a description, no actions of its own): the title block shrinks instead of pushing the
+   control onto a row of its own on phones */
+#ag-ph:has(#ag-desc:not([hidden])) > .ph-title { flex: 1 1 0; }
+.ag-proto-menu { max-height: min(calc(var(--space-96) * 6), calc(100dvh - 2 * var(--space-16))); }
+@media (max-width: 1279.98px) { .ag-proto-l { display: none; } }
+
+/* ---------- tablet and phone: one scroller (the page) ---------- */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  .ag-work { display: block; }
+  .ag-scroll { overflow: visible; }
+  .ag-layout { padding-bottom: var(--space-40); }
+}
+@media (max-width: 767.98px) {
+  .ag-layout { padding-top: var(--space-16); }
+  .ag-aside { grid-template-columns: minmax(0, 1fr); }
+  .ag-pad { padding-top: var(--space-16); }
+  .ag-room-acts > .ag-room-open, .ag-room-acts > .btn--danger { flex: 1 1 auto; }
+  .ag-room-acts > .ibtn { margin-left: 0; }
+  .ag-tools .ag-search { flex: 1 1 100%; max-width: none; }
+  .ag-tools-row { flex: 1 1 auto; overflow-x: auto; scrollbar-width: none; }
+  .ag-tools-row > * { flex: none; }
+  .ag-frame .dt-wrap, #pa-dt { display: none; }
+  .ag-rows { display: block; }
+  .ag-grid2 { grid-template-columns: minmax(0, 1fr); }
+  .ag-indent { margin-inline-start: 0; }
+  .ag-ready-link { min-height: var(--size-hit-touch); width: 100%; }
+  .ag-approval .gate-foot > .gate-reason { order: -2; }
+  .ag-approval .gate-foot > [data-primary] { order: -1; flex: 1 1 100%; }
+  .ag-approval .gate-foot > .btn:not([data-primary]) { flex: 1 1 0; }
+  .ag-ctlf { grid-template-columns: minmax(0, 1fr) auto; }
+  .ag-ctlf-l { grid-column: 1 / -1; }
+}
+@media (forced-colors: active) {
+  .ag-empty-line, .ag-decided, .ag-frame, .ag-limits, .ag-legend, .ag-svc, .ag-passage { border: var(--bw-hairline) solid CanvasText; }
+}
+
+/* column priorities by shell width (03-pages/07 §1.16, §2.16) */
+@media (max-width: 1279.98px) { #mt-table .ag-p3 { display: none; } }
+@media (max-width: 1023.98px) { #mt-table .ag-p2, #pa-tasks .ag-p2 { display: none; } #pa-scroll .ag-dt { overflow: auto; } }
+#mt-room-sheet .sheet-body > *, #mt-mtg-sheet .sheet-body > *, #pa-task-sheet .sheet-body > *, #mt-start .sheet-body > *, #pa-new .sheet-body > *, #pa-callgate .sheet-body > * { flex-shrink: 0; }
+@media (max-width: 767.98px) { .ag-approval .gate-foot > [data-ap="skip"] { order: 1; } }

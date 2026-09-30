@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Meetings · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Meetings (Live now, Start a meeting, rooms, past meetings) and Personal agents (readiness, approvals, tasks, New task, Agent settings). Spec 03-pages/07.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/agents.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/agents-data.js" defer></script>
+<script src="pages/agents.js" defer></script>
+<script src="pages/agents-meetings.js" defer></script>
+<script src="pages/agents-rooms.js" defer></script>
+<script src="pages/agents-mtg-sheet.js" defer></script>
+<script src="pages/agents-start.js" defer></script>
+<script src="pages/agents-deck.js" defer></script>
+<script src="pages/agents-tasks.js" defer></script>
+<script src="pages/agents-approvals.js" defer></script>
+<script src="pages/agents-task-sheet.js" defer></script>
+<script src="pages/agents-newtask.js" defer></script>
+<script src="pages/agents-settings.js" defer></script>
+<script src="pages/agents-boot.js" defer></script>
+</head>
+<!-- One file, three views (?view=meetings · personal-agents · agent-settings). Meetings and Personal agents are separate
+     destinations with their own H1 (03-pages/07 A2); Agent settings keeps the Personal agents nav item current. -->
+<body data-page="meetings">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame" tabindex="-1" data-focus-target>
+      <div class="ph" id="ag-ph">
+        <div class="ph-title">
+          <nav class="crumbs ag-crumbs" id="ag-crumbs" aria-label="Breadcrumb" hidden><a href="agents.html?view=personal-agents">Personal agents</a></nav>
+          <h1 id="page-title">Meetings</h1>
+          <span class="ph-meta ag-mline" id="ag-meta"></span>
+          <span class="ag-break" id="ag-desc-break" aria-hidden="true" hidden></span><p class="ph-desc" id="ag-desc" hidden></p>
+        </div>
+        <div class="ph-actions ag-ph-acts">
+          <!-- Prototype-only states control (not product UI). It lives in the PageHeader, as on assistant.html, so it never
+               covers content; icon-only below 1280. The menu (#ag-proto-menu) is at the end of the body. -->
+          <button class="btn btn--sm btn--tertiary has-lead ag-proto-btn proto-btn proto-btn--fold" type="button" aria-label="Prototype states" aria-haspopup="menu" aria-controls="ag-proto-menu" aria-expanded="false" data-placement="bottom-end" data-tooltip="For reviewers: every state in the spec. Not part of the product."><i data-icon="sliders-horizontal" data-size="sm"></i><span class="ag-proto-l">Prototype states</span></button>
+          <!-- The view’s own actions, rendered per view by agents.js (display: contents, so they sit in the same row) -->
+          <div class="ag-acts" id="ag-actions"></div>
+        </div>
+      </div>
+
+      <!-- ================= Meetings (§1) ================= -->
+      <div class="with-sheet ag-work" id="mt-view" hidden>
+        <div class="ag-scroll l-cq" id="mt-scroll">
+          <div class="ag-layout" id="mt-layout">
+            <div class="ag-maincol" id="mt-main"></div>
+            <aside class="ag-aside" id="mt-aside" aria-label="Meeting agent and this month"></aside>
+          </div>
+        </div>
+        <div class="sheet sheet--record" id="mt-room-sheet" role="dialog" aria-labelledby="mt-room-t" data-dockable hidden></div>
+        <div class="sheet sheet--detail" id="mt-mtg-sheet" role="dialog" aria-labelledby="mt-mtg-t" data-dockable hidden></div>
+      </div>
+
+      <!-- ================= Personal agents (§2) ================= -->
+      <div class="with-sheet ag-work" id="pa-view" hidden>
+        <div class="ag-scroll l-cq" id="pa-scroll" data-shortcut-scope="pa-table"></div>
+        <div class="sheet sheet--record" id="pa-task-sheet" role="dialog" aria-labelledby="pa-task-t" data-dockable hidden></div>
+      </div>
+
+      <!-- ================= Agent settings (§2.11) ================= -->
+      <div class="ag-settings" id="ps-view" hidden></div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ================= PAGE OVERLAYS ================= -->
+<!-- Header overflow menu (items per view) and the shared row / card menus (items rendered for the trigger) -->
+<div class="menu" id="ag-more-menu" role="menu" aria-label="More actions" hidden></div>
+<div class="menu" id="ag-row-menu" role="menu" aria-label="Actions" hidden></div>
+<div class="menu" id="ag-sub-menu" role="menu" aria-label="Action items" hidden></div>
+<div class="menu" id="ag-sheet-menu" role="menu" aria-label="More actions" hidden></div>
+
+<!-- How meetings work · How personal agents work (Popover, info variant) -->
+<div class="pop pop--info" id="mt-how" aria-labelledby="mt-how-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="mt-how-t">How meetings work</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body"><p class="ag-p">Start a meeting to get a link. The meeting agent joins your video room to present slides or talk through a published flow. With notes on, you get a transcript, summary and action items afterwards. Room time uses your free minutes first; agent time is charged from the wallet.</p></div>
+  <div class="pop-foot"><a class="btn btn--link" href="billing.html#plans">Plans and rates</a></div>
+</div>
+<div class="pop pop--info" id="pa-how" aria-labelledby="pa-how-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="pa-how-t">How personal agents work</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body"><p class="ag-p">Give an agent a goal instead of a script. It plans the steps, then calls, messages and looks things up from its own number until the job is done. Inside each task’s limits it works on its own; anything it can’t undo waits for you, and payments need your second factor.</p><p class="ag-p">For one scripted call, build a flow instead.</p></div>
+  <div class="pop-foot"><a class="btn btn--link" href="flow-designer.html">Flows</a></div>
+</div>
+
+<!-- Past meetings filter popover -->
+<div class="pop" id="mt-filter-pop" aria-labelledby="mt-filter-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="mt-filter-t">Filter past meetings</h2></div>
+  <div class="pop-body" id="mt-filter-body"></div>
+  <div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="mt-filter-clear">Clear</button><button class="btn btn--sm" type="button" id="mt-filter-apply" data-popover-close>Show meetings</button></div>
+</div>
+<div class="listbox" id="mt-date-lb" role="listbox" aria-label="Date range" hidden></div>
+
+<!-- Start a meeting: the form gate (Sheet gate 640, modal). Rendered by agents-start.js -->
+<div class="sheet sheet--gate" id="mt-start" role="dialog" aria-modal="true" aria-labelledby="mt-start-t" hidden></div>
+<!-- Add agent: popover gate (400), a bottom sheet on phones -->
+<div class="gate" id="mt-addagent" role="dialog" aria-modal="true" aria-labelledby="mt-addagent-t" hidden></div>
+<!-- Generate a deck (Dialog md; the body changes by step) -->
+<div class="dlg" id="mt-deck" role="dialog" aria-modal="true" aria-labelledby="mt-deck-t" data-discard="Discard this description? What you typed will be lost." hidden></div>
+
+<!-- New task: the task’s gate (Sheet gate 640, modal). Rendered by agents-newtask.js -->
+<div class="sheet sheet--gate" id="pa-new" role="dialog" aria-modal="true" aria-labelledby="pa-new-t" hidden></div>
+<!-- Call gate launched from a call decision (Sheet gate, settings read-only) -->
+<div class="sheet sheet--gate" id="pa-callgate" role="dialog" aria-modal="true" aria-labelledby="pa-callgate-t" hidden></div>
+<!-- Confirm it’s you (Settings ST §5), for Confirm + 2FA decisions -->
+<div class="dlg dlg--sm" id="pa-2fa" role="dialog" aria-modal="true" aria-labelledby="pa-2fa-t" hidden></div>
+
+<!-- Prototype-only states menu (not product UI); its trigger is the first PageHeader action -->
+<div class="menu ag-proto-menu" id="ag-proto-menu" role="menu" aria-label="Prototype states (not product UI)" hidden></div>
+</body>
+</html>
