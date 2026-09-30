@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Site-visit qualifier · Flows · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: the Flow Designer (canvas, inspector, validation, Draft and Live, Publish gate, test simulator, Outline).">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/flow-designer.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- Flow Designer (04-flow-designer parts 1 and 2). Split by concern; every file extends window.VaaniFlow.
+     flow-designer-frames*.js add FrameNode and NoteNode (FD1 §12.4, §12.5). -->
+<script src="pages/flow-designer-core.js" defer></script>
+<script src="pages/flow-designer-data.js" defer></script>
+<script src="pages/flow-designer-rules.js" defer></script>
+<script src="pages/flow-designer-store.js" defer></script>
+<script src="pages/flow-designer-canvas.js" defer></script>
+<script src="pages/flow-designer-input.js" defer></script>
+<script src="pages/flow-designer-popovers.js" defer></script>
+<script src="pages/flow-designer-inspector.js" defer></script>
+<script src="pages/flow-designer-fields.js" defer></script>
+<script src="pages/flow-designer-bind.js" defer></script>
+<script src="pages/flow-designer-palette.js" defer></script>
+<script src="pages/flow-designer-outline.js" defer></script>
+<script src="pages/flow-designer-problems.js" defer></script>
+<script src="pages/flow-designer-header.js" defer></script>
+<script src="pages/flow-designer-publish.js" defer></script>
+<script src="pages/flow-designer-lifecycle.js" defer></script>
+<script src="pages/flow-designer-test.js" defer></script>
+<script src="pages/flow-designer-frames.js" defer></script>
+<script src="pages/flow-designer-frames-input.js" defer></script>
+<script src="pages/flow-designer.js" defer></script>
+</head>
+<!-- Focus mode (03-pages/00 §3.2): rail at every desktop width, no Baseline, the 48 px Flow header instead of the PageHeader.
+     The Flow header has no .ph, so the TopBar (tablet, phone) shows data-topbar-title; flow-designer.js keeps it in sync. -->
+<body data-page="flows" data-shell="focus" data-topbar-title="Site-visit qualifier">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame" tabindex="-1" data-focus-target>
+      <!-- ================================ PAGE CONTENT HERE ================================ -->
+      <div class="fd" id="fd" data-mode="full" aria-busy="true">
+        <!-- FlowHeader (FD1 §3.3, content FD2 §4.3). Rendered by flow-designer-header.js. -->
+        <div class="fd-head" id="fd-head">
+          <div class="fd-head-l">
+            <nav class="crumbs fd-crumb" aria-label="Breadcrumb"><button type="button" class="btn btn--link fd-crumb-link" id="fd-crumb">Flows</button><span aria-hidden="true">/</span></nav>
+            <h1 class="fd-title" id="page-title"><button type="button" class="select select--quiet" id="fd-switch" data-select aria-controls="fd-switch-lb" aria-describedby="fd-switch-d"><span class="select-value" id="fd-switch-v"><span class="fd-title-t">Site-visit qualifier</span></span><i data-icon="chevron-down" data-size="sm"></i></button></h1>
+            <span class="sr-only" id="fd-switch-d">Switch flow</span>
+            <div class="fd-head-state" id="fd-head-state"></div>
+          </div>
+          <div class="fd-head-r" id="fd-head-r"></div>
+        </div>
+        <!-- Phase ruler (FD1 §4.4): one connected bar, Phase columns toggle, live note -->
+        <div class="fd-ruler" id="fd-ruler"></div>
+        <!-- Phone chip row and Outline | Canvas switch (FD1 §3.2 phone) -->
+        <div class="fd-phone" id="fd-phone"></div>
+        <div class="fd-noticeslot" id="fd-noticeslot"></div>
+        <div class="fd-body" id="fd-body">
+          <!-- ToolRail (FD1 §3.1) -->
+          <div class="fd-tools" id="fd-tools" role="toolbar" aria-orientation="vertical" aria-label="Flow tools"></div>
+          <!-- LeftPanel: Add step · Outline · Variables · Version history (FD1 §3.1, §8.2, §12.3; FD2 §6.1, §8.4) -->
+          <section class="fd-left" id="fd-left" aria-labelledby="fd-left-t" hidden></section>
+          <div class="fd-center" id="fd-center">
+            <!-- FlowCanvas: a section with a hidden h2, one roving tab stop, no role="application" (06 §6.1) -->
+            <section class="fd-canvas canvas" id="fd-canvas" aria-labelledby="fd-canvas-h" aria-describedby="fd-instr" data-shortcut-scope="flow-canvas">
+              <h2 class="sr-only" id="fd-canvas-h">Canvas</h2>
+              <p class="sr-only" id="fd-instr">Arrow keys follow connections. Enter opens a step. C connects, A adds a step after, Alt and arrow keys move steps. Question mark lists all shortcuts.</p>
+              <div class="fd-vp" id="fd-vp"><div class="nl" id="fd-nl"></div></div>
+              <div class="fd-labels" id="fd-labels" aria-hidden="true"></div>
+              <div class="fd-canvas-top" id="fd-canvas-top"></div>
+              <div class="fd-status sr-only" id="fd-load-status" role="status">Loading Site-visit qualifier…</div>
+            </section>
+            <!-- TestPanel dock (FD2 §13.1): 280 px at the bottom of the canvas column at ≥ 1024 -->
+            <div class="fd-testdock" id="fd-testdock" hidden></div>
+          </div>
+          <!-- StepInspector (FD2 §7.1): docked 320–480 at ≥ 1280, overlay at 1024–1279, read-only sheet below 1024 -->
+          <section class="sheet fd-insp" id="fd-insp" aria-labelledby="fd-insp-t" hidden></section>
+        </div>
+        <!-- ProblemsBar (FD1 §3.4, FD2 §12.4) or CompareBar (FD2 §4.5) -->
+        <div class="fd-pbar" id="fd-pbar" role="region" aria-label="Problems"></div>
+        <!-- Phone sticky action bar: Test · Publish, above the BottomBar -->
+        <div class="fd-sticky" id="fd-sticky"></div>
+      </div>
+      <!-- ================================ /PAGE CONTENT ================================ -->
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ================================ PAGE OVERLAYS HERE ================================ -->
+<!-- FlowSwitcher listbox (core §5.4): options are filled by flow-designer-header.js -->
+<div class="listbox listbox--wide" id="fd-switch-lb" role="listbox" aria-label="Flows" hidden></div>
+<!-- Menus are generated into this holder when they open (step, canvas, version, zoom, view options, ⋯). -->
+<div id="fd-menus"></div>
+<!-- Connect to… (FD2 §16.4) and Add step picker (FD1 §8.4): one searchable list popover, two titles -->
+<div class="pop pop--wide fd-pick" id="fd-pick" aria-labelledby="fd-pick-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="fd-pick-t">Connect to…</h2></div>
+  <div class="pop-body fd-pick-body">
+    <div class="input input--sm"><i data-icon="search" data-size="sm"></i><input type="text" id="fd-pick-q" role="combobox" aria-expanded="true" aria-controls="fd-pick-list" aria-autocomplete="list" aria-labelledby="fd-pick-t" autocomplete="off" spellcheck="false" data-autofocus></div>
+    <div class="fd-pick-list" id="fd-pick-list" role="listbox" aria-labelledby="fd-pick-t"></div>
+  </div>
+  <div class="pop-foot fd-pick-foot"><p class="form-note" id="fd-pick-note"></p></div>
+</div>
+<!-- Edge popover (FD1 §7.5) -->
+<div class="pop fd-edgepop" id="fd-edgepop" aria-labelledby="fd-edgepop-t" hidden>
+  <div class="pop-head"><h2 class="pop-title fd-edgepop-title" id="fd-edgepop-t">Connection</h2></div>
+  <div class="pop-body fd-edgepop-body" id="fd-edgepop-body"></div>
+</div>
+<!-- Publish gate (FD2 §5; G §5.2): sheet gate 640, modal; full screen on phones -->
+<div class="gate gate--sheet fd-gate" id="fd-gate" role="dialog" aria-modal="true" aria-labelledby="fd-gate-t" hidden></div>
+<!-- Call gate for "Call my phone…" (Cockpit §7.2 pattern, G §5.1): anchored gate popover -->
+<div class="gate fd-callgate" id="fd-callgate" role="dialog" aria-modal="true" aria-labelledby="fd-callgate-t" hidden></div>
+<!-- Conflict sheet (FD2 §4.6) -->
+<div class="sheet sheet--gate fd-sheet" id="fd-conflict" role="dialog" aria-labelledby="fd-conflict-t" hidden></div>
+<!-- Flow settings (FD2 §11) -->
+<div class="sheet sheet--detail fd-sheet" id="fd-settings" role="dialog" aria-labelledby="fd-settings-t" hidden></div>
+<!-- Problems list, full screen on phones (FD1 §3.4) -->
+<div class="sheet sheet--detail fd-sheet" id="fd-probsheet" role="dialog" aria-labelledby="fd-probsheet-t" hidden></div>
+<!-- Version history sheet below 1024 (FD2 §6.1) -->
+<div class="sheet sheet--detail fd-sheet" id="fd-histsheet" role="dialog" aria-labelledby="fd-histsheet-t" hidden></div>
+<!-- Prototype states (prototype only: not part of the design) -->
+<div class="dlg" id="fd-proto" role="dialog" aria-modal="true" aria-labelledby="fd-proto-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="fd-proto-t">Prototype states</h2><p class="dlg-desc">Prototype only, not part of the design. Each link reloads the page in one of the states the spec lists, so reviewers can see every case.</p><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body" id="fd-proto-body"></div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Close</button></div>
+</div>
+</body>
+</html>
