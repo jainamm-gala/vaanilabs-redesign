@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gate gallery</title>
+<meta name="description" content="Every gate variant from spec/02-components-gate.md (check kinds, Call gate single and batch, blocked and changed states, Publish gate, money gate, setup track, inline checklist, phone bottom sheet), drawn only from components.css, light and dark side by side. Sample data only.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+/* Page layout only (gg- prefix). Every component comes from components.css, unmodified. */
+:root { --font-hanken: "Hanken Grotesk", "Noto Sans"; }
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); }
+.gg-page { max-width: calc(var(--size-container-page) + var(--space-96)); margin: 0 auto; padding: var(--space-32) var(--space-24) var(--space-64); }
+.gg-top h1 { margin: 0 0 var(--space-8); font: var(--type-title-24); letter-spacing: var(--type-title-24-tracking); }
+.gg-top p { margin: 0 0 var(--space-8); max-width: var(--size-measure); color: var(--text-2); }
+.gg-sec { padding-top: var(--space-32); }
+.gg-h { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: var(--space-24); margin-bottom: var(--space-12); }
+.gg-h h2 { margin: 0; font: var(--type-title-20); letter-spacing: var(--type-title-20-tracking); }
+.gg-h p { margin: 0; color: var(--text-2); }
+.gg-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-16); }
+.gg-pane { min-width: 0; padding: var(--space-16); background: var(--bg); color: var(--text); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); }
+.gg-lbl { display: block; margin-bottom: var(--space-12); font: var(--type-label-12); color: var(--text-3); }
+.gg-row { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-16); }
+.gg-cap { margin: 0 0 var(--space-6); font: var(--type-meta-12); color: var(--text-3); }
+.gg-col { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-6); min-width: 0; align-content: start; width: var(--size-popover-gate); max-width: 100%; }
+.gg-wide { width: 100%; gap: var(--space-16); }
+.gg-mt { margin-top: var(--space-16); }
+/* group label with the summary on its line (G §2.3) */
+.gg-glabel { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); margin: var(--space-4) 0 0; font: var(--type-label-12); color: var(--text-3); }
+.gg-kind { font: var(--type-mono-12); color: var(--text-3); }
+.gg-members { margin: var(--space-4) 0 0; padding: 0; list-style: none; display: grid; gap: var(--space-2); font: var(--type-meta-12); color: var(--text-2); }
+.gg-members li { display: flex; justify-content: space-between; gap: var(--space-8); }
+.gg-sub { margin: var(--space-4) 0 0; padding: 0; list-style: none; display: grid; gap: var(--space-4); font: var(--type-data-13); }
+.gg-sub li { display: flex; justify-content: space-between; gap: var(--space-8); }
+.gg-ack { display: flex; align-items: center; gap: var(--space-8); margin-top: var(--space-6); font: var(--type-data-13); color: var(--text); }
+/* scope summary (readonly KeyValue or the editable one-line summary) */
+.gg-kv { display: grid; grid-template-columns: var(--space-80) minmax(0, 1fr); gap: var(--space-4) var(--space-12); margin: 0; font: var(--type-data-13); }
+.gg-kv dt { color: var(--text-3); }
+.gg-kv dd { margin: 0; color: var(--text); display: flex; flex-wrap: wrap; gap: var(--space-6); align-items: center; }
+.gg-set { display: flex; align-items: flex-start; gap: var(--space-8); padding: var(--space-8) 0; border-block: var(--bw-hairline) solid var(--border); font: var(--type-data-13); color: var(--text-2); }
+.gg-set .k { color: var(--text-3); }
+.gg-push { margin-left: auto; }
+/* RadioCard pair (core §6.2) */
+.gg-rc { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-8); }
+.gg-rc > div { display: grid; grid-template-columns: var(--space-16) minmax(0, 1fr); gap: var(--space-2) var(--space-8); padding: var(--space-8) var(--space-10); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-6); font: var(--type-label-13); }
+.gg-rc > div.on { background: var(--accent-soft); border-color: var(--accent-mark); }
+.gg-rc .d { grid-column: 2; font: var(--type-meta-12); color: var(--text-3); }
+.gg-radio { width: var(--space-16); height: var(--space-16); border-radius: 50%; border: var(--bw-hairline) solid var(--control); background: var(--surface); }
+.gg-rc .on .gg-radio { border: var(--space-4) solid var(--accent); }
+/* Publish sections, targets, changes, note */
+.gg-h3 { margin: var(--space-4) 0 0; font: var(--type-title-14); display: flex; justify-content: space-between; gap: var(--space-8); align-items: center; }
+.gg-tgt { display: grid; grid-template-columns: var(--space-20) minmax(0, 1fr); gap: var(--space-10); font: var(--type-data-13); }
+.gg-ti { display: inline-grid; color: var(--text-2); }
+.gg-tgt .m { display: block; font: var(--type-meta-12); color: var(--text-3); }
+.gg-chg { display: grid; grid-template-columns: var(--space-64) minmax(0, 1fr) auto; gap: var(--space-8); padding: var(--space-6) 0; border-top: var(--bw-hairline) solid var(--border); font: var(--type-data-13); }
+.gg-chg .k { font-weight: var(--fw-medium); }
+.gg-chg .m { display: block; font: var(--type-meta-12); color: var(--text-3); }
+.gg-input { display: block; padding: var(--space-6) var(--space-10); border: var(--bw-hairline) solid var(--control); border-radius: var(--radius-6); background: var(--surface); font: var(--type-body-14); color: var(--text-3); }
+.gg-quote { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-6) var(--space-12); margin: 0; font: var(--type-data-13); font-variant-numeric: tabular-nums; }
+.gg-quote dt { color: var(--text-2); } .gg-quote dd { margin: 0; text-align: right; }
+.gg-quote .em { font-weight: var(--fw-semibold); color: var(--text); padding-top: var(--space-6); border-top: var(--bw-hairline) solid var(--border); }
+.gg-presets { display: flex; gap: var(--space-8); }
+.gg-presets span { padding: var(--space-6) var(--space-12); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-6); font: var(--type-label-13); }
+.gg-presets span.on { background: var(--accent-soft); border-color: var(--accent-mark); }
+/* setup track rings and the current row (G §5.3) */
+.gg-ring { display: grid; place-items: center; width: var(--space-20); height: var(--space-20); border-radius: 50%; border: 1.5px solid var(--control); }
+.gg-ring--cur { border: var(--bw-strong) solid var(--accent-mark); }
+.gg-ring--cur::after { content: ""; width: var(--space-6); height: var(--space-6); border-radius: 50%; background: var(--accent-mark); }
+.gg-cur { margin-inline: calc(-1 * var(--space-16)); padding-inline: var(--space-16); background: var(--accent-soft); box-shadow: inset var(--bw-strong) 0 0 var(--accent-mark); }
+.gg-track { width: calc(var(--size-popover-gate) + var(--space-96) + var(--space-32)); max-width: 100%; }
+.gg-step-t { font: var(--type-label-13); color: var(--text); }
+.gg-step-t.dim { color: var(--text-2); }
+.gg-step-b { display: block; margin-top: var(--space-2); font: var(--type-meta-12); color: var(--text-2); }
+.gg-step-a { margin-top: var(--space-8); }
+/* entry point with its reason (global blocker, G §4.4) */
+.gg-entry { display: grid; justify-items: start; gap: var(--space-6); max-width: var(--size-popover-gate); }
+.gg-reason { font: var(--type-meta-12); color: var(--text-2); }
+.gg-bad { color: var(--danger-text); }
+.gg-w40 { width: 40%; }
+.gg-t2 { color: var(--text-2); }
+/* phone frame */
+.gg-device { position: relative; width: min(calc(var(--space-96) * 4 - var(--space-2) * 3), 100%); height: calc(var(--space-96) * 7 + var(--space-48)); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-12); overflow: hidden; background: var(--surface); }
+.gg-behind { padding: var(--space-16); font: var(--type-data-13); color: var(--text-2); }
+@media (max-width: 1100px) { .gg-pair { grid-template-columns: minmax(0, 1fr); } .gg-h { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 767px) { .gg-page { padding: var(--space-24) var(--space-16) var(--space-48); } .gg-pane { padding: var(--space-8); } .gg-rc { grid-template-columns: minmax(0, 1fr); } }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="gg-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="gg-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="gg-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="gg-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="gg-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="gg-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+<symbol id="gg-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.2-8.6"/></symbol>
+<symbol id="gg-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></symbol>
+<symbol id="gg-phone-in" viewBox="0 0 24 24"><use href="#gg-phone"/><path d="M16 2v6h6M22 2l-6 6"/></symbol>
+<symbol id="gg-list" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="gg-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6a2 2 0 0 1 .7 1.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/></symbol>
+<symbol id="gg-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="gg-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="gg-circle-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+<symbol id="gg-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+</svg>
+<main class="gg-page">
+<header class="gg-top"><h1>Gate</h1>
+<p>The one component in front of anything that dials, bills or goes live (direction P3). It has four parts: what will happen, the checks, the consequence line and one confirming action, confirmed with the labelled button or <span class="kbd">Ctrl</span> <span class="kbd">Enter</span>. Spec: <code>spec/02-components-gate.md</code>. Every component on this page comes from <code>components.css</code>; the page adds layout only (<code>gg-</code>). Sample data only.</p></header>
+
+<section class="gg-sec" id="kinds"><div class="gg-h"><h2>1 · Check kinds (G §2.1)</h2><p>One enum everywhere: pass · blocking · adjusted · advisory · checking · unknown. Red means fix this before confirming, amber means something changed or is risky, and neutral means worth knowing. Each row starts with a hidden kind word, so the state never depends on colour.</p></div>
+<div class="gg-pair" data-tpl="t-kinds"></div></section>
+<template id="t-kinds"><div class="gate" role="group" aria-labelledby="k1{S}"><div class="gate-head"><h3 class="gate-title" id="k1{S}">Every kind, as GateCheckRow renders it</h3><span class="gate-sub">The meta line names the kind for this gallery only</span></div><div class="gate-body"><ul class="gate-list">
+<li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text"><span class="sr-only">Passed: </span>Caller ID <span class="phone-text" translate="no">+91 80 •••• 2210</span> verified<span class="gate-meta">pass</span></span><span></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--block"><svg class="ic"><use href="#gg-x"/></svg></span><span class="gate-text"><span class="sr-only">Blocking: </span>Outside calling hours. Opens 10 am IST.<span class="gate-meta">blocking · stops the primary; its sentence is the why-text</span></span><span class="gate-act"><button class="btn btn--link" type="button">Schedule</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--adjusted"><svg class="ic"><use href="#gg-minus"/></svg></span><span class="gate-text"><span class="sr-only">Adjusted: </span>2 leads were called in the last 24 h<span class="gate-meta">adjusted · skipped to avoid a repeat call; count and cost follow</span><ul class="gg-members"><li><span>Lead 1043 · 22 h ago</span><button class="btn btn--link" type="button">Include</button></li><li><span>Lead 1051 · 6 h ago</span><button class="btn btn--link" type="button">Include</button></li></ul></span><span class="gate-act"><button class="btn btn--link" type="button">Include both</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--advisory"><svg class="ic"><use href="#gg-info"/></svg></span><span class="gate-text"><span class="sr-only">Note: </span>2 leads prefer Tamil. Vaani speaks Hindi and English.<span class="gate-meta">advisory · never blocks</span></span><span class="gate-act"><button class="btn btn--link" type="button">Choose voice</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--advisory-warn"><svg class="ic"><use href="#gg-alert"/></svg></span><span class="gate-text"><span class="sr-only">Warning: </span>Wallet covers about 40 of 120 calls. Calls pause at ₹0.<span class="gate-meta">advisory, severity warning</span></span><span class="gate-act"><button class="btn btn--link" type="button">Top up</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--advisory-warn"><svg class="ic"><use href="#gg-alert"/></svg></span><span class="gate-text"><span class="sr-only">Warning: </span>WhatsApp template "visit_confirm" is pending approval.<label class="gg-ack"><input class="cb" type="checkbox">Publish with this warning</label><span class="gate-meta">advisory with a required ack · blocks until ticked</span></span><span class="gate-act"><button class="btn btn--link" type="button">Go to step</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--checking"><svg class="ic spin"><use href="#gg-loader"/></svg></span><span class="gate-text"><span class="sr-only">Checking: </span><span class="gg-t2">Checking the DND registry…</span><span class="gate-meta">checking · the primary waits</span></span><span></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--unknown"><svg class="ic"><use href="#gg-help"/></svg></span><span class="gate-text"><span class="sr-only">Couldn't check: </span>Couldn't check calling hours.<span class="gate-meta">unknown · treated as blocking</span></span><span class="gate-act"><button class="btn btn--link" type="button">Retry</button></span></li>
+</ul></div></div></template>
+
+<section class="gg-sec" id="call"><div class="gg-h"><h2>2 · CallGate: single (Cockpit) and batch (Leads)</h2><p>A popover gate at 400 px: <code>--e3</code>, radius 12, no scrim, and focus starts on the title. In the Cockpit the scope is read-only (it was chosen on the card); from Leads it is editable. Checks sit under group labels. The consequence line sits above the choice, and the choice sits above the footer because it relabels the primary.</p></div>
+<div class="gg-pair" data-tpl="t-call"></div></section>
+<template id="t-call"><div class="gg-row">
+<div class="gate" role="dialog" aria-labelledby="c1{S}" aria-describedby="c1s{S}"><div class="gate-head"><h3 class="gate-title" id="c1{S}" tabindex="-1">Call Lead 1042</h3><span class="gate-sub" id="c1s{S}">Their phone rings when you place the call. · Checked just now</span></div>
+<div class="gate-body"><dl class="gg-kv"><dt>To</dt><dd>Lead 1042 <span class="phone-text" translate="no">+91 •••••• 4821</span> Hindi</dd><dt>Flow</dt><dd>Site-visit qualifier <span class="tag tag--success"><span class="live-dot" data-mark></span>Live v7</span></dd><dt>Voice</dt><dd>Vaani · Hindi + English</dd><dt>Caller ID</dt><dd><span class="phone-text" translate="no">+91 80 •••• 2210</span></dd></dl>
+<p class="gg-glabel">Must pass<span class="gate-sum gate-sum--ok" role="status"><svg class="ic ic--sm"><use href="#gg-check"/></svg>Ready · 1 thing to know</span></p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Within calling hours · 10 am to 7 pm IST</span><span></span></li><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Not on the DND list</span><span></span></li><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Wallet ₹2,340.50 · about 16 h of calls</span><span></span></li></ul>
+<p class="gg-glabel">Good to know</p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--advisory"><svg class="ic"><use href="#gg-info"/></svg></span><span class="gate-text">Called 22 h ago · Callback due today</span><span></span></li></ul>
+<div class="gate-cost"><span>1 call · about 1 to 2 min</span><b>₹2 to ₹5</b></div><p class="gate-note">The agent says the call is recorded at the start.</p></div>
+<div class="gate-foot"><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn btn--primary" type="button" aria-keyshortcuts="Control+Enter"><svg class="ic"><use href="#gg-phone"/></svg>Place call</button></div></div>
+<div class="gate" role="dialog" aria-labelledby="c2{S}"><div class="gate-head"><h3 class="gate-title" id="c2{S}" tabindex="-1">Call 9 leads</h3><span class="gate-sub">Nothing dials until you start. · Checked just now</span></div>
+<div class="gate-body"><div class="gg-set"><span class="k">Settings</span><span>Uses each lead's flow · Vaani · Auto language · Caller ID •••• 2210</span><span class="gg-push"><button class="btn btn--sm btn--tertiary" type="button" aria-expanded="false">Change<svg class="ic ic--sm"><use href="#gg-chev"/></svg></button></span></div>
+<p class="gg-glabel">Must pass<span class="gate-sum gate-sum--ok" role="status"><svg class="ic ic--sm"><use href="#gg-check"/></svg>9 calls ready · 3 leads skipped</span></p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">2 flows are live<span class="gate-meta">Site-visit qualifier v7 (8) · Home-loan follow-up v3 (1)</span></span><span></span></li><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Caller ID verified · inside calling hours</span><span></span></li></ul>
+<p class="gg-glabel">Adjusted</p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--adjusted"><svg class="ic"><use href="#gg-minus"/></svg></span><span class="gate-text">2 leads were called in the last 24 h<span class="gate-meta">Skipped to avoid a repeat call</span></span><span class="gate-act"><button class="btn btn--link" type="button">Include</button></span></li><li class="gate-row"><span class="gate-mark gate-mark--adjusted"><svg class="ic"><use href="#gg-minus"/></svg></span><span class="gate-text">1 lead is on the DND registry<span class="gate-meta">Skipped · 11 of 12 clear</span></span><span></span></li></ul>
+<div class="gate-cost"><span>9 calls · about 1 to 2 min each</span><b>₹21 to ₹44</b></div><p class="gate-note">Wallet ₹2,340.50 · about 16 h of calls</p>
+<div class="gg-rc"><div class="on"><span class="gg-radio"></span>Place now<span class="d">Calls start in order within a minute.</span></div><div><span class="gg-radio"></span>Schedule…<span class="d">Pick a time inside calling hours.</span></div></div></div>
+<div class="gate-foot"><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn btn--primary" type="button" aria-keyshortcuts="Control+Enter"><svg class="ic"><use href="#gg-phone"/></svg>Start 9 calls</button></div></div>
+</div></template>
+
+<section class="gg-sec" id="blocked"><div class="gg-h"><h2>3 · Blocked, global blockers, changed</h2><p>An in-gate blocker disables the primary: it stays focusable and reads its reason, which is the why-text in the danger tone. A global blocker such as wallet ₹0 keeps the gate closed, and its entry point says why (G §4.4). If the wallet drops to ₹0 while the gate is open, a blocking row appears at the top and the gate stays open. After 120 s the gate re-checks before confirming.</p></div>
+<div class="gg-pair" data-tpl="t-blocked"></div></section>
+<template id="t-blocked"><div class="gg-row">
+<div class="gate" role="dialog" aria-labelledby="b1{S}"><div class="gate-head"><h3 class="gate-title" id="b1{S}" tabindex="-1">Call 3 leads</h3><span class="gate-sub">Nothing dials until you start. · Checked just now</span></div>
+<div class="gate-body"><p class="gg-glabel">Must pass<span class="gate-sum gate-sum--blocked" role="status"><svg class="ic ic--sm"><use href="#gg-circle-x"/></svg>Phone calls blocked · 1 thing to fix</span></p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--block"><svg class="ic"><use href="#gg-x"/></svg></span><span class="gate-text">Outside calling hours. Opens 10 am IST.</span><span class="gate-act"><button class="btn btn--link" type="button">Schedule</button></span></li><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Site-visit qualifier v7 is live</span><span></span></li></ul>
+<div class="gate-cost"><span>3 calls · about 1 to 2 min each</span><b>₹7 to ₹15</b></div><p class="gate-note">Rate ₹0.04/s</p></div>
+<div class="gate-foot"><span class="gate-reason" id="br{S}"><span class="gg-bad">Calls can't start outside calling hours.</span></span><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn btn--primary" type="button" aria-disabled="true" aria-describedby="br{S}">Start 3 calls</button></div></div>
+<div class="gg-col">
+<p class="gg-cap">Global blocker: the entry point, and the gate never opens</p>
+<div class="gg-entry"><button class="btn btn--sm" type="button" aria-disabled="true" aria-describedby="ge{S}"><svg class="ic ic--sm"><use href="#gg-phone"/></svg>Call…</button><span class="gg-reason" id="ge{S}">Wallet is ₹0. <button class="btn btn--link" type="button">Top up</button> to place calls.</span></div>
+<p class="gg-cap gg-mt">The wallet reached ₹0 while the gate was open (row added at the top)</p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--block"><svg class="ic"><use href="#gg-x"/></svg></span><span class="gate-text">Wallet is ₹0. Top up to place calls.</span><span class="gate-act"><button class="btn btn--link" type="button">Top up</button></span></li></ul>
+<p class="gg-cap gg-mt">Changed: the recheck at confirm differed from what was shown</p>
+<div class="notice notice--warning"><svg class="ic"><use href="#gg-alert"/></svg><span class="notice-body">Checks changed since you opened this. Review and start again.</span></div>
+<p class="gg-cap gg-mt">Failed confirm (the same idempotency key on Retry)</p>
+<div class="notice notice--danger" role="alert"><svg class="ic"><use href="#gg-circle-x"/></svg><span class="notice-body">Couldn't start the calls. Nothing was dialled. <button class="btn btn--link" type="button">Retry</button></span></div>
+</div></div></template>
+
+<section class="gg-sec" id="sheets"><div class="gg-h"><h2>4 · Sheet gates: Publish and money</h2><p>A 640 px sheet, modal with a flat scrim. On tablets it is full height and on phones full screen. The Publish gate reads decision, then blast radius, then detail. A warning needs a tick and relabels the button. The money gate's consequence line is the server quote, and its primary names the amount charged; nothing is charged before the UPI PIN.</p></div>
+<div class="gg-pair" data-tpl="t-sheets"></div></section>
+<template id="t-sheets"><div class="gg-col gg-wide">
+<div class="gate gate--sheet" role="dialog" aria-labelledby="p1{S}"><div class="gate-head"><h3 class="gate-title" id="p1{S}" tabindex="-1">Publish v8</h3><span class="gate-sub">Site-visit qualifier · draft from v7 · 3 changes · Callers hear v8 only after you publish.</span></div>
+<div class="gate-body"><h4 class="gg-h3">Checks<span class="gate-sum gate-sum--warn" role="status"><svg class="ic ic--sm"><use href="#gg-alert"/></svg>Ready · 1 warning to confirm</span></h4>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">No errors<span class="gate-meta">14 steps checked just now. The server runs the same rules.</span></span><span></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--advisory-warn"><svg class="ic"><use href="#gg-alert"/></svg></span><span class="gate-text">#4 Book site visit: WhatsApp template "visit_confirm" is pending approval.<label class="gg-ack"><input class="cb" type="checkbox" checked>Publish with this warning</label></span><span class="gate-act"><button class="btn btn--link" type="button">Go to step</button></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Tested on this draft<span class="gate-meta">Text test · Today 11:02 am · reached "Visit booked"</span></span><span></span></li></ul>
+<h4 class="gg-h3">Where it goes live</h4>
+<div class="gg-tgt"><span class="gg-ti"><svg class="ic"><use href="#gg-phone-in"/></svg></span><span>Inbound <span class="phone-text" translate="no">+91 80 •••• 2210</span><span class="m">Mon to Sat, 10 am to 7 pm IST</span></span></div>
+<div class="gg-tgt"><span class="gg-ti"><svg class="ic"><use href="#gg-list"/></svg></span><span>Batch "Weekend follow-ups"<span class="m">46 leads queued · the next call uses v8</span></span></div>
+<div class="gg-tgt"><span class="gg-ti"><svg class="ic"><use href="#gg-house"/></svg></span><span>Workspace default flow<span class="m">Calls in progress finish on v7. New calls use v8.</span></span></div>
+<h4 class="gg-h3">Changes (3)</h4>
+<div><div class="gg-chg"><span class="k">Changed</span><span>Ask about a site visit<span class="m">prompt edited · answer "Later" added · by you</span></span><button class="btn btn--link" type="button">Show</button></div><div class="gg-chg"><span class="k">Added</span><span>Book site visit<span class="m">by a teammate</span></span><button class="btn btn--link" type="button">Show</button></div></div>
+<h4 class="gg-h3">Note (optional)</h4><span class="gg-input">What changed and why…</span></div>
+<div class="gate-foot"><span class="gate-reason">Callers hear v8 from the next call.</span><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn btn--primary" type="button" aria-keyshortcuts="Control+Enter">Publish with 1 warning</button></div></div>
+<div class="gate gate--sheet" role="dialog" aria-labelledby="m1{S}"><div class="gate-head"><h3 class="gate-title" id="m1{S}" tabindex="-1">Top up wallet</h3><span class="gate-sub">Balance ₹42.10 · about 17 min of calls · Nothing is charged until you approve in your UPI app.</span></div>
+<div class="gate-body"><div class="gg-presets" role="radiogroup" aria-label="Top-up amount"><span>₹100</span><span class="on">₹500</span><span>₹1,000</span></div>
+<dl class="gg-quote"><dt>Wallet credit</dt><dd>₹500.00</dd><dt>GST (18%)</dt><dd>₹90.00</dd><dt class="em">You pay</dt><dd class="em">₹590.00</dd><dt>New balance</dt><dd>₹542.10 · about 3 h 45 min of calls</dd></dl>
+<p class="gate-note">Pay with any UPI app. Money is added when your UPI app confirms.</p></div>
+<div class="gate-foot"><span class="gate-reason">Autopay is off · <button class="btn btn--link" type="button">Set up autopay</button></span><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn btn--primary" type="button" aria-keyshortcuts="Control+Enter">Pay ₹590 via UPI</button></div></div>
+</div></template>
+
+<section class="gg-sec" id="track"><div class="gg-h"><h2>5 · SetupTrack (page variant) and the inline checklist</h2><p>Setup steps are checks whose fix is a whole task. An unmet step shows as a ring, not a red cross, because on a new workspace that is expected; the red <code>x</code> is kept for a step that actually failed. The inline checklist above a gate hides passing rows behind "Show all" (<code>collapse="passing"</code>).</p></div>
+<div class="gg-pair" data-tpl="t-track"></div></section>
+<template id="t-track"><div class="gg-row">
+<div class="gate gate--page gg-track" role="group" aria-labelledby="s1{S}"><div class="gate-head"><h3 class="gate-title" id="s1{S}">Get your first call live</h3><span class="gate-sub">2 of 5 done · Do them in any order.</span></div>
+<div class="gate-body"><div class="progress" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" aria-label="2 of 5 done"><i class="gg-w40"></i></div>
+<ul class="gate-list">
+<li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text"><span class="sr-only">Done: </span><span class="gg-step-t">Publish a flow</span><span class="gate-meta">Site-visit qualifier v1 is live</span></span><span class="gate-act"><button class="btn btn--link" type="button">Open</button></span></li>
+<li class="gate-row gg-cur"><span class="gg-ring gg-ring--cur" aria-hidden="true"></span><span class="gate-text"><span class="sr-only">Current step: </span><span class="gg-step-t">Add money</span><span class="gg-step-b">Calls are prepaid from your wallet. ₹500 covers about 3 h 28 min at your rate.</span><span class="gg-step-a"><button class="btn btn--primary btn--sm" type="button">Top up…</button></span></span><span></span></li>
+<li class="gate-row"><span class="gate-mark"><svg class="ic"><use href="#gg-lock"/></svg></span><span class="gate-text"><span class="sr-only">Blocked: </span><span class="gg-step-t dim">Call yourself</span><span class="gg-step-b">Needs money in the wallet.</span></span><span></span></li>
+<li class="gate-row"><span class="gg-ring" aria-hidden="true"></span><span class="gate-text"><span class="sr-only">To do: </span><span class="gg-step-t">Add people to call</span><span class="gg-step-b">Import leads or connect inbound calls.</span><span class="gg-step-a"><button class="btn btn--sm" type="button"><svg class="ic ic--sm"><use href="#gg-upload"/></svg>Import leads…</button></span></span><span></span></li>
+<li class="gate-row"><span class="gate-mark gate-mark--block"><svg class="ic"><use href="#gg-x"/></svg></span><span class="gate-text"><span class="sr-only">Failed: </span><span class="gg-step-t">Teach your agent</span> <span class="tag">Optional</span><span class="gg-step-b gg-bad">Couldn't index price-sheet.pdf · <button class="btn btn--link" type="button">Retry</button></span></span><span></span></li>
+</ul></div></div>
+<div class="gg-col"><p class="gg-cap">Inline readiness (Cockpit New call card), collapse="passing"</p>
+<div class="gate gate--page" role="group" aria-labelledby="r1{S}"><div class="gate-head"><h3 class="gate-title" id="r1{S}">Readiness</h3><span class="gate-sum gate-sum--blocked" role="status"><svg class="ic ic--sm"><use href="#gg-circle-x"/></svg>Phone calls blocked · 1 thing to fix</span></div>
+<div class="gate-body"><ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--block"><svg class="ic"><use href="#gg-x"/></svg></span><span class="gate-text">Verify a caller ID before placing phone calls.</span><span class="gate-act"><button class="btn btn--link" type="button">Phone setup</button></span></li><li class="gate-row"><span class="gate-mark gate-mark--advisory"><svg class="ic"><use href="#gg-info"/></svg></span><span class="gate-text">Live v7 hasn't been tested since it was published.<span class="gate-meta">Talk in browser first.</span></span><span></span></li></ul>
+<button class="btn btn--link" type="button" aria-expanded="false">Show all 5 checks</button></div></div></div>
+</div></template>
+
+<section class="gg-sec" id="phone"><div class="gg-h"><h2>6 · Phone: the Call gate as a bottom sheet</h2><p>Below 768 px, and on tablets when the gate doesn't fit its anchor, the popover gate becomes a bottom sheet over a flat scrim. Its header is sticky, and the primary is sticky above the safe area at 44 px. The content and rules are the same as on desktop.</p></div>
+<div class="gg-pair" data-tpl="t-phone"></div></section>
+<template id="t-phone"><div class="gg-device"><div class="gg-behind">Leads · 2 selected</div><div class="scrim"></div>
+<div class="bsheet" role="dialog" aria-labelledby="ph{S}"><div class="bsheet-head"><h3 id="ph{S}" tabindex="-1">Call 2 leads</h3><button class="ibtn" type="button" aria-label="Close"><svg class="ic"><use href="#gg-x"/></svg></button></div>
+<div class="bsheet-body"><div class="gate-body"><span class="gate-sub">Nothing dials until you start. · Checked just now</span>
+<p class="gg-glabel">Must pass<span class="gate-sum gate-sum--ok"><svg class="ic ic--sm"><use href="#gg-check"/></svg>1 call ready · 1 skipped</span></p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Flow live · Caller ID verified</span><span></span></li><li class="gate-row"><span class="gate-mark gate-mark--pass"><svg class="ic"><use href="#gg-check"/></svg></span><span class="gate-text">Inside calling hours<span class="gate-meta">Open until 7 pm IST</span></span><span></span></li></ul>
+<p class="gg-glabel">Adjusted</p>
+<ul class="gate-list"><li class="gate-row"><span class="gate-mark gate-mark--adjusted"><svg class="ic"><use href="#gg-minus"/></svg></span><span class="gate-text">Lead 1043 was called 22 h ago<span class="gate-meta">Skipped to avoid a repeat call</span></span><span class="gate-act"><button class="btn btn--link" type="button">Include</button></span></li></ul>
+<div class="gate-cost"><span>1 call · about 1 to 2 min</span><b>₹2 to ₹5</b></div></div></div>
+<div class="gate-foot"><button class="btn btn--lg btn--tertiary" type="button">Cancel</button><button class="btn btn--lg btn--primary" type="button"><svg class="ic"><use href="#gg-phone"/></svg>Start 1 call</button></div></div></div></template>
+</main>
+<script>
+(function () {
+  document.querySelectorAll('.gg-pair[data-tpl]').forEach(function (pair) {
+    var tpl = document.getElementById(pair.getAttribute('data-tpl'));
+    [['light', 'Light', '-l'], ['dark', 'Dark', '-d']].forEach(function (t) {
+      var pane = document.createElement('div');
+      pane.className = 'gg-pane'; pane.setAttribute('data-theme', t[0]);
+      pane.innerHTML = '<span class="gg-lbl">' + t[1] + '</span>' + tpl.innerHTML.split('{S}').join(t[2]);
+      pair.appendChild(pane);
+    });
+  });
+})();
+</script>
+</body>
+</html>

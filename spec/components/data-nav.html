@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data and navigation components</title>
+<meta name="description" content="Vaani Labs (Sutradhar) component gallery, data-nav group: app shell navigation, page header, tabs, cards, KPI tiles, tags, filter bar, data table, key-value panels, avatars, timeline, chart rules and the voice components, each in its states, light and dark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC" rel="stylesheet">
+<script>try{var t=localStorage.getItem('vaani-gallery-theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="components.css">
+<script src="shell-partials.js"></script>
+<style>
+:root{--font-hanken:"Hanken Grotesk","Noto Sans";}
+:root{--device-phone:375px;--device-tablet:768px;}
+*,*::before,*::after{box-sizing:border-box}
+body{font:var(--type-body-14)}
+h1,h2,h3,h4,p,ul,ol,dl,dd,figure{margin:0}
+ul,ol{padding:0;list-style:none}
+button{cursor:pointer}
+
+.mono-12{font:var(--type-mono-12)}
+.t3{color:var(--text-3)} .t2{color:var(--text-2)}
+
+.g-head{display:flex;align-items:flex-end;justify-content:space-between;gap:var(--space-24);padding:var(--space-40) var(--space-24) var(--space-24);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border)}
+.g-head h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking)}
+.g-head p{margin-top:var(--space-6);color:var(--text-2);max-width:var(--size-measure)}
+.g-toc{position:sticky;top:0;z-index:var(--z-chrome);display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);padding:var(--space-10) var(--space-24);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border)}
+.g-toc a{font:var(--type-label-13);color:var(--text-2);text-decoration:none}
+.g-toc a:hover{color:var(--text);text-decoration:underline}
+.g-sec{padding:var(--space-40) var(--space-24);border-bottom:var(--bw-hairline) solid var(--border)}
+.g-sec-head{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr);gap:var(--space-24);margin-bottom:var(--space-20)}
+.g-sec-head h2{font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking)}
+.g-sec-head .ids{font:var(--type-meta-12);color:var(--text-3);margin-top:var(--space-4)}
+.g-sec-head p{color:var(--text-2)}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-16)}
+.pair--stack{grid-template-columns:minmax(0,1fr)}
+.pair+.pair{margin-top:var(--space-16)}
+.pane{background:var(--bg);color:var(--text);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);padding:var(--space-16);min-width:0}
+.pane-label{display:flex;justify-content:space-between;font:var(--type-label-12);color:var(--text-3);margin-bottom:var(--space-12)}
+.cap{font:var(--type-meta-12);color:var(--text-3);margin:var(--space-16) 0 var(--space-8)}
+.cap:first-child{margin-top:0}
+.row{display:flex;flex-wrap:wrap;gap:var(--space-12);align-items:center}
+.row--tight{gap:var(--space-8)}
+.stack{display:grid;grid-template-columns:minmax(0,1fr);gap:var(--space-12);min-width:0}
+.cols-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-16)}
+
+.frame{border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);overflow:hidden;background:var(--surface);position:relative}
+.theme-switch{display:inline-flex;gap:var(--space-8);align-items:center;font:var(--type-label-13);color:var(--text-2)}
+
+.tip{position:absolute;z-index:var(--z-tooltip);max-width:var(--size-tooltip-max);padding:var(--space-4) var(--space-8);border-radius:var(--radius-6);background:var(--surface-inverse);color:var(--text);font:var(--type-meta-12);white-space:nowrap;display:inline-flex;gap:var(--space-8);align-items:center}
+
+.menu{position:absolute;z-index:var(--z-popover);min-width:var(--size-menu-min);max-width:var(--size-menu-max);padding:var(--space-4);background:var(--surface-raised);border:var(--bw-hairline) solid var(--border-overlay);border-radius:var(--radius-6);box-shadow:var(--e2)}
+.menu-item{display:flex;align-items:center;gap:var(--space-8);height:var(--control-h);padding:0 var(--space-8);border-radius:var(--radius-4);font:var(--type-data-13);color:var(--text);white-space:nowrap}
+.menu-item.is-hover{background:var(--surface-2)}
+.menu-sep{height:var(--bw-hairline);background:var(--border);margin:var(--space-4) 0}
+.menu-label{font:var(--type-label-12);color:var(--text-3);padding:var(--space-6) var(--space-8) var(--space-2)}
+.is-focus{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+
+.shell{display:grid;grid-template-columns:var(--size-sidebar) minmax(0,1fr);height:calc(var(--space-96) * 8 + var(--space-40));border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);overflow:hidden;background:var(--surface)}
+
+.nav-item span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+:root,[data-theme="light"]{--nav-hover-bg:var(--surface-3);--nav-active-bg:var(--surface);--nav-active-border:var(--border)}
+[data-theme="dark"]{--nav-hover-bg:var(--surface-2);--nav-active-bg:var(--surface-3);--nav-active-border:var(--border-strong)}
+
+.progress>i{display:block;height:100%;background:var(--accent-mark);border-radius:var(--radius-2)}
+
+.main{display:flex;flex-direction:column;min-width:0;min-height:0;background:var(--surface);position:relative}
+
+
+.rail-demo{display:grid;grid-template-columns:var(--size-rail) minmax(0,1fr);height:calc(var(--space-96) * 6 + var(--space-64));border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);overflow:hidden;background:var(--surface);position:relative}
+
+
+.bbar a{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-2);min-width:0;font:var(--type-label-12);color:var(--text-2);text-decoration:none;text-align:center}
+.bbar a span{white-space:nowrap}
+.bbar a[aria-current="page"]{color:var(--accent-text)}
+.bbar a[aria-current="page"]::before{content:"";position:absolute;top:calc(var(--bw-hairline) * -1);left:25%;right:25%;height:var(--bw-strong);background:var(--accent-mark)}
+.device{width:var(--device-phone);height:calc(var(--space-96) * 7);display:flex;flex-direction:column;border:var(--bw-hairline) solid var(--border-strong);border-radius:var(--radius-12);overflow:hidden;background:var(--bg);position:relative;flex:none;
+  --row-h:var(--space-48);--control-h:var(--size-hit-touch);--control-h-sm:calc(var(--space-32) + var(--space-4));--cell-px:var(--space-16);--tag-h:var(--space-24);--field-font:var(--type-body-16-size);--page-margin:var(--space-16)}
+.device-body{flex:1;min-height:0;overflow:hidden;position:relative;background:var(--surface)}
+
+</style>
+<style>
+
+.ph h1{font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+.crumbs a{color:var(--text-2);text-decoration:none}
+.crumbs a:hover{color:var(--text);text-decoration:underline}
+
+.vtab .count{font:var(--type-meta-12);color:var(--text-3);font-variant-numeric:tabular-nums}
+
+.vtab[aria-selected="true"] .count,.vtab[aria-current="page"] .count{color:var(--text-2)}
+
+.seg button{height:calc(var(--control-h) - var(--space-6));padding:0 var(--space-10);border:var(--bw-hairline) solid transparent;border-radius:var(--radius-4);background:transparent;font:var(--type-label-13);color:var(--text-2);white-space:nowrap}
+.seg button:hover{color:var(--text)}
+.seg [aria-checked="true"]{background:var(--surface);border-color:var(--border-strong);box-shadow:var(--e1);color:var(--text)}
+.seg .is-focus{outline-offset:var(--space-0)}
+.seg [aria-disabled="true"]{color:var(--text-dis)}
+
+.card{display:block;background:var(--surface);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);padding:var(--space-panel-pad);color:var(--text);text-decoration:none;min-width:0;position:relative}
+.card-head{display:flex;align-items:baseline;justify-content:space-between;gap:var(--space-8);margin-bottom:var(--space-12)}
+.card-title{font:var(--type-title-14)}
+.card-meta{font:var(--type-meta-12);color:var(--text-3)}
+.card-body{font:var(--type-body-14);color:var(--text-2)}
+.card--i{transition:background-color var(--dur-fast) var(--ease-standard),border-color var(--dur-fast) var(--ease-standard)}
+.card--i:hover,.card--i.is-hover{background:var(--surface-2);border-color:var(--border-strong)}
+.card--i.is-press{background:var(--surface-3);border-color:var(--border-strong)}
+.card--i.is-focus{outline-offset:var(--focus-offset)}
+.card[aria-checked="true"]{background:var(--accent-soft);border-color:var(--accent-mark)}
+.card[aria-disabled="true"]{background:var(--surface-2);border-color:var(--border);color:var(--text-dis)}
+.card[aria-disabled="true"] .card-title{color:var(--text-dis)}
+.card-check{position:absolute;top:var(--space-12);right:var(--space-12);color:var(--accent-text)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(calc(var(--space-40) * 5),1fr));gap:var(--space-12)}
+.kpi{display:grid;gap:var(--space-4);align-content:start}
+.kpi-label{display:flex;align-items:center;gap:var(--space-4);font:var(--type-label-13);color:var(--text-2)}
+
+.kpi-value{font:var(--type-num-28);letter-spacing:var(--type-num-28-tracking);font-variant-numeric:tabular-nums;color:var(--text)}
+.kpi-foot{display:flex;align-items:center;justify-content:space-between;gap:var(--space-8);min-height:var(--space-20)}
+.kpi-scope{font:var(--type-meta-12);color:var(--text-3)}
+.kpi--compact .kpi-value{font:var(--type-num-20);letter-spacing:var(--type-num-20-tracking)}
+.delta{display:inline-flex;align-items:center;gap:var(--space-2);font:var(--type-label-12);font-variant-numeric:tabular-nums;white-space:nowrap}
+.delta--good{color:var(--success-text)} .delta--bad{color:var(--danger-text)} .delta--flat{color:var(--text-2)}
+.spark{display:block;width:100%;height:var(--space-32);margin-top:var(--space-8);overflow:visible}
+.spark polyline{fill:none;stroke:var(--chart-1);stroke-width:var(--icon-stroke);vector-effect:non-scaling-stroke;stroke-linejoin:round;stroke-linecap:round}
+.spark-empty{display:flex;align-items:center;height:var(--space-32);margin-top:var(--space-8);font:var(--type-meta-12);color:var(--text-3);border-top:var(--bw-hairline) solid var(--border)}
+.sk{display:block;height:var(--space-8);border-radius:var(--radius-2);background:var(--skeleton)}
+.sk--num{height:var(--space-28);width:50%}
+
+@keyframes vl-pulse{0%{transform:scale(1);opacity:.55}70%,100%{transform:scale(2.6);opacity:0}}
+
+.search input{flex:1;min-width:0;border:0;background:transparent;font:var(--type-data-13);font-size:var(--field-font);color:var(--text);outline:0}
+
+.hscroll{display:flex;gap:var(--space-8);overflow-x:auto;scrollbar-width:none;-webkit-mask-image:linear-gradient(90deg,var(--surface) 85%,transparent);mask-image:linear-gradient(90deg,var(--surface) 85%,transparent)}
+
+.dt th{position:sticky;top:0;z-index:var(--z-sticky);height:var(--size-table-head);padding:0 var(--cell-px);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);font:var(--type-label-12);color:var(--text-3);text-align:left;white-space:nowrap}
+.dt td{height:var(--row-h);padding:0 var(--cell-px);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);white-space:nowrap;transition:background-color var(--dur-fast) var(--ease-standard)}
+
+.dt .sticky-l2{position:sticky;left:calc(var(--space-96) + var(--space-40));z-index:var(--z-raised);border-right:var(--bw-hairline) solid var(--border)}
+.dt th.sticky-l2{z-index:calc(var(--z-sticky) + var(--z-raised))}
+
+.dt tbody tr:hover td,.dt tr.is-hover td{background:var(--row-hover)}
+.dt tr[aria-selected="true"] td{background:var(--row-selected)}
+.dt tr[aria-selected="true"]:hover td,.dt tr[aria-selected="true"].is-hover td{background:var(--row-selected-hover)}
+.dt tr[aria-selected="true"] td:first-child{box-shadow:inset var(--bw-strong) 0 0 var(--row-selected-bar)}
+.dt tr:focus-visible,.dt tr.is-focus{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset-inset)}
+
+.meter i{display:block;width:var(--space-40);height:var(--space-4);border-radius:var(--radius-2);background:var(--surface-3);overflow:hidden}
+.meter i b{display:block;height:100%;background:var(--text-2)}
+
+.dt-empty td{height:auto;padding:var(--space-48) var(--space-24);text-align:center;white-space:normal}
+
+.empty h3{font:var(--type-title-16);color:var(--text)}
+.empty p{font:var(--type-body-14);color:var(--text-2)}
+
+</style>
+<style>
+.kv{display:grid;margin:0}
+.kv-row{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:var(--space-16);padding:var(--space-6) 0;font:var(--type-data-13)}
+.kv-row dt{color:var(--text-3)}
+.kv-row dd{color:var(--text);min-width:0;display:flex;align-items:center;gap:var(--space-6);flex-wrap:wrap}
+.kv--rows .kv-row{padding:var(--space-10) 0;border-bottom:var(--bw-hairline) solid var(--border)}
+.kv--stacked .kv-row{grid-template-columns:minmax(0,1fr);gap:var(--space-2)}
+.pending{color:var(--text-3)}
+.src{font:var(--type-meta-12);color:var(--text-3)}
+
+.av--ws{border-radius:var(--radius-6);background:var(--ink-tile);color:var(--ink-tile-fg);font:var(--type-label-13)}
+.av-stack{display:inline-flex}
+
+.tl-day{font:var(--type-label-12);color:var(--text-3);padding:var(--space-12) 0 var(--space-8)}
+.tl-day:first-child{padding-top:0}
+.tl-item{position:relative;display:grid;grid-template-columns:var(--size-glyph-tile) minmax(0,1fr) auto;gap:var(--space-4) var(--space-12);padding-bottom:var(--space-16)}
+.tl-item::before{content:"";position:absolute;left:calc(var(--size-glyph-tile) / 2);top:calc(var(--size-glyph-tile) + var(--space-4));bottom:var(--space-4);width:var(--bw-hairline);background:var(--border)}
+.tl-item:last-child::before{display:none}
+.tl-node{display:grid;place-items:center;width:var(--size-glyph-tile);height:var(--size-glyph-tile);border-radius:var(--radius-6);background:var(--surface-2);border:var(--bw-hairline) solid var(--border);color:var(--text-2)}
+.tl-node--success{background:var(--success-soft);border-color:transparent;color:var(--success-text)}
+.tl-node--warning{background:var(--warning-soft);border-color:transparent;color:var(--warning-text)}
+
+.tl-text{font:var(--type-data-13);color:var(--text-2);padding-top:var(--space-2)}
+.tl-text b{font-weight:var(--fw-medium);color:var(--text)}
+.tl-time{font:var(--type-meta-12);color:var(--text-3);padding-top:var(--space-4);white-space:nowrap}
+.tl-detail{grid-column:2 / -1;font:var(--type-data-13);color:var(--text-2);padding:var(--space-8) var(--space-12);background:var(--surface-2);border-radius:var(--radius-6)}
+.tl-more{grid-column:2 / -1}
+
+.chart{position:relative;width:100%;height:calc(var(--space-40) * 5)}
+.chart svg{display:block;overflow:visible}
+.chart .grid{stroke:var(--chart-grid);stroke-width:var(--bw-hairline);shape-rendering:crispEdges}
+.chart .axis{stroke:var(--chart-axis);stroke-width:var(--bw-hairline);shape-rendering:crispEdges}
+.chart text{font:var(--type-meta-12);fill:var(--chart-label);font-variant-numeric:tabular-nums}
+.chart .bar{fill:var(--chart-1)}
+.s-pos{fill:var(--sentiment-positive);background:var(--sentiment-positive)}
+.s-neu{fill:var(--sentiment-neutral);background:var(--sentiment-neutral)}
+.s-mix{fill:var(--sentiment-mixed);background:var(--sentiment-mixed)}
+.s-neg{fill:var(--sentiment-negative);background:var(--sentiment-negative)}
+.legend{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);font:var(--type-meta-12);color:var(--text-2);margin-bottom:var(--space-12)}
+.legend li{display:inline-flex;align-items:center;gap:var(--space-6)}
+.legend b{font-weight:var(--fw-medium);color:var(--text);font-variant-numeric:tabular-nums}
+.sw{display:inline-block;width:var(--space-8);height:var(--space-8);border-radius:var(--radius-2);flex:none}
+.ctip{position:absolute;z-index:var(--z-tooltip);min-width:calc(var(--space-40) * 4);padding:var(--space-8) var(--space-10);background:var(--surface-raised);border:var(--bw-hairline) solid var(--border-overlay);border-radius:var(--radius-6);box-shadow:var(--e2);font:var(--type-meta-12);color:var(--text-2);pointer-events:none}
+.ctip-h{font:var(--type-label-12);color:var(--text);margin-bottom:var(--space-4)}
+.ctip-r{display:flex;align-items:center;gap:var(--space-6)}
+.ctip-r b{margin-left:auto;font-weight:var(--fw-medium);color:var(--text);font-variant-numeric:tabular-nums;padding-left:var(--space-12)}
+.barlist{display:grid;gap:var(--space-8)}
+.barlist-row{display:grid;grid-template-columns:minmax(0,14ch) minmax(0,1fr) auto;gap:var(--space-12);align-items:center;font:var(--type-data-13);color:var(--text)}
+.barlist-row .lbl{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.barlist-row .trk{height:var(--space-8);border-radius:var(--radius-2);background:var(--surface-2);overflow:hidden}
+.barlist-row .trk i{display:block;height:100%;background:var(--chart-1);border-radius:0 var(--radius-2) var(--radius-2) 0}
+.barlist-row .val{font:var(--type-meta-12);color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap;text-align:right}
+.funnel-step{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-4) var(--space-12);padding:var(--space-8) 0;border-bottom:var(--bw-hairline) solid var(--border)}
+.funnel-step a{font:var(--type-data-13);color:var(--text);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.funnel-step a:hover{text-decoration:underline}
+.funnel-step .val{font:var(--type-meta-12);color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.funnel-step .trk{grid-column:1 / -1;height:var(--space-8);border-radius:var(--radius-2);background:var(--surface-3);overflow:hidden}
+.funnel-step .trk i{display:block;height:100%;background:var(--chart-1)}
+.heat{display:grid;gap:var(--space-2)}
+.heat i{display:block;height:var(--space-20);border-radius:var(--radius-2)}
+.seq-0{background:var(--seq-empty)} .seq-1{background:var(--seq-1)} .seq-2{background:var(--seq-2)} .seq-3{background:var(--seq-3)} .seq-4{background:var(--seq-4)} .seq-5{background:var(--seq-5)}
+.heat-axis{display:flex;justify-content:space-between;font:var(--type-meta-12);color:var(--chart-label);margin-top:var(--space-4)}
+.chart-empty{display:grid;place-items:center;align-content:center;gap:var(--space-6);height:calc(var(--space-40) * 4);border-bottom:var(--bw-hairline) solid var(--chart-axis);text-align:center}
+.chart-empty p{font:var(--type-body-14);color:var(--text-2);max-width:calc(var(--space-96) * 3)}
+
+
+.cs-head{display:flex;align-items:center;gap:var(--space-12);min-width:0}
+.cs-timer{font:var(--type-num-20);letter-spacing:var(--type-num-20-tracking);font-variant-numeric:tabular-nums;margin-left:auto}
+.lq{display:inline-flex;align-items:center;gap:var(--space-6);font:var(--type-data-13);color:var(--text);white-space:nowrap}
+.lq .k{color:var(--text-3)}
+.lq .ms{font:var(--type-meta-12);color:var(--text-3);font-variant-numeric:tabular-nums}
+.bars{display:inline-flex;align-items:flex-end;gap:var(--space-2);height:var(--icon-sm)}
+.bars i{display:block;width:var(--space-2);border-radius:var(--radius-2);background:var(--border-strong)}
+.bars i:nth-child(1){height:var(--space-4)} .bars i:nth-child(2){height:var(--space-8)} .bars i:nth-child(3){height:var(--space-12)}
+.lq--good .bars i{background:var(--success)}
+.lq--fair .bars i:nth-child(-n+2){background:var(--warning)}
+.lq--poor .bars i:nth-child(1){background:var(--danger)}
+.lq--good .w{color:var(--success-text)} .lq--fair .w{color:var(--warning-text)} .lq--poor .w{color:var(--danger-text)}
+
+.tr-head h3{font:var(--type-title-14)}
+
+.turn-h a{color:var(--text-2);text-decoration:underline;text-decoration-color:var(--border-strong);text-underline-offset:var(--space-2)}
+
+.player{display:grid;gap:var(--space-10);padding:var(--space-12) var(--space-16);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);background:var(--surface);min-width:0}
+.player-row{display:flex;align-items:center;gap:var(--space-8);min-width:0}
+.player-time{font:var(--type-meta-12);color:var(--text-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.talk{position:relative;display:grid;gap:var(--space-4);padding:var(--space-6) 0;cursor:pointer}
+.lane{position:relative;height:var(--space-6);background:var(--surface-2);border-radius:var(--radius-2)}
+.lane i{position:absolute;top:0;bottom:0;border-radius:var(--radius-2)}
+.lane--agent i{background:var(--talk-agent)}
+.lane--caller i{background:var(--talk-caller)}
+.playhead{position:absolute;top:0;bottom:0;width:var(--bw-strong);background:var(--text);border-radius:var(--radius-2)}
+.playhead::after{content:"";position:absolute;left:50%;top:calc(var(--space-4) * -1);width:var(--space-10);height:var(--space-10);transform:translateX(-50%);border-radius:var(--radius-2);background:var(--text);box-shadow:0 0 0 var(--bw-strong) var(--surface)}
+.talk.is-focus{outline-offset:var(--space-2);border-radius:var(--radius-4)}
+.talk-legend{display:flex;flex-wrap:wrap;gap:var(--space-4) var(--space-16);font:var(--type-meta-12);color:var(--text-3);font-variant-numeric:tabular-nums}
+.wave{display:flex;align-items:center;gap:var(--bw-hairline);height:var(--space-32)}
+.wave i{flex:1;min-width:var(--bw-hairline);border-radius:var(--radius-2);background:var(--chart-other)}
+.wave i.is-played{background:var(--accent-mark)}
+.voices{display:grid;gap:var(--space-8)}
+.voice{position:relative;display:grid;align-items:center;gap:var(--space-4) var(--space-12);padding:var(--space-12);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);background:var(--surface);cursor:pointer}
+.voice:hover,.voice.is-hover{background:var(--surface-2);border-color:var(--border-strong)}
+.voice-name{font:var(--type-title-14);color:var(--text);display:flex;align-items:center;gap:var(--space-8)}
+.voice-meta{font:var(--type-meta-12);color:var(--text-3);display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-4) var(--space-8);margin-top:var(--space-2)}
+
+.voice-compact{display:flex;align-items:center;gap:var(--space-8);height:var(--space-48);padding:0 var(--space-4) 0 var(--space-8);border:var(--bw-hairline) solid var(--control);border-radius:var(--radius-6);background:var(--surface)}
+.meterlive{display:inline-flex;align-items:center;gap:var(--space-2);height:var(--space-16)}
+.meterlive i{display:block;width:var(--space-2);border-radius:var(--radius-2);background:var(--accent-mark)}
+@media (max-width: 1199.98px){.pair{grid-template-columns:minmax(0,1fr)}.g-sec-head{grid-template-columns:minmax(0,1fr)}}
+@media (max-width: 767.98px){.g-sec{padding:var(--space-24) var(--space-16)}.g-head{padding:var(--space-24) var(--space-16);flex-direction:column;align-items:flex-start}.cols-2{grid-template-columns:minmax(0,1fr)}.shell{grid-template-columns:minmax(0,1fr)}.shell > nav[aria-label="Main"]{display:none}.device{width:100%}.pane{padding:var(--space-12)}.rail-demo{height:auto}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vl-i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="vl-i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol><symbol id="vl-i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol><symbol id="vl-i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="vl-i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol><symbol id="vl-i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol><symbol id="vl-i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol><symbol id="vl-i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol><symbol id="vl-i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol><symbol id="vl-i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol><symbol id="vl-i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="vl-i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="vl-i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="vl-i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="vl-i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="vl-i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="vl-i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol><symbol id="vl-i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="vl-i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol><symbol id="vl-i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol><symbol id="vl-i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="vl-i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol><symbol id="vl-i-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+<symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+<symbol id="i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-chevron-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-chevrons-up-down" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></symbol>
+<symbol id="i-arrow-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7M12 19V5"/></symbol>
+<symbol id="i-arrow-down" viewBox="0 0 24 24"><path d="M12 5v14M19 12l-7 7-7-7"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol>
+<symbol id="i-columns" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-phone-out" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M22 8V2h-6M16 8l6-6"/></symbol>
+<symbol id="i-phone-call" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M14 2a9 9 0 0 1 8 8M14 6a5 5 0 0 1 4 4"/></symbol>
+<symbol id="i-phone-missed" viewBox="0 0 24 24"><use href="#i-phone"/><path d="m22 2-6 6M16 2l6 6"/></symbol>
+<symbol id="i-phone-off" viewBox="0 0 24 24"><path d="M10.7 13.3a16 16 0 0 0 3.4 2.6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.4 19.4 0 0 1-3.3-2.7M6.2 9.9a19.8 19.8 0 0 1-3-8.6A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9M22 2 2 22"/></symbol>
+<symbol id="i-circle-pause" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 15V9M14 15V9"/></symbol>
+<symbol id="i-timer-off" viewBox="0 0 24 24"><path d="M10 2h4M4.6 11a8 8 0 0 0 1.7 8.7 8 8 0 0 0 8.7 1.7M7.4 7.4a8 8 0 0 1 10.3 1 8 8 0 0 1 .9 10.2M2 2l20 20M12 12v-2"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><rect x="14" y="4" width="4" height="16" rx="1"/><rect x="6" y="4" width="4" height="16" rx="1"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+<symbol id="i-stop" viewBox="0 0 24 24"><rect width="14" height="14" x="5" y="5" rx="1"/></symbol>
+<symbol id="i-clipboard" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2M9 14l2 2 4-4"/></symbol>
+<symbol id="i-circle-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-smile" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2M9 9h.01M15 9h.01"/></symbol>
+<symbol id="i-meh" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 15h8M9 9h.01M15 9h.01"/></symbol>
+<symbol id="i-frown" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M16 16s-1.5-2-4-2-4 2-4 2M9 9h.01M15 9h.01"/></symbol>
+<symbol id="i-contrast" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 18a6 6 0 0 0 0-12z"/></symbol>
+<symbol id="i-circle-dashed" viewBox="0 0 24 24"><path d="M10.1 2.2a10 10 0 0 1 3.8 0M17.6 3.7a10 10 0 0 1 2.7 2.7M21.8 10.1a10 10 0 0 1 0 3.8M20.3 17.6a10 10 0 0 1-2.7 2.7M13.9 21.8a10 10 0 0 1-3.8 0M6.4 20.3a10 10 0 0 1-2.7-2.7M2.2 13.9a10 10 0 0 1 0-3.8M3.7 6.4a10 10 0 0 1 2.7-2.7"/></symbol>
+<symbol id="i-circle-dot" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="1"/></symbol>
+<symbol id="i-ban" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></symbol>
+<symbol id="i-thumbs-up" viewBox="0 0 24 24"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8a2 2 0 0 1-1.9 1.4H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9Z"/></symbol>
+<symbol id="i-circle-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 15l6-6"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.8 9.8 0 0 1 6.7 2.7L21 8M21 3v5h-5M21 12a9 9 0 0 1-9 9 9.8 9.8 0 0 1-6.7-2.7L3 16M8 16H3v5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+<symbol id="i-back5" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.8 9.8 0 0 0-6.7 2.7L3 8M3 3v5h5"/></symbol>
+<symbol id="i-fwd5" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-9-9c2.5 0 4.9 1 6.7 2.7L21 8M21 3v5h-5"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol>
+<symbol id="i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol>
+<symbol id="i-upload-list" viewBox="0 0 24 24"><path d="M3 5h12M3 12h8M3 19h8M17 21v-8M13 17l4-4 4 4"/></symbol>
+</svg>
+
+<header class="g-head">
+  <div>
+    <h1>Data and navigation components</h1>
+    <p>Sutradhar gallery for the data-nav group. Every board is rendered twice from one source: light on the left, dark on the right (wide boards stack). States that need a pointer or keyboard are forced with <code>is-hover</code>, <code>is-focus</code> and <code>is-press</code> classes so they can be reviewed side by side. Spec: <code>spec/02-components-data-nav.md</code>. Sample data only; no real customers.</p>
+  </div>
+  <label class="theme-switch">Page theme
+    <select id="pageTheme"><option value="">System</option><option value="light">Light</option><option value="dark">Dark</option></select>
+  </label>
+</header>
+<nav class="g-toc" aria-label="Gallery sections">
+  <a href="#shell">1 Shell</a><a href="#header">2 Page header</a><a href="#tabs">3 Tabs</a><a href="#cards">4 Cards and KPIs</a><a href="#tags">5 Tags</a><a href="#filters">6 Filter bar</a><a href="#table">7 Data table</a><a href="#kv">8 Key-value</a><a href="#avatars">9 Avatars</a><a href="#timeline">10 Timeline</a><a href="#charts">11 Charts</a><a href="#voice">12 Voice</a>
+</nav>
+<main>
+
+<section class="g-sec" id="shell">
+  <div class="g-sec-head">
+    <div><h2>1 · App shell navigation</h2><p class="ids">F-UX-007 · F-UX-008 · F-UX-017 · F-UX-029 · F-RWD-001 · F-RWD-005 · F-VIS-015 · F-VIS-032 · F-VIS-033 · F-A11Y-012 · F-A11Y-017</p></div>
+    <p>Desktop 1280 and up: a labelled 232 px sidebar in four groups, one tab stop per item. The current page sits on the thread: a 1 px line runs down each group and the current item marks it with a 2 px Neel segment, an accent icon and 600 text, plus <code>aria-current</code>. The workspace switcher carries the mark; there is no search field (Search lives in the Baseline and ⌘K). Badges carry facts only (live calls, drafts, callbacks due); wallet state lives in the Baseline, not a nav badge. The setup card and the account menu are pinned; the list between them scrolls vertically only, so nothing is ever clipped or grows a sideways scrollbar.</p>
+  </div>
+  <div class="pair pair--stack"><div class="board">
+    <div class="shell">
+      <nav class="sb" aria-label="Main">
+        <button class="ws" aria-haspopup="menu" aria-label="Workspace: Sample Realty, Admin. Switch workspace"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name" translate="no">Sample Realty</span><span class="ws-role">Workspace · Admin</span></span><svg class="ic ic--sm t3"><use href="#i-chevron-down"/></svg></button>
+        <div class="sb-scroll">
+          <div class="nav-g"><span class="nav-g-label" id="g-op">Operate</span>
+            <ul class="nav-list" aria-labelledby="g-op">
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-activity"/></svg><span>Cockpit</span><span class="nav-badge nav-badge--live"><span class="live-dot live-dot--pulse" data-mark></span>2 live</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-bot"/></svg><span>Assistant</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-headphones"/></svg><span>Rep console</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-video"/></svg><span>Meetings</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-list-checks"/></svg><span>Personal agents</span></a></li>
+            </ul></div>
+          <div class="nav-g"><span class="nav-g-label" id="g-build">Build</span>
+            <ul class="nav-list" aria-labelledby="g-build">
+              <li><a class="nav-item is-hover" href="#"><svg class="ic"><use href="#i-workflow"/></svg><span>Flows</span><span class="nav-badge">1 draft</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-book-open"/></svg><span>Knowledge</span></a></li>
+            </ul></div>
+          <div class="nav-g"><span class="nav-g-label" id="g-data">Data</span>
+            <ul class="nav-list" aria-labelledby="g-data">
+              <li><a class="nav-item" href="#" aria-current="page"><svg class="ic"><use href="#i-users"/></svg><span>Leads</span></a></li>
+              <li><a class="nav-item is-focus" href="#"><svg class="ic"><use href="#i-file-text"/></svg><span>Call reports</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-chart"/></svg><span>Analytics</span></a></li>
+            </ul></div>
+          <div class="nav-g"><span class="nav-g-label" id="g-acct">Account</span>
+            <ul class="nav-list" aria-labelledby="g-acct">
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-wallet"/></svg><span>Billing</span></a></li>
+              <li><a class="nav-item" href="#"><svg class="ic"><use href="#i-sliders"/></svg><span>Settings</span></a></li>
+            </ul></div>
+        </div>
+        <a class="setup" href="#"><span class="setup-top">Finish setup <span class="count-badge">3 of 5</span></span><span class="progress" role="img" aria-label="3 of 5 steps done"><i style="width:60%"></i></span><span class="setup-next">Next: add money</span></a>
+        <button class="acct" aria-haspopup="menu"><span class="av" aria-hidden="true">AR</span><span style="flex:1">Anika R.</span><svg class="ic ic--sm t3"><use href="#i-chevron-down"/></svg></button>
+      </nav>
+      <div class="main">
+        <div class="ph"><div class="ph-title"><h1>Leads</h1><span class="ph-meta">1,284 leads · synced 11:24 am</span></div>
+          <div class="ph-actions"><button class="btn btn--tertiary"><svg class="ic"><use href="#i-download"/></svg>Export</button><button class="btn"><svg class="ic"><use href="#i-upload"/></svg>Import…</button><button class="btn btn--primary"><svg class="ic"><use href="#i-plus"/></svg>New lead</button></div></div>
+        <div class="vtabs" role="tablist" aria-label="Views"><button class="vtab" role="tab" aria-selected="true">All <span class="vtab-count">1,284</span></button><button class="vtab" role="tab" aria-selected="false">New <span class="vtab-count">312</span></button><button class="vtab" role="tab" aria-selected="false">Callbacks due <span class="vtab-count">18</span></button><button class="vtab" role="tab" aria-selected="false">Interested <span class="vtab-count">96</span></button><button class="vtab" role="tab" aria-selected="false">Not reached <span class="vtab-count">204</span></button><button class="vtab vtab--add"><svg class="ic ic--sm"><use href="#i-plus"/></svg>Save view</button></div>
+        <div style="flex:1;display:grid;place-items:center;color:var(--text-3);font:var(--type-body-14)">Toolbar and table: sections 6 and 7</div>
+        <div data-vl="baseline" data-vl-state="activity"></div>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="pair"><div class="board">
+    <p class="cap">Laptop 1024–1279: 56 px rail. Labels come from a portal tooltip on hover and on focus (never clipped). Group dividers replace the group labels. <span class="kbd">[</span> or the expand button opens the full sidebar as an overlay with a scrim; content never reflows.</p>
+    <div class="cols-2">
+      <div class="rail-demo">
+        <nav class="rail" aria-label="Main">
+          <svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>
+          <a class="rail-item" href="#" aria-label="Cockpit, 2 live calls"><svg class="ic"><use href="#i-activity"/></svg><span class="rail-mark" data-mark></span></a>
+          <a class="rail-item" href="#" aria-label="Assistant"><svg class="ic"><use href="#i-bot"/></svg></a>
+          <a class="rail-item" href="#" aria-label="Rep console"><svg class="ic"><use href="#i-headphones"/></svg></a>
+          <a class="rail-item" href="#" aria-label="Meetings"><svg class="ic"><use href="#i-video"/></svg></a>
+          <a class="rail-item" href="#" aria-label="Personal agents"><svg class="ic"><use href="#i-list-checks"/></svg></a>
+          <span class="rail-sep" aria-hidden="true"></span>
+          <a class="rail-item" href="#" aria-label="Flows"><svg class="ic"><use href="#i-workflow"/></svg></a>
+          <a class="rail-item" href="#" aria-label="Knowledge"><svg class="ic"><use href="#i-book-open"/></svg></a>
+          <span class="rail-sep" aria-hidden="true"></span>
+          <a class="rail-item" href="#" aria-label="Leads" aria-current="page"><svg class="ic"><use href="#i-users"/></svg></a>
+          <a class="rail-item is-hover is-focus" href="#" aria-label="Call reports"><svg class="ic"><use href="#i-file-text"/></svg><span class="tip" data-surface="inverse" role="tooltip" style="left:calc(100% + var(--space-8));top:50%;transform:translateY(-50%)">Call reports</span></a>
+          <a class="rail-item" href="#" aria-label="Analytics"><svg class="ic"><use href="#i-chart"/></svg></a>
+          <span class="rail-sep" aria-hidden="true"></span>
+          <a class="rail-item" href="#" aria-label="Billing"><svg class="ic"><use href="#i-wallet"/></svg></a>
+          <a class="rail-item" href="#" aria-label="Settings"><svg class="ic"><use href="#i-sliders"/></svg></a>
+          <span style="flex:1"></span>
+          <button class="rail-item" aria-label="Expand sidebar" aria-expanded="false" aria-keyshortcuts="["><svg class="ic"><use href="#i-panel"/></svg></button>
+        </nav>
+        <div class="main"><div class="ph"><div class="ph-title"><h1 >Leads</h1></div></div></div>
+      </div>
+      <div class="rail-demo">
+        <nav class="rail" aria-hidden="true"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg></nav>
+        <div class="main"><div class="ph"><div class="ph-title"><strong style="font:var(--type-title-20)">Leads</strong></div></div></div>
+        <div class="scrim"></div>
+        <nav class="sb sb--overlay" aria-label="Main">
+          <button class="ws"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name">Sample Realty</span><span class="ws-role">Workspace · Admin</span></span></button>
+          <div class="sb-scroll">
+            <div class="nav-g"><span class="nav-g-label">Operate</span><ul class="nav-list"><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-activity"/></svg><span>Cockpit</span><span class="nav-badge nav-badge--live"><span class="live-dot" data-mark></span>2 live</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-bot"/></svg><span>Assistant</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-headphones"/></svg><span>Rep console</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-video"/></svg><span>Meetings</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-list-checks"/></svg><span>Personal agents</span></a></li></ul></div>
+            <div class="nav-g"><span class="nav-g-label">Build</span><ul class="nav-list"><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-workflow"/></svg><span>Flows</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-book-open"/></svg><span>Knowledge</span></a></li></ul></div>
+            <div class="nav-g"><span class="nav-g-label">Data</span><ul class="nav-list"><li><a class="nav-item" href="#" aria-current="page"><svg class="ic"><use href="#i-users"/></svg><span>Leads</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-file-text"/></svg><span>Call reports</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-chart"/></svg><span>Analytics</span></a></li></ul></div>
+            <div class="nav-g"><span class="nav-g-label">Account</span><ul class="nav-list"><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-wallet"/></svg><span>Billing</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-sliders"/></svg><span>Settings</span></a></li></ul></div>
+          </div>
+        </nav>
+      </div>
+    </div>
+  </div></div>
+
+  <div class="pair pair--stack"><div class="board">
+    <p class="cap">Tablet 768–1023: 52 px top bar (menu, page title, a call chip that exists only during a call, a separate wallet chip, search). The menu opens the same grouped nav as a modal left sheet, 320 px (max 85%), with the setup card.</p>
+    <div class="frame" style="width:var(--device-tablet);max-width:100%;height:calc(var(--space-96) * 5)">
+      <div data-vl="topbar" data-vl-title="Leads" data-vl-mode="tablet" data-vl-chips="call wallet-low"></div>
+      <div class="ph"><div class="ph-title"><span class="ph-meta">1,284 leads · synced 11:24 am</span></div><div class="ph-actions"><button class="ibtn ibtn--secondary" aria-label="More actions"><svg class="ic"><use href="#i-more"/></svg></button><button class="btn btn--primary"><svg class="ic"><use href="#i-plus"/></svg>New lead</button></div></div>
+      <div class="scrim"></div>
+      <nav class="nav-sheet" aria-label="Main" role="dialog" aria-modal="true">
+        <div style="display:flex;align-items:center"><button class="ws" style="flex:1"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name">Sample Realty</span><span class="ws-role">Workspace · Admin</span></span></button><button class="ibtn" aria-label="Close navigation"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        <div class="sb-scroll">
+          <div class="nav-g"><span class="nav-g-label">Operate</span><ul class="nav-list"><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-activity"/></svg><span>Cockpit</span><span class="nav-badge nav-badge--live"><span class="live-dot" data-mark></span>1 live</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-bot"/></svg><span>Assistant</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-headphones"/></svg><span>Rep console</span></a></li></ul></div>
+          <div class="nav-g"><span class="nav-g-label">Data</span><ul class="nav-list"><li><a class="nav-item" href="#" aria-current="page"><svg class="ic"><use href="#i-users"/></svg><span>Leads</span></a></li><li><a class="nav-item" href="#"><svg class="ic"><use href="#i-file-text"/></svg><span>Call reports</span></a></li></ul></div>
+        </div>
+        <a class="setup" href="#"><span class="setup-top">Finish setup <span class="count-badge">3 of 5</span></span><span class="progress"><i style="width:60%"></i></span><span class="setup-next">Next: add money</span></a>
+      </nav>
+    </div>
+  </div></div>
+
+  <div class="pair pair--stack"><div class="board">
+    <p class="cap">Phone 320–767: top bar plus a 56 px bottom bar with five items. More is a bottom sheet listing every remaining destination, grouped, with the setup card, the account and Sign out, so 12 of 12 are reachable. When the current page lives in More, More carries the active mark.</p>
+    <div class="row" style="align-items:flex-start;gap:var(--space-24)">
+      <div class="device">
+        <div data-vl="topbar" data-vl-title="Leads" data-vl-mode="phone" data-vl-chips="call"></div>
+        <div class="device-body">
+          <div class="ph ph--phone"><div class="ph-title"><span class="ph-meta">1,284 leads</span></div><div class="ph-actions"><button class="ibtn" aria-label="More actions"><svg class="ic ic--lg"><use href="#i-more"/></svg></button><button class="btn btn--primary btn--sm"><svg class="ic"><use href="#i-plus"/></svg>New lead</button></div></div>
+          <div class="vtabs"><button class="vtab" aria-selected="true">All <span class="vtab-count">1,284</span></button><button class="vtab">New <span class="vtab-count">312</span></button><button class="vtab">Callbacks due <span class="vtab-count">18</span></button><button class="vtab">Interested</button></div>
+          <div class="tb"><div class="search search--full"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" placeholder="Search name, phone or city…"></div></div>
+          <ul>
+            <li class="li"><span class="li-title">Aarav K.</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-thumbs-up"/></svg>Interested</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 4821</span> · Visit booked · 10:42 am</span><span class="lm lm--compact">Hindi</span></li>
+            <li class="li"><span class="li-title">Meera S.</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Callback due</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 3307</span> · Call later · Yesterday</span><span class="lm lm--compact">Hinglish</span></li>
+            <li class="li"><span class="li-title">Rohan I.</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-dot"/></svg>New</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 9158</span> · Not called yet</span><span class="lm lm--compact">English</span></li>
+            <li class="li"><span class="li-title">Zoya S.</span><span class="tag"><svg class="ic ic--xs"><use href="#i-phone-missed"/></svg>Not reached</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 6612</span> · No answer · Yesterday</span><span class="lm lm--compact">Hindi</span></li>
+            <li class="li"><span class="li-title">Nandini R.</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-slash"/></svg>Not interested</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 7730</span> · Declined · 2 days ago</span><span class="lm lm--compact">Telugu</span></li>
+            <li class="li"><span class="li-title">Harsh V.</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-dot"/></svg>New</span><span class="li-meta"><span class="phone-text phone-text--sm" translate="no">+91 •••••• 1189</span> · Not called yet</span><span class="lm lm--compact">English</span></li>
+          </ul>
+        </div>
+        <div data-vl="bottombar" data-vl-current="leads"></div>
+      </div>
+      <div class="device">
+        <div data-vl="topbar" data-vl-title="Analytics" data-vl-mode="phone" data-vl-chips="none"></div>
+        <div class="device-body">
+          <div class="scrim"></div>
+          <div class="bsheet" role="dialog" aria-modal="true" aria-labelledby="more-t">
+            <div class="bsheet-head"><h3 id="more-t">More</h3><button class="ibtn" aria-label="Close"><svg class="ic ic--lg"><use href="#i-x"/></svg></button></div>
+            <div class="bsheet-body">
+              <span class="more-label">Operate</span>
+              <div class="more-cols"><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-bot"/></svg>Assistant</a><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-headphones"/></svg>Rep console</a><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-video"/></svg>Meetings</a><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-list-checks"/></svg>Personal agents</a></div>
+              <div class="more-cols"><div><span class="more-label">Build</span><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-book-open"/></svg>Knowledge</a></div><div><span class="more-label">Data</span><a class="more-item" href="#" aria-current="page"><svg class="ic ic--lg"><use href="#i-chart"/></svg>Analytics</a></div></div><span class="more-label">Account</span><div class="more-cols"><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-wallet"/></svg>Billing</a><a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-sliders"/></svg>Settings</a></div>
+              <a class="setup" href="#"><span class="setup-top">Finish setup <span class="count-badge">3 of 5</span></span><span class="progress"><i style="width:60%"></i></span><span class="setup-next">Next: add money</span></a>
+              <div class="menu-sep"></div>
+              <a class="more-item" href="#"><span class="av" aria-hidden="true">AR</span>Anika R. · Admin</a>
+              <a class="more-item" href="#"><svg class="ic ic--lg"><use href="#i-logout"/></svg>Sign out…</a>
+            </div>
+          </div>
+        </div>
+        <div data-vl="bottombar" data-vl-current="analytics" data-vl-expanded="true"></div>
+      </div>
+    </div>
+  </div></div>
+</section>
+
+<section class="g-sec" id="header">
+  <div class="g-sec-head">
+    <div><h2>2 · Page header and breadcrumbs</h2><p class="ids">F-VIS-005 · F-VIS-010 · F-VIS-034 · F-RWD-007 · F-RWD-008 · F-A11Y-013 · F-UX-030 · F-UX-031</p></div>
+    <p>One H1 style (title-20), one line of computed meta, at most three visible actions with at most one primary (always last). Parents appear as an inline breadcrumb before the H1. Below 1024 the H1 moves into the top bar and this row keeps meta and actions; below 768 only the primary and an overflow menu remain. Nothing ever pushes the page sideways.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">Data page (Leads): title, meta, secondary actions, one primary</p>
+    <div class="frame"><div class="ph"><div class="ph-title"><h1 >Leads</h1><span class="ph-meta">1,284 leads · synced 11:24 am</span></div><div class="ph-actions"><button class="btn btn--tertiary"><svg class="ic"><use href="#i-download"/></svg>Export</button><button class="btn"><svg class="ic"><use href="#i-upload"/></svg>Import…</button><button class="btn btn--primary"><svg class="ic"><use href="#i-plus"/></svg>New lead</button></div></div></div>
+    <p class="cap">Nested page: breadcrumb plus H1, a state tag, overflow for the rest</p>
+    <div class="frame"><div class="ph"><div class="ph-title"><nav class="crumbs" aria-label="Breadcrumb"><a href="#">Flows</a><svg class="ic ic--sm" aria-hidden="true"><use href="#i-chevron-right"/></svg></nav><h1  translate="no">Site-visit qualifier</h1><span class="tag tag--success"><span class="live-dot" data-mark></span>Live v7</span></div><div class="ph-actions"><button class="ibtn ibtn--secondary" aria-label="More actions for Site-visit qualifier"><svg class="ic"><use href="#i-more"/></svg></button><button class="btn">Test</button><button class="btn btn--primary">Publish v8…</button></div></div></div>
+    <p class="cap">Settings sub-page: breadcrumb, description (overview and form pages only), Save enabled only when there are unsaved changes</p>
+    <div class="frame"><div class="ph"><div class="ph-title"><nav class="crumbs" aria-label="Breadcrumb"><a href="#">Settings</a><svg class="ic ic--sm" aria-hidden="true"><use href="#i-chevron-right"/></svg></nav><h1 >Phone setup</h1><p class="ph-desc">Your inbound number, the caller ID people see, and where transfers go.</p></div><div class="ph-actions"><span class="ph-meta">No unsaved changes</span><button class="btn btn--primary" aria-disabled="true">Save changes</button></div></div></div>
+    <p class="cap">Loading: the title renders from the nav config at once; meta is a skeleton, never "0 leads"</p>
+    <div class="frame"><div class="ph" aria-busy="true"><div class="ph-title" style="align-items:center"><h1 >Call reports</h1><span class="sk" style="width:calc(var(--space-40) * 3)"></span></div><div class="ph-actions"><button class="btn btn--tertiary"><svg class="ic"><use href="#i-download"/></svg>Export</button></div></div></div>
+    <p class="cap">States of a header action: hover, focus-visible, overflow menu open</p>
+    <div class="frame" style="overflow:visible"><div class="ph"><div class="ph-title"><h1 >Knowledge</h1><span class="ph-meta">14 files · 1 indexing</span></div><div class="ph-actions" style="position:relative"><button class="btn btn--tertiary" style="background:var(--surface-2);color:var(--text)">Test search</button><button class="ibtn ibtn--secondary is-focus" aria-label="More actions" aria-expanded="true"><svg class="ic"><use href="#i-more"/></svg></button><button class="btn btn--primary"><svg class="ic"><use href="#i-upload"/></svg>Upload…</button>
+      <div class="menu" role="menu" style="top:calc(100% + var(--space-4));right:calc(var(--space-96) + var(--space-8))"><div class="menu-item is-hover" role="menuitem"><svg class="ic"><use href="#i-refresh"/></svg>Re-index all</div><div class="menu-item" role="menuitem"><svg class="ic"><use href="#i-download"/></svg>Export list</div><div class="menu-sep"></div><div class="menu-item" role="menuitem" style="color:var(--danger-text)">Delete all files…</div></div></div></div></div>
+    <div style="height:calc(var(--space-40) * 2)"></div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="tabs">
+  <div class="g-sec-head">
+    <div><h2>3 · Tabs and segmented controls</h2><p class="ids">F-A11Y-016 · F-UX-031 · F-UX-036 · F-QA-015 · F-RWD-009 · F-RWD-012 · F-VIS-017</p></div>
+    <p>View tabs filter one table and keep the view in the URL; counts are pipeline-wide and never page-scoped. Route tabs are links with <code>aria-current</code>. Panel tabs switch content inside a sheet. Segmented controls are radio groups for a single mode (density, range). The selected tab is a 2 px accent-mark underline; hover previews it in border-strong.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">View tabs: selected, hover, focus-visible, idle, counts loading, Save view</p>
+    <div class="frame"><div class="vtabs" role="tablist" aria-label="Views"><button class="vtab" role="tab" aria-selected="true">All <span class="vtab-count">121</span></button><button class="vtab is-hover" role="tab" aria-selected="false">Needs review <span class="vtab-count">9</span></button><button class="vtab is-focus" role="tab" aria-selected="false">Positive <span class="vtab-count">41</span></button><button class="vtab" role="tab" aria-selected="false">Negative <span class="vtab-count">15</span></button><button class="vtab" role="tab" aria-selected="false">Mixed <span class="sk" style="width:var(--space-16)"></span></button><button class="vtab vtab--add"><svg class="ic ic--sm"><use href="#i-plus"/></svg>Save view</button></div></div>
+    <p class="cap">Route tabs (Billing): links, one per URL</p>
+    <div class="frame"><nav class="vtabs" aria-label="Billing sections"><a class="vtab" href="#" aria-current="page">Wallet</a><a class="vtab" href="#">Usage</a><a class="vtab" href="#">Plans</a><a class="vtab" href="#">Invoices</a><a class="vtab" href="#">Autopay</a></nav></div>
+    <p class="cap">Panel tabs inside the 560 px call-detail sheet</p>
+    <div class="frame"><div class="vtabs vtabs--panel" role="tablist" aria-label="Call details"><button class="vtab" role="tab" aria-selected="false">Summary</button><button class="vtab" role="tab" aria-selected="true">Transcript <span class="vtab-count">14</span></button><button class="vtab" role="tab" aria-selected="false">Captured <span class="vtab-count">3</span></button></div></div>
+    <p class="cap">Segmented controls: density (Shift+D), range, focus on an option, an option unavailable with a reason</p>
+    <div class="row">
+      <div class="seg" role="radiogroup" aria-label="Density"><button role="radio" aria-checked="true">Standard</button><button role="radio" aria-checked="false">Compact</button></div>
+      <div class="seg" role="radiogroup" aria-label="Range"><button role="radio" aria-checked="false">7 days</button><button role="radio" aria-checked="true" class="is-focus">30 days</button><button role="radio" aria-checked="false">90 days</button></div>
+      <div class="seg" role="radiogroup" aria-label="Group by"><button role="radio" aria-checked="true">Day</button><button role="radio" aria-checked="false" aria-disabled="true" title="Needs at least 14 days of calls">Week</button></div>
+    </div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="cards">
+  <div class="g-sec-head">
+    <div><h2>4 · Cards and KPI tiles</h2><p class="ids">F-VIS-010 · F-VIS-011 · F-VIS-016 · F-QA-014 · F-QA-015 · F-UX-011 · F-UX-030 · F-UX-036</p></div>
+    <p>A card is one level of containment: hairline border, radius 8, no shadow, never a card inside a card. Interactive cards change fill only (no lift). Selectable cards use the selection treatment: accent-soft fill plus a 1 px accent-mark border and a check. KPI tiles state their scope in words, colour the delta by desirability with an arrow and sign, and show a sparkline only when there are enough points.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <div class="cols-2">
+      <div class="card"><div class="card-head"><h3 class="card-title">Call volume</h3><span class="card-meta">Last 7 days</span></div><p class="card-body">Plain card: a titled region on an overview page. Header 14/600 with quiet meta.</p></div>
+      <a class="card card--i is-hover" href="#"><div class="card-head"><h3 class="card-title">EMI reminder</h3><svg class="ic t3"><use href="#i-chevron-right"/></svg></div><p class="card-body">Interactive card, hover: fill surface-2, border strong.</p></a>
+      <a class="card card--i is-focus" href="#"><div class="card-head"><h3 class="card-title">Site visit</h3><svg class="ic t3"><use href="#i-chevron-right"/></svg></div><p class="card-body">Focus-visible: 2 px outline, 2 px offset.</p></a>
+      <div class="card card--i" role="radio" aria-checked="true" tabindex="0"><svg class="ic card-check"><use href="#i-circle-check"/></svg><div class="card-head"><h3 class="card-title">Lead qualification</h3></div><p class="card-body">Selected: accent-soft fill, accent-mark border and a check.</p></div>
+      <div class="card card--i is-press"><div class="card-head"><h3 class="card-title">COD confirmation</h3></div><p class="card-body">Pressed: surface-3 for the length of the press.</p></div>
+      <div class="card" role="radio" aria-checked="false" aria-disabled="true"><div class="card-head"><h3 class="card-title">Appointment</h3><span class="tag tag--outline">Needs calendar</span></div><p class="card-body t3">Unavailable: connect a calendar in Settings to use this template.</p></div>
+    </div>
+    <p class="cap">KPI tiles: good rise, bad rise, flat, not enough data, loading, error</p>
+    <div class="kpis">
+      <div class="card kpi"><span class="kpi-label">Calls</span><span class="kpi-value">184</span><div class="kpi-foot"><span class="delta delta--good"><svg class="ic ic--xs"><use href="#i-arrow-up"/></svg>+12% vs previous 7 days</span></div><svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,24 16,20 33,22 50,14 66,16 83,9 100,6"/></svg><span class="kpi-scope">Last 7 days · calls, not legs · test calls excluded</span></div>
+      <div class="card kpi"><span class="kpi-label">Negative sentiment</span><span class="kpi-value">15</span><div class="kpi-foot"><span class="delta delta--bad"><svg class="ic ic--xs"><use href="#i-arrow-up"/></svg>+4 vs previous 7 days</span></div><svg class="spark" viewBox="0 0 100 32" preserveAspectRatio="none" aria-hidden="true"><polyline points="0,26 16,24 33,25 50,20 66,18 83,14 100,12"/></svg><span class="kpi-scope">Last 7 days</span></div>
+      <div class="card kpi"><span class="kpi-label">Average duration</span><span class="kpi-value">1m 18s</span><div class="kpi-foot"><span class="delta delta--flat"><svg class="ic ic--xs"><use href="#i-minus"/></svg>No change</span></div><div class="spark-empty">Not enough data yet</div><span class="kpi-scope">All time · completed calls</span></div>
+      <div class="card kpi" aria-busy="true"><span class="kpi-label">Wallet</span><span class="sk sk--num"></span><div class="kpi-foot"><span class="sk" style="width:60%"></span></div><span class="kpi-scope">Updated when loaded</span></div>
+      <div class="card kpi"><span class="kpi-label">Minutes used</span><span class="kpi-value t3">–</span><div class="kpi-foot"><span class="delta delta--bad"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Couldn't load</span><button class="btn btn--tertiary btn--sm">Retry</button></div><span class="kpi-scope">This month</span></div>
+      <div class="card kpi kpi--compact"><span class="kpi-label">Open pipeline</span><span class="kpi-value">₹85 L</span><div class="kpi-foot"><span class="kpi-scope">In this filter · 96 leads</span></div></div>
+    </div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="tags">
+  <div class="g-sec-head">
+    <div><h2>5 · Tags, status tags, live dot, language marks</h2><p class="ids">F-VIS-017 · F-VIS-027 · F-A11Y-019 · F-VIS-011 · F-UX-004 · F-UX-005 · F-UX-043</p></div>
+    <p>One tag: 20 px (24 on touch), radius 4, 12/500 sentence case, a 12 px icon and a word. Tone follows state only. One domain map per enum, shared by every page. The live dot is the only thing that pulses, and only while a call is live. Language marks: the name alone in tables and lists; a filled glyph tile plus the name in pickers; the bare tile only in transcript turns.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">Tones: neutral, info, success, warning, danger, outline; 24 px size for headers and chips</p>
+    <div class="row row--tight"><span class="tag">Neutral</span><span class="tag tag--info"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Scheduled</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Connected</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>1 warning</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-circle-x"/></svg>2 errors</span><span class="tag tag--outline">Test call</span><span class="tag tag--outline">2 legs</span><span class="tag tag--lg tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>No issues</span></div>
+    <p class="cap">Lead status</p>
+    <div class="row row--tight"><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-dot"/></svg>New</span><span class="tag"><svg class="ic ic--xs"><use href="#i-phone"/></svg>Contacted</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Callback due</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-thumbs-up"/></svg>Interested</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-slash"/></svg>Not interested</span><span class="tag"><svg class="ic ic--xs"><use href="#i-phone-missed"/></svg>Not reached</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-circle-check"/></svg>Converted</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-ban"/></svg>Do not call</span></div>
+    <p class="cap">Call outcome and sentiment (icon + word, never a coloured word alone)</p>
+    <div class="row row--tight"><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Completed</span><span class="tag"><svg class="ic ic--xs"><use href="#i-phone-missed"/></svg>No answer</span><span class="tag"><svg class="ic ic--xs"><use href="#i-phone-off"/></svg>Busy</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-circle-x"/></svg>Failed</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-smile"/></svg>Positive</span><span class="tag"><svg class="ic ic--xs"><use href="#i-meh"/></svg>Neutral</span><span class="tag"><svg class="ic ic--xs"><use href="#i-contrast"/></svg>Mixed</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-frown"/></svg>Negative</span><span class="tag tag--outline"><svg class="ic ic--xs"><use href="#i-circle-dashed"/></svg>Unscored</span></div>
+    <p class="cap">Outcomes borrow the icon and tone of the lead status they write (Callback is always amber with a clock); task states for the Assistant and Personal agents</p>
+    <div class="row row--tight"><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-thumbs-up"/></svg>Interested</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Callback</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-slash"/></svg>Not interested</span><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-pause"/></svg>Waiting for you</span><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-pause"/></svg>Paused</span><span class="tag"><svg class="ic ic--xs"><use href="#i-timer-off"/></svg>Expired</span></div>
+    <p class="cap">Flow lifecycle and indexing (computed, never permanent)</p>
+    <div class="row row--tight"><span class="tag tag--success"><span class="live-dot" data-mark></span>Live v7</span><button class="tag tag--lg" aria-haspopup="menu">Draft · 3 changes<svg class="ic ic--xs"><use href="#i-chevron-down"/></svg></button><span class="tag tag--outline">Not published</span><span class="tag tag--info">Publishing…</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Couldn't save</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Indexed</span><span class="tag tag--info">Indexing… 60%</span><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-circle-x"/></svg>Couldn't index</span></div>
+    <p class="cap">Live dot (pulses only while a call is live; static under reduced motion), counts, language marks</p>
+    <div class="row"><span class="row row--tight" style="font:var(--type-label-13)"><span class="live-dot live-dot--pulse" data-mark></span>Live</span><span class="row row--tight" style="font:var(--type-label-13)"><span class="live-dot" data-mark></span>Live v7 (a flow is not a call: static)</span><span class="count-badge">1,284</span></div>
+    <p class="cap">LanguageMark (§5.6): <b>name</b> in tables and lists · <b>full</b> (fill tile, no stroke) in voice and language pickers and the call-header legend · <b>compact</b> tile in turn rows only. A bordered square is a Kbd keycap, never a language.</p>
+    <div class="row"><span class="t2" style="font:var(--type-data-13)">Hindi</span><span class="t2" style="font:var(--type-data-13)">Hinglish</span><span class="t2" style="font:var(--type-data-13)">Tamil</span><span class="t3" style="font:var(--type-meta-12)">name</span><span class="lm"><span class="lm-g" lang="hi" aria-hidden="true">अ</span>Hindi</span><span class="lm"><span class="lm-g" lang="hi-Latn" aria-hidden="true">अA</span>Hinglish</span><span class="lm"><span class="lm-g" aria-hidden="true">A</span>English</span><span class="lm"><span class="lm-g" lang="ta" aria-hidden="true">த</span>Tamil</span><span class="lm"><span class="lm-g" lang="bn" aria-hidden="true">ব</span>Bengali</span><span class="t3" style="font:var(--type-meta-12)">full</span><span class="lm-g" lang="hi" role="img" aria-label="Hindi">अ</span><span class="t3" style="font:var(--type-meta-12)">compact</span><span class="kbd" style="margin-left:var(--space-16)">K</span><span class="t3" style="font:var(--type-meta-12)">Kbd, for contrast</span></div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="filters">
+  <div class="g-sec-head">
+    <div><h2>6 · Filter bar</h2><p class="ids">F-UX-031 · F-QA-016 · F-RWD-009 · F-RWD-012 · F-UX-046 · F-A11Y-016 · F-VIS-009</p></div>
+    <p>One 48 px toolbar: search, a Filter menu that adds 6 px filter tokens (never pill chips), Clear, then Columns and density on the right. Quick filters are view tabs, not chips. Everything is in the URL. Below 1024 the tokens fold into the Filter button with a count; on phones search takes its own row and filters open as a sheet.</p>
+  </div>
+  <div class="pair pair--stack"><div class="board"><div class="stack">
+    <p class="cap">Idle (desktop)</p>
+    <div class="frame"><div class="tb" role="search" aria-label="Leads"><div class="search"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" placeholder="Search name, phone or city…" aria-keyshortcuts="/"></div><button class="btn"><svg class="ic"><use href="#i-filter"/></svg>Filter</button><span class="tb-spacer"></span><button class="btn btn--tertiary"><svg class="ic"><use href="#i-columns"/></svg>Columns</button><div class="seg" role="radiogroup" aria-label="Density"><button role="radio" aria-checked="true">Standard</button><button role="radio" aria-checked="false">Compact</button></div></div></div>
+    <p class="cap">Active: search text (focused), two tokens, token hover, Clear; the result count is announced politely</p>
+    <div class="frame"><div class="tb"><div class="search is-focus"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" value="visit"><button class="ibtn ibtn--sm" aria-label="Clear search"><svg class="ic ic--sm"><use href="#i-x"/></svg></button></div><button class="btn"><svg class="ic"><use href="#i-filter"/></svg>Filter</button><span class="ftoken"><button class="ftoken-body" aria-label="Language is Hindi or English. Edit filter"><span class="ftoken-f">Language</span><span class="ftoken-v">Hindi, English</span></button><button class="ftoken-x" aria-label="Remove Language filter"><svg class="ic ic--sm"><use href="#i-x"/></svg></button></span><span class="ftoken"><button class="ftoken-body" style="background:var(--surface-2)" aria-label="Source is Website. Edit filter"><span class="ftoken-f">Source</span><span class="ftoken-v">Website</span></button><button class="ftoken-x" aria-label="Remove Source filter"><svg class="ic ic--sm"><use href="#i-x"/></svg></button></span><button class="btn btn--tertiary btn--sm">Clear</button><span class="tb-spacer"></span><span class="ph-meta" role="status">38 of 1,284</span></div></div>
+    <p class="cap">Adding a filter: field menu, then a value list with search and counts</p>
+    <div class="frame" style="height:calc(var(--space-96) * 3 + var(--space-16))"><div class="tb"><div class="search"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" placeholder="Search name, phone or city…"></div><div style="position:relative"><button class="btn" aria-expanded="true" aria-haspopup="menu"><svg class="ic"><use href="#i-filter"/></svg>Filter</button>
+      <div class="menu" role="menu" style="top:calc(100% + var(--space-4));left:0"><div class="menu-label">Filter by</div><div class="menu-item" role="menuitem"><svg class="ic t3"><use href="#i-circle-dot"/></svg>Status</div><div class="menu-item is-hover" role="menuitem" aria-expanded="true"><span class="lm-g" aria-hidden="true" style="min-width:var(--icon-md);height:var(--icon-md)">अ</span>Language<svg class="ic t3" style="margin-left:auto"><use href="#i-chevron-right"/></svg></div><div class="menu-item" role="menuitem"><svg class="ic t3"><use href="#i-workflow"/></svg>Flow</div><div class="menu-item" role="menuitem"><svg class="ic t3"><use href="#i-phone"/></svg>Last call outcome</div><div class="menu-item" role="menuitem"><svg class="ic t3"><use href="#i-clock"/></svg>Last called</div></div>
+      <div class="menu" role="dialog" aria-label="Language" style="top:calc(100% + var(--space-4));left:calc(var(--size-menu-min) + var(--space-8));width:var(--size-menu-min)"><div class="search" style="min-width:0;margin-bottom:var(--space-4)"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search languages" placeholder="Search…"></div><label class="menu-item"><input type="checkbox" class="cb" checked> Hindi<span class="count-badge" style="margin-left:auto">612</span></label><label class="menu-item"><input type="checkbox" class="cb" checked> English<span class="count-badge" style="margin-left:auto">388</span></label><label class="menu-item is-hover"><input type="checkbox" class="cb"> Hinglish<span class="count-badge" style="margin-left:auto">201</span></label><label class="menu-item"><input type="checkbox" class="cb"> Tamil<span class="count-badge" style="margin-left:auto">43</span></label></div>
+    </div></div></div>
+    <p class="cap">Tablet: tokens fold into the Filter button with a count; Columns becomes an icon button with a label</p>
+    <div class="frame" style="width:var(--device-tablet);max-width:100%"><div class="tb"><div class="search"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" placeholder="Search leads…"></div><button class="btn" aria-label="Filter, 2 active"><svg class="ic"><use href="#i-filter"/></svg>Filter<span class="fcount">2</span></button><button class="btn btn--tertiary btn--sm">Clear</button><span class="tb-spacer"></span><button class="ibtn" aria-label="Columns"><svg class="ic"><use href="#i-columns"/></svg></button></div></div>
+    <p class="cap">Phone: search on its own row; a scrolling row of Filter, tokens and Clear with an edge fade</p>
+    <div class="frame" style="width:var(--device-phone);max-width:100%"><div class="tb" style="--page-margin:var(--space-16)"><div class="search search--full"><svg class="ic"><use href="#i-search"/></svg><input aria-label="Search leads" placeholder="Search leads…"></div><div class="hscroll" style="flex:1 1 100%"><button class="btn btn--sm"><svg class="ic"><use href="#i-filter"/></svg>Filter<span class="fcount">2</span></button><span class="ftoken"><button class="ftoken-body"><span class="ftoken-f">Language</span><span class="ftoken-v">Hindi, English</span></button><button class="ftoken-x" aria-label="Remove Language filter"><svg class="ic ic--sm"><use href="#i-x"/></svg></button></span><span class="ftoken"><button class="ftoken-body"><span class="ftoken-f">Source</span><span class="ftoken-v">Website</span></button><button class="ftoken-x" aria-label="Remove Source filter"><svg class="ic ic--sm"><use href="#i-x"/></svg></button></span></div></div></div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="table">
+  <div class="g-sec-head">
+    <div><h2>7 · Data table</h2><p class="ids">F-UX-009 · F-VIS-009 · F-VIS-027 · F-A11Y-002 · F-A11Y-004 · F-A11Y-010 · F-A11Y-018 · F-QA-005 · F-QA-015 · F-RWD-004 · F-RWD-010 · F-RWD-011 · F-RWD-016 · F-UX-046 · F-VIS-013</p></div>
+    <p>A real table on TanStack Table: sticky 12/500 sentence-case header with <code>aria-sort</code>, 40 px Standard rows (32 Compact, 48 touch), the key column as the row link, one tab stop for the body with J/K and arrows moving focus. Hover is surface-2; selected is accent-soft with a 2 px inset bar; focus is an inset outline; when both apply, both show. Row actions appear on hover and focus and never hold a destructive action. Server pagination states its scope.</p>
+  </div>
+  <div class="pair pair--stack"><div class="board">
+    <p class="cap">Leads · Standard density · 2 selected (row 2 hovered), row 4 keyboard-focused, row 7 hovered with its actions, sorted by Last call</p>
+    <div class="frame" style="height:calc(var(--space-96) * 5 + var(--space-32))">
+      <div class="dt-wrap" style="height:calc(100% - var(--size-pager))">
+        <table class="dt" role="grid" aria-label="Leads" aria-rowcount="1285" aria-multiselectable="true">
+          <thead><tr aria-rowindex="1"><th class="c-sel" scope="col"><input type="checkbox" class="cb" data-mixed aria-label="Select all leads on this page" aria-checked="mixed"></th><th scope="col" aria-sort="none"><button class="th-sort">Lead<svg class="ic ic--xs"><use href="#i-chevron-down"/></svg></button></th><th scope="col">Phone</th><th scope="col">Status</th><th scope="col" aria-sort="descending"><button class="th-sort">Last call<svg class="ic ic--xs"><use href="#i-arrow-down"/></svg></button></th><th scope="col" class="c-num" aria-sort="none"><button class="th-sort">Interest<svg class="ic ic--xs"><use href="#i-chevron-down"/></svg></button></th><th scope="col">Language</th><th scope="col">Flow</th><th scope="col" class="c-act"><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            <tr aria-selected="true" aria-rowindex="2" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" checked aria-label="Select Aarav K."></td><td class="c-key"><a href="#" translate="no">Aarav K.</a></td><td><span class="phone-text" translate="no">+91 •••••• 4821</span></td><td><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-thumbs-up"/></svg>Interested</span></td><td>Visit booked <span class="t3">· Today 10:42 am</span></td><td class="c-num"><span class="meter">82<i><b style="width:82%"></b></i></span></td><td class="t2">Hindi</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Aarav K."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr aria-selected="true" class="is-hover" aria-rowindex="3" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" checked aria-label="Select Meera S."></td><td class="c-key"><a href="#">Meera S.</a></td><td><span class="phone-text" translate="no">+91 •••••• 3307</span></td><td><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Callback due</span></td><td>Call later <span class="t3">· Yesterday 1:20 pm</span></td><td class="c-num"><span class="meter">64<i><b style="width:64%"></b></i></span></td><td class="t2">Hinglish</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Meera S."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr aria-rowindex="4" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Rohan I."></td><td class="c-key"><a href="#">Rohan I.</a></td><td><span class="phone-text" translate="no">+91 •••••• 9158</span></td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-dot"/></svg>New</span></td><td class="t3">Not called yet</td><td class="c-num t3">Not scored</td><td class="t2">English</td><td>Home-loan follow-up</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Rohan I."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr class="is-focus" aria-rowindex="5" tabindex="0"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Zoya S."></td><td class="c-key"><a href="#">Zoya S.</a></td><td><span class="phone-text" translate="no">+91 •••••• 6612</span></td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-phone"/></svg>Contacted</span></td><td>No answer <span class="t3">· Yesterday</span></td><td class="c-num"><span class="meter">41<i><b style="width:41%"></b></i></span></td><td class="t2">Hindi</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Zoya S."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr aria-rowindex="6" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Pranav I."></td><td class="c-key"><a href="#">Pranav I.</a></td><td><span class="phone-text" translate="no">+91 •••••• 2045</span></td><td><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-thumbs-up"/></svg>Interested</span></td><td>Visit booked <span class="t3">· Today 10:12 am</span></td><td class="c-num"><span class="meter">77<i><b style="width:77%"></b></i></span></td><td class="t2">English</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Pranav I."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr aria-rowindex="7" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Nandini R."></td><td class="c-key"><a href="#">Nandini R.</a></td><td><span class="phone-text" translate="no">+91 •••••• 7730</span></td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-slash"/></svg>Not interested</span></td><td>Declined <span class="t3">· 2 days ago</span></td><td class="c-num"><span class="meter">12<i><b style="width:12%"></b></i></span></td><td class="t2">Telugu</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Nandini R."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr class="is-hover" aria-rowindex="8" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Harsh V."></td><td class="c-key"><a href="#">Harsh V.</a></td><td><span class="phone-text" translate="no">+91 •••••• 1189</span></td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-circle-dot"/></svg>New</span></td><td class="t3">Not called yet</td><td class="c-num t3">Not scored</td><td class="t2">English</td><td>Site-visit qualifier</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Harsh V."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+            <tr aria-rowindex="9" tabindex="-1"><td class="c-sel"><input type="checkbox" class="cb" aria-label="Select Sunita D."></td><td class="c-key"><a href="#">Sunita D.</a></td><td><span class="phone-text" translate="no">+91 •••••• 5520</span></td><td><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-clock"/></svg>Callback due</span></td><td>Busy <span class="t3">· 3 days ago</span></td><td class="c-num"><span class="meter">55<i><b style="width:55%"></b></i></span></td><td class="t2">Bengali</td><td>Home-loan follow-up</td><td class="c-act"><span class="row-actions"><button class="btn btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call…</button><button class="ibtn ibtn--sm" aria-label="More actions for Sunita D."><svg class="ic"><use href="#i-more"/></svg></button></span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="bulk" role="toolbar" aria-label="2 leads selected"><span class="bulk-count" role="status">2 selected</span><button class="btn btn--primary btn--sm"><svg class="ic"><use href="#i-phone"/></svg>Call 2 leads…</button><button class="btn btn--tertiary btn--sm">Set status</button><button class="btn btn--tertiary btn--sm">Assign flow</button><button class="btn btn--tertiary btn--sm">Export</button><button class="ibtn ibtn--sm" aria-label="Clear selection" aria-keyshortcuts="Escape"><svg class="ic"><use href="#i-x"/></svg></button></div>
+      <nav class="pager" aria-label="Pagination"><span role="status">1–50 of 1,284 leads</span><span class="pager-sp"></span><span>Rows per page</span><button class="btn btn--tertiary btn--sm">50<svg class="ic ic--sm"><use href="#i-chevron-down"/></svg></button><span>Page 1 of 26</span><button class="ibtn ibtn--sm" aria-label="Previous page" aria-disabled="true" style="color:var(--text-dis)"><svg class="ic"><use href="#i-chevron-left"/></svg></button><button class="ibtn ibtn--sm" aria-label="Next page"><svg class="ic"><use href="#i-chevron-right"/></svg></button></nav>
+    </div>
+  </div></div>
+
+  <div class="pair pair--stack"><div class="board">
+    <p class="cap">Call reports · Compact density · scrolled sideways: When and Lead stay pinned, actions stay pinned right. Extracted flow fields collapse into one Captured column; per-field columns appear only when one flow is filtered.</p>
+    <div class="frame" data-density="compact">
+      <div class="dt-wrap js-scroll">
+        <table class="dt" role="grid" aria-label="Call reports" aria-rowcount="122" style="min-width:calc(var(--space-96) * 16)">
+          <thead><tr><th scope="col" class="sticky-l" aria-sort="descending" style="width:calc(var(--space-96) + var(--space-40));min-width:calc(var(--space-96) + var(--space-40))"><button class="th-sort">When<svg class="ic ic--xs"><use href="#i-arrow-down"/></svg></button></th><th scope="col" class="sticky-l2">Lead</th><th scope="col">Direction</th><th scope="col" class="c-num">Duration</th><th scope="col">Outcome</th><th scope="col">Sentiment</th><th scope="col">Flow</th><th scope="col">Language</th><th scope="col">Captured</th><th scope="col" class="c-act sticky-r"><span class="sr-only">Actions</span></th></tr></thead>
+          <tbody>
+            <tr tabindex="0"><td class="sticky-l"><a href="#" class="t2" style="text-decoration:none" aria-label="Open call from today 10:42 am, 2 min 31 s, completed"><time class="num">Today 10:42 am</time></a></td><td class="sticky-l2 c-key"><a href="#">Aarav K.</a></td><td><span class="row row--tight" style="gap:var(--space-4)"><svg class="ic ic--sm t3"><use href="#i-phone-out"/></svg>Outbound</span></td><td class="c-num">2m 31s</td><td><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-circle-check"/></svg>Visit booked</span></td><td><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-smile"/></svg>Positive</span></td><td>Site-visit qualifier <span class="t3">v7</span></td><td class="t2">Hindi</td><td><span class="cell-t" title="Budget ₹85 L to ₹1 Cr · Preferred day Saturday · Site visit Yes">Budget ₹85 L to ₹1 Cr · Day Saturday · +1</span></td><td class="c-act sticky-r"><button class="ibtn ibtn--sm" aria-label="More actions for call at 10:42 am"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr tabindex="-1" class="is-hover"><td class="sticky-l"><time class="num">Today 9:58 am</time></td><td class="sticky-l2 c-key"><a href="#">Zoya S.</a></td><td><span class="row row--tight" style="gap:var(--space-4)"><svg class="ic ic--sm t3"><use href="#i-phone-out"/></svg>Outbound</span></td><td class="c-num t3">–</td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-phone-missed"/></svg>No answer</span></td><td><span class="tag tag--outline"><svg class="ic ic--xs"><use href="#i-circle-dashed"/></svg>Unscored</span></td><td>Site-visit qualifier <span class="t3">v7</span></td><td class="t3">–</td><td class="t3">Nothing captured</td><td class="c-act sticky-r"><button class="ibtn ibtn--sm" aria-label="More actions for call at 9:58 am"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr tabindex="-1"><td class="sticky-l"><time class="num">Today 9:31 am</time></td><td class="sticky-l2 c-key"><a href="#">Test call · you</a> <span class="tag tag--outline">Test</span></td><td><span class="row row--tight" style="gap:var(--space-4)"><svg class="ic ic--sm t3"><use href="#i-mic"/></svg>Browser</span></td><td class="c-num">1m 27s</td><td><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Completed</span></td><td><span class="tag"><svg class="ic ic--xs"><use href="#i-contrast"/></svg>Mixed</span></td><td>Site-visit qualifier <span class="t3">draft v8</span></td><td class="t2">Hinglish</td><td><span class="cell-t">Budget ₹50 L · Day Sunday</span></td><td class="c-act sticky-r"><button class="ibtn ibtn--sm" aria-label="More actions for call at 9:31 am"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+            <tr tabindex="-1"><td class="sticky-l"><time class="num">Yesterday 6:12 pm</time></td><td class="sticky-l2 c-key"><a href="#">Nandini R.</a></td><td><span class="row row--tight" style="gap:var(--space-4)"><svg class="ic ic--sm t3"><use href="#i-phone"/></svg>Inbound</span></td><td class="c-num">41s</td><td><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-circle-x"/></svg>Failed</span></td><td><span class="tag tag--danger"><svg class="ic ic--xs"><use href="#i-frown"/></svg>Negative</span></td><td>Home-loan follow-up <span class="t3">v3</span></td><td class="t2">Telugu</td><td class="t3">Nothing captured</td><td class="c-act sticky-r"><button class="ibtn ibtn--sm" aria-label="More actions for call yesterday at 6:12 pm"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <nav class="pager" aria-label="Pagination"><span>1–50 of 121 calls · test calls shown</span><span class="pager-sp"></span><span>Page 1 of 3</span><button class="ibtn ibtn--sm" aria-label="Next page"><svg class="ic"><use href="#i-chevron-right"/></svg></button></nav>
+    </div>
+  </div></div>
+
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">Loading: real header, static skeleton rows after 200 ms (no shimmer), inside the shell</p>
+    <div class="frame"><table class="dt" aria-busy="true"><thead><tr><th>Lead</th><th>Status</th><th>Last call</th><th class="c-num">Interest</th></tr></thead><tbody><tr><td><span class="sk" style="width:70%"></span></td><td><span class="sk" style="width:50%"></span></td><td><span class="sk" style="width:80%"></span></td><td><span class="sk" style="width:40%;margin-left:auto"></span></td></tr><tr><td><span class="sk" style="width:55%"></span></td><td><span class="sk" style="width:40%"></span></td><td><span class="sk" style="width:65%"></span></td><td><span class="sk" style="width:40%;margin-left:auto"></span></td></tr><tr><td><span class="sk" style="width:62%"></span></td><td><span class="sk" style="width:45%"></span></td><td><span class="sk" style="width:72%"></span></td><td><span class="sk" style="width:40%;margin-left:auto"></span></td></tr></tbody></table></div>
+    <p class="cap">Filtered to nothing (different copy from an empty account)</p>
+    <div class="frame"><table class="dt"><thead><tr><th>When</th><th>Lead</th><th>Outcome</th><th>Sentiment</th></tr></thead><tbody><tr class="dt-empty"><td colspan="4"><div class="empty"><svg class="ic ic--xl"><use href="#i-search"/></svg><h3>No calls match “visit” and 2 filters</h3><p>Try a shorter search or remove a filter.</p><button class="btn">Clear filters</button></div></td></tr></tbody></table></div>
+    <p class="cap">Empty account: what will appear here, and one action</p>
+    <div class="frame"><table class="dt"><thead><tr><th>Lead</th><th>Status</th><th>Last call</th></tr></thead><tbody><tr class="dt-empty"><td colspan="3"><div class="empty"><svg class="ic ic--xl"><use href="#i-users"/></svg><h3>No leads yet</h3><p>Leads you import or capture from calls appear here with their status and last call.</p><button class="btn btn--primary"><svg class="ic"><use href="#i-upload"/></svg>Import leads…</button></div></td></tr></tbody></table></div>
+    <p class="cap">Errors: first load failed (inside the table); refresh failed with data on screen (above it)</p>
+    <div class="frame"><table class="dt"><thead><tr><th>When</th><th>Lead</th><th>Outcome</th></tr></thead><tbody><tr class="dt-empty"><td colspan="3"><div class="notice notice--danger" role="alert" style="text-align:left"><svg class="ic"><use href="#i-circle-x"/></svg><span class="notice-body">Couldn't load calls. Check your connection and try again.</span><button class="btn btn--sm">Retry</button></div></td></tr></tbody></table></div>
+    <div class="notice notice--warning" role="status"><svg class="ic"><use href="#i-alert"/></svg><span class="notice-body">Showing results from 11:24 am. Couldn't refresh.</span><button class="btn btn--sm">Retry</button></div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="kv">
+  <div class="g-sec-head">
+    <div><h2>8 · Key-value panels</h2><p class="ids">F-UX-003 · F-UX-010 · F-UX-032 · F-VIS-024 · F-A11Y-019</p></div>
+    <p>A <code>dl</code> with the key in text-3 and the value in text. Missing values say so in words ("Not captured"), pending ones end in "…", and every value can name its source. Ids and numbers are mono tokens with a Copy button. One formatter owns every date, duration and amount.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="cols-2">
+    <div class="card"><div class="card-head"><h3 class="card-title">Call</h3><span class="card-meta">Today 10:42 am</span></div>
+      <dl class="kv">
+        <div class="kv-row"><dt>Outcome</dt><dd><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-circle-check"/></svg>Visit booked</span></dd></div>
+        <div class="kv-row"><dt>Duration</dt><dd class="num">2m 31s</dd></div>
+        <div class="kv-row"><dt>Flow</dt><dd><a href="#">Site-visit qualifier v7</a></dd></div>
+        <div class="kv-row"><dt>Voice</dt><dd>Vaani · Hindi + English</dd></div>
+        <div class="kv-row"><dt>Line</dt><dd><span class="lq lq--good"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="w">Good</span><span class="ms">180 ms</span></span></dd></div>
+        <div class="kv-row"><dt>Cost</dt><dd class="num">₹6.04 <span class="src">₹0.04/s</span></dd></div>
+        <div class="kv-row"><dt>Call id</dt><dd><span class="mono-12">call_7c21e0</span><button class="ibtn ibtn--sm" aria-label="Copy call id"><svg class="ic ic--sm"><use href="#i-copy"/></svg></button></dd></div>
+        <div class="kv-row"><dt>Legs</dt><dd>2 legs <span class="src">browser test, counted once</span></dd></div>
+      </dl></div>
+    <div class="card"><div class="card-head"><h3 class="card-title">Captured so far</h3><span class="card-meta">2 of 3</span></div>
+      <dl class="kv kv--rows">
+        <div class="kv-row"><dt>Preferred day</dt><dd>Saturday, morning</dd></div>
+        <div class="kv-row"><dt>Budget</dt><dd>₹85 L to ₹1 Cr</dd></div>
+        <div class="kv-row"><dt>Site visit</dt><dd class="pending">Waiting for an answer…</dd></div>
+        <div class="kv-row"><dt>City</dt><dd>Pune <span class="src">from Leads</span></dd></div>
+        <div class="kv-row"><dt>Email</dt><dd class="pending">Not captured</dd></div>
+      </dl>
+      <p class="cap">Stacked variant (containers under 320 px)</p>
+      <dl class="kv kv--stacked"><div class="kv-row"><dt>Summary</dt><dd>Asked for a Saturday morning visit; budget confirmed; wants the brochure on WhatsApp.</dd></div></dl>
+    </div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="avatars">
+  <div class="g-sec-head">
+    <div><h2>9 · Avatars</h2><p class="ids">F-UX-029 · F-VIS-016 · F-UX-003</p></div>
+    <p>People are round with neutral initials; agents and voices are square tiles, so a person and an AI voice never look alike; the workspace is an ink tile. No colour-coded backgrounds, no faces for the agent, no photos of leads.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <div class="row"><span class="av av--20" aria-hidden="true">A</span><span class="av" aria-hidden="true">AR</span><span class="av av--32" aria-hidden="true">AK</span><span class="av av--voice av--32" role="img" aria-label="Voice: Vaani">Va</span><span class="av av--voice av--32" role="img" aria-label="Voice: Vikash">Vi</span><span class="av av--ws" role="img" aria-label="Workspace: Sample Realty">S</span><span class="av-stack" role="img" aria-label="3 participants: Anika R., Dev M. and 1 more"><span class="av">AR</span><span class="av">DM</span><span class="av">+1</span></span></div>
+    <p class="cap">20 people in feeds · 28 default · 32 in call headers · 32 voice tile · 28 workspace tile · stack of at most 3 then +n</p>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="timeline">
+  <div class="g-sec-head">
+    <div><h2>10 · Timeline and activity feed</h2><p class="ids">F-QA-037 · F-UX-042 · F-QA-023 · F-UX-032 · F-VIS-024</p></div>
+    <p>An ordered list grouped by day. Each event is one sentence (actor, verb, object) with a 24 px glyph tile; only events that carry a state get a tone. Relative time with the absolute time on hover. Stale queued calls are flagged, not left to look current. Older items load with a button, not endless scroll.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="card">
+    <div class="tl-day" role="heading" aria-level="3">Today</div>
+    <ol class="tl">
+      <li class="tl-item"><span class="tl-node tl-node--success"><svg class="ic ic--sm"><use href="#i-phone-out"/></svg></span><span class="tl-text"><b>Vaani</b> called · <a href="#">Visit booked</a> · 2m 31s</span><time class="tl-time" title="26 Sep 2026, 10:42 am IST">10:42 am</time><div class="tl-detail"><span class="turn-h" style="margin-bottom:var(--space-2)"><span class="lm-g" aria-hidden="true">अA</span> Caller</span>“Saturday ho sakta hai, but morning mein.”</div></li>
+      <li class="tl-item"><span class="tl-node"><svg class="ic ic--sm"><use href="#i-circle-dot"/></svg></span><span class="tl-text">Status changed from <b>New</b> to <b>Interested</b> by the Outcome step</span><time class="tl-time">10:44 am</time></li>
+      <li class="tl-item"><span class="av av--20" aria-hidden="true" style="margin:var(--space-2)">A</span><span class="tl-text"><b>Anika R.</b> added a note</span><time class="tl-time">11:02 am</time><div class="tl-detail">Send the brochure before Saturday.</div></li>
+    </ol>
+    <div class="tl-day" role="heading" aria-level="3">28 Aug 2026</div>
+    <ol class="tl">
+      <li class="tl-item"><span class="tl-node tl-node--warning"><svg class="ic ic--sm"><use href="#i-clock"/></svg></span><span class="tl-text"><b>Call queued</b> · no update since 28 Aug, 11:45 pm</span><time class="tl-time">29 days ago</time><div class="tl-more"><button class="btn btn--tertiary btn--sm">Check status</button></div></li>
+      <li class="tl-item"><span class="tl-node"><svg class="ic ic--sm"><use href="#i-upload-list"/></svg></span><span class="tl-text"><b>Imported</b> from website-leads.csv</span><time class="tl-time">11:30 pm</time></li>
+    </ol>
+    <button class="btn btn--tertiary btn--sm">Show older activity</button>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="charts">
+  <div class="g-sec-head">
+    <div><h2>11 · Chart styling rules</h2><p class="ids">F-VIS-011 · F-VIS-012 · F-QA-019 · F-UX-036 · F-UX-011 · F-VIS-013 · F-VIS-010</p></div>
+    <p>Drawn at 1:1 with the container (no stretched viewBox), text at 12 px or more in the label token, horizontal solid gridlines only, one axis line, nice ticks. Single series use chart-1; sentiment uses its own palette in a fixed order with 2 px gaps; state colours never paint a series. Tooltips follow the pointer and the keyboard. Every chart states its range and has an empty state.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <div class="card"><div class="card-head"><h3 class="card-title">Calls per day</h3><span class="card-meta">Last 7 days · calls, not legs</span></div><div class="chart" data-chart="bars" role="img" aria-label="Calls per day, last 7 days: from 9 on Sunday 27 September to 31 on Thursday 24 September."></div></div>
+    <div class="card"><div class="card-head"><h3 class="card-title">Sentiment by day</h3><span class="card-meta">Last 7 days</span></div>
+      <ul class="legend"><li><span class="sw s-pos" data-mark></span>Positive <b>41</b></li><li><span class="sw s-neu" data-mark></span>Neutral <b>52</b></li><li><span class="sw s-mix" data-mark></span>Mixed <b>13</b></li><li><span class="sw s-neg" data-mark></span>Negative <b>15</b></li></ul>
+      <div class="chart" data-chart="stack" role="img" aria-label="Sentiment by day, last 7 days. Totals: positive 41, neutral 52, mixed 13, negative 15."></div></div>
+    <div class="cols-2">
+      <div class="card"><div class="card-head"><h3 class="card-title">Where callers drop off</h3><span class="card-meta">Site-visit qualifier v7 · 121 calls</span></div>
+        <div class="funnel-step"><a href="#">1 · Greeting</a><span class="val">121 · 100%</span><span class="trk"><i style="width:100%"></i></span></div>
+        <div class="funnel-step"><a href="#">2 · Ask about budget</a><span class="val">104 · 14% drop</span><span class="trk"><i style="width:86%"></i></span></div>
+        <div class="funnel-step"><a href="#">3 · Ask about a site visit</a><span class="val">88 · 15% drop</span><span class="trk"><i style="width:73%"></i></span></div>
+        <div class="funnel-step"><a href="#">4 · Book site visit</a><span class="val">41 · 53% drop · largest</span><span class="trk"><i style="width:34%"></i></span></div>
+      </div>
+      <div class="card"><div class="card-head"><h3 class="card-title">Top intents</h3><span class="card-meta">Last 30 days · 121 calls</span></div>
+        <div class="barlist">
+          <div class="barlist-row"><span class="lbl">Site visit booking</span><span class="trk"><i style="width:100%"></i></span><span class="val">38 · 31%</span></div>
+          <div class="barlist-row"><span class="lbl">Price enquiry</span><span class="trk"><i style="width:71%"></i></span><span class="val">27 · 22%</span></div>
+          <div class="barlist-row"><span class="lbl" title="Loan eligibility and EMI questions">Loan eligibility and EMI questions</span><span class="trk"><i style="width:50%"></i></span><span class="val">19 · 16%</span></div>
+          <div class="barlist-row"><span class="lbl">Callback request</span><span class="trk"><i style="width:37%"></i></span><span class="val">14 · 12%</span></div>
+          <div class="barlist-row"><span class="lbl">Other</span><span class="trk"><i style="width:60%;background:var(--chart-other)"></i></span><span class="val">23 · 19%</span></div>
+        </div></div>
+      <div class="card"><div class="card-head"><h3 class="card-title">Calls by hour</h3><span class="card-meta">IST · last 30 days</span></div>
+        <div class="heat" style="grid-template-columns:repeat(24,minmax(0,1fr))" role="img" aria-label="Calls by hour: busiest 11 am to 1 pm; none before 9 am or after 9 pm."><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-1"></i><i class="seq-2"></i><i class="seq-5"></i><i class="seq-4"></i><i class="seq-3"></i><i class="seq-2"></i><i class="seq-3"></i><i class="seq-3"></i><i class="seq-2"></i><i class="seq-2"></i><i class="seq-1"></i><i class="seq-1"></i><i class="seq-0"></i><i class="seq-0"></i><i class="seq-0"></i></div>
+        <div class="heat-axis"><span>12 am</span><span>6 am</span><span>12 pm</span><span>6 pm</span><span>11 pm</span></div>
+        <ul class="legend" style="margin:var(--space-12) 0 0"><li><span class="sw seq-0" data-mark style="outline:var(--bw-hairline) solid var(--border)"></span>No calls</li><li><span class="sw seq-1" data-mark></span>Fewer</li><li><span class="sw seq-3" data-mark></span></li><li><span class="sw seq-5" data-mark></span>More</li></ul></div>
+      <div class="card"><div class="card-head"><h3 class="card-title">Calls to your number</h3><span class="card-meta">Last 7 days</span></div>
+        <div class="chart-empty"><svg class="ic ic--xl t3"><use href="#i-phone"/></svg><p>No calls to your number yet. Your number is still being verified.</p><a class="btn btn--sm" href="#">Open Phone setup</a></div></div>
+    </div>
+  </div></div></div>
+</section>
+
+<section class="g-sec" id="voice">
+  <div class="g-sec-head">
+    <div><h2>12 · Voice components</h2><p class="ids">F-VIS-029 · F-VIS-030 · F-UX-026 · F-UX-018 · F-UX-003 · F-UX-010 · F-UX-014 · F-A11Y-014 · F-A11Y-022 · F-RWD-002</p></div>
+    <p>One call-state machine, each state a word, an icon and a tone. Line quality appears only during a call, in words first. The transcript is rows, not bubbles: a mono timecode gutter, speaker, language mark, the flow step in plain words, and the utterance at 15/24 (Devanagari 15/26). Partial text is text-3 ending in "…". Scrolling up pauses follow mode and offers Jump to latest. Recordings seek from the talk strip or any timecode.</p>
+  </div>
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">Call state (chip)</p>
+    <div class="row row--tight"><span class="cs cs--idle"><svg class="ic ic--xs"><use href="#i-phone"/></svg>Idle</span><span class="cs cs--dialling"><svg class="ic ic--xs"><use href="#i-phone-out"/></svg>Dialling… <span class="cs-t">00:03</span></span><span class="cs cs--ringing"><svg class="ic ic--xs"><use href="#i-phone-call"/></svg>Ringing… <span class="cs-t">00:07</span></span><span class="cs cs--live"><span class="live-dot live-dot--pulse" data-mark></span>Live <span class="cs-t">02:14</span></span><span class="cs cs--hold"><svg class="ic ic--xs"><use href="#i-pause"/></svg>On hold</span><span class="cs cs--wrapup"><svg class="ic ic--xs"><use href="#i-clipboard"/></svg>Wrap-up</span><span class="cs cs--ended"><svg class="ic ic--xs"><use href="#i-phone-off"/></svg>Ended</span><span class="cs cs--ended"><svg class="ic ic--xs"><use href="#i-phone-missed"/></svg>No answer</span><span class="cs cs--ended"><svg class="ic ic--xs"><use href="#i-phone-off"/></svg>Busy</span><span class="cs cs--failed"><svg class="ic ic--xs"><use href="#i-circle-x"/></svg>Failed</span></div>
+    <p class="cap">Call header with the stepper, and line quality in words (Good, Fair, Poor, Reconnecting)</p>
+    <div class="card stack">
+      <div class="cs-head" role="status" aria-live="polite"><span class="cs cs--live"><span class="live-dot live-dot--pulse" data-mark></span>Live</span><span class="t2" style="font:var(--type-data-13)">Outbound · Site-visit qualifier v7</span><span class="cs-timer" aria-hidden="true">02:14</span></div>
+      <ol class="stepper" aria-label="Call progress"><li class="done"><span class="stepper-dot"></span>Dialling<span class="stepper-t">00:00</span></li><li class="done"><span class="stepper-dot"></span>Ringing<span class="stepper-t">00:03</span></li><li class="now" aria-current="step"><span class="stepper-dot" data-mark></span>Live<span class="stepper-t">00:09</span></li><li><span class="stepper-dot"></span>Wrap-up<span class="stepper-t">next</span></li></ol>
+      <div class="row"><span class="lq lq--good"><span class="k">Line</span><span class="bars" aria-hidden="true"><i data-mark></i><i data-mark></i><i data-mark></i></span><span class="w">Good</span><span class="ms">180 ms</span></span><span class="lq lq--fair"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="w">Fair</span><span class="ms">420 ms</span></span><span class="lq lq--poor"><span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="w">Poor</span><span class="ms">950 ms · callers may talk over the agent</span></span><span class="lq"><svg class="ic ic--sm" style="color:var(--warning-text)"><use href="#i-refresh"/></svg><span class="w" style="color:var(--warning-text)">Reconnecting…</span><span class="ms">4 s</span></span></div>
+    </div>
+    <p class="cap">Live transcript, following the latest turn (partial text still arriving)</p>
+    <section class="tr" aria-labelledby="tr-h">
+      <div class="tr-head"><h3 id="tr-h">Transcript</h3><span class="tag tag--info">Streaming</span><span style="flex:1"></span><button class="ibtn" aria-label="Search transcript"><svg class="ic"><use href="#i-search"/></svg></button><button class="ibtn" aria-label="Copy transcript"><svg class="ic"><use href="#i-copy"/></svg></button></div>
+      <ol class="tr-body" style="height:calc(var(--space-96) * 4)">
+        <li class="turn" lang="hi"><span class="turn-tc">00:09</span><span class="turn-h" lang="en"><span class="turn-who" translate="no">Vaani</span><span class="lm-g" lang="hi" role="img" aria-label="Hindi">अ</span><span>Step · <a href="#">Greeting</a></span></span><p class="turn-u">नमस्ते जी, मैं वाणी बोल रही हूँ। क्या अभी दो मिनट बात हो सकती है?</p></li>
+        <li class="turn turn--caller" lang="hi"><span class="turn-tc">00:17</span><span class="turn-h" lang="en"><span class="turn-who">Caller</span><span class="lm-g" lang="hi" role="img" aria-label="Hindi">अ</span></span><p class="turn-u">हाँ जी, बोलिए।</p></li>
+        <li class="turn"><span class="turn-tc">00:21</span><span class="turn-h"><span class="turn-who" translate="no">Vaani</span><span class="lm-g" role="img" aria-label="English">A</span><span>Step · <a href="#">Ask about a site visit</a></span></span><p class="turn-u">You had asked about a 2 BHK near the metro. Would you like to visit the site this week?</p></li>
+        <li class="turn--sys"><svg class="ic ic--sm"><use href="#i-book-open"/></svg>Knowledge lookup · price-sheet.pdf · 2 passages</li>
+        <li class="turn turn--caller turn--partial" lang="hi-Latn"><span class="turn-tc">02:12</span><span class="turn-h" lang="en"><span class="turn-who">Caller</span><span class="lm-g" role="img" aria-label="Hinglish">अA</span><span>speaking…</span></span><p class="turn-u">Haan, eleven works, bas address WhatsApp kar…</p></li>
+      </ol>
+    </section>
+    <p class="cap">Scrolled up: follow mode paused, new turns counted</p>
+    <section class="tr" aria-label="Transcript">
+      <ol class="tr-body" style="height:calc(var(--space-96) + var(--space-56))">
+        <li class="turn"><span class="turn-tc">00:41</span><span class="turn-h"><span class="turn-who">Vaani</span><span class="lm-g" role="img" aria-label="English">A</span><span class="row row--tight" style="gap:var(--space-4)"><svg class="ic ic--xs"><use href="#i-book-open"/></svg>Knowledge · price-sheet.pdf</span></span><p class="turn-u">2 BHK homes start at ₹85 lakh. Shall I book Saturday at 11 am?</p></li>
+      </ol>
+      <button class="btn btn--sm jump-latest"><svg class="ic"><use href="#i-arrow-down"/></svg>Jump to latest · 2 new</button>
+    </section>
+  </div></div></div>
+
+  <div class="pair"><div class="board"><div class="stack">
+    <p class="cap">Recording player: talk strip scrubber (focused), synced transcript with the playing turn marked</p>
+    <div class="player" role="group" aria-label="Recording">
+      <div class="player-row"><button class="ibtn ibtn--secondary" aria-label="Pause" aria-keyshortcuts="Space"><svg class="ic"><use href="#i-pause"/></svg></button><button class="ibtn" aria-label="Back 5 seconds"><svg class="ic"><use href="#i-back5"/></svg></button><button class="ibtn" aria-label="Forward 5 seconds"><svg class="ic"><use href="#i-fwd5"/></svg></button><span class="player-time">00:41 / 02:31</span><span style="flex:1"></span><button class="btn btn--tertiary btn--sm" aria-label="Playback speed, 1×" aria-haspopup="menu">1×<svg class="ic ic--sm"><use href="#i-chevron-down"/></svg></button><button class="ibtn" aria-label="More recording actions"><svg class="ic"><use href="#i-more"/></svg></button></div>
+      <div class="talk is-focus" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="151" aria-valuenow="41" aria-valuetext="00:41 of 02:31, Vaani speaking">
+        <div class="lane lane--agent"><i style="left:2%;width:9%"></i><i style="left:14%;width:12%"></i><i style="left:27%;width:9%"></i><i style="left:44%;width:14%"></i><i style="left:66%;width:10%"></i><i style="left:84%;width:8%"></i></div>
+        <div class="lane lane--caller"><i style="left:11%;width:3%"></i><i style="left:36%;width:7%"></i><i style="left:58%;width:7%"></i><i style="left:77%;width:6%"></i><i style="left:92%;width:6%"></i></div>
+        <span class="playhead" style="left:27%"></span>
+      </div>
+      <div class="talk-legend"><span class="row row--tight" style="gap:var(--space-4)"><span class="sw" style="background:var(--talk-agent)" data-mark></span>Agent 58%</span><span class="row row--tight" style="gap:var(--space-4)"><span class="sw" style="background:var(--talk-caller)" data-mark></span>Caller 42%</span><span>9 turns</span><span>1 interruption</span><span style="margin-left:auto">Recording disclosed at 00:01</span></div>
+    </div>
+    <ol class="tr" aria-label="Transcript, synced to the recording">
+      <li class="turn turn--caller" lang="hi"><button class="turn-tc" aria-label="Play from 00:17">00:17</button><span class="turn-h" lang="en"><span class="turn-who">Caller</span><span class="lm-g" lang="hi" role="img" aria-label="Hindi">अ</span></span><p class="turn-u">हाँ जी, बोलिए।</p></li>
+      <li class="turn turn--active" aria-current="true"><button class="turn-tc" aria-label="Play from 00:41">00:41</button><span class="turn-h"><span class="turn-who">Vaani</span><span class="lm-g" role="img" aria-label="English">A</span><span>Playing</span></span><p class="turn-u">2 BHK homes start at ₹85 lakh. Shall I book Saturday at 11 am?</p></li>
+    </ol>
+    <p class="cap">Waveform variant (only from the recording's real peaks, when per-turn timing is missing) and the unavailable state</p>
+    <div class="player"><div class="player-row"><button class="ibtn ibtn--secondary" aria-label="Play"><svg class="ic"><use href="#i-play"/></svg></button><span class="player-time">01:02 / 03:10</span></div><div class="wave js-wave" role="slider" tabindex="0" aria-label="Seek" aria-valuemin="0" aria-valuemax="190" aria-valuenow="62" aria-valuetext="01:02 of 03:10"></div></div>
+    <div class="notice notice--info" role="note"><svg class="ic" style="color:var(--info-text)"><use href="#i-info"/></svg><span class="notice-body">No recording for this call. Recording is off for browser tests. The transcript is still available.</span></div>
+    <p class="cap">Voice picker: radio cards (selected, hover with preview playing, unavailable with the reason) and the compact row</p>
+    <div class="voices" role="radiogroup" aria-label="Voice for this call">
+      <div class="voice" data-checked="true"><span class="voice-radio" role="radio" aria-checked="true" tabindex="0"><span class="av av--voice av--32" aria-hidden="true">Va</span><span><span class="voice-name" translate="no">Vaani <span class="tag tag--outline">Workspace default</span></span><span class="voice-meta"><span class="lm"><span class="lm-g" lang="hi" aria-hidden="true">अ</span>Hindi</span><span class="lm"><span class="lm-g" aria-hidden="true">A</span>English</span><span>Warm, measured pace</span></span></span></span><span class="row row--tight"><svg class="ic" style="color:var(--accent-text)" aria-hidden="true"><use href="#i-circle-check"/></svg><button class="ibtn ibtn--secondary" aria-label="Preview Vaani in Hindi"><svg class="ic"><use href="#i-play"/></svg></button></span></div>
+      <div class="voice is-hover"><span class="voice-radio" role="radio" aria-checked="false" tabindex="-1"><span class="av av--voice av--32" aria-hidden="true">Vi</span><span><span class="voice-name" translate="no">Vikash</span><span class="voice-meta"><span class="lm"><span class="lm-g" lang="hi" aria-hidden="true">अ</span>Hindi</span><span class="lm"><span class="lm-g" aria-hidden="true">A</span>English</span><span>Clear, brisk pace</span></span></span></span><span class="row row--tight"><span class="meterlive" aria-hidden="true"><i style="height:40%"></i><i style="height:90%"></i><i style="height:60%"></i><i style="height:75%"></i></span><button class="ibtn ibtn--secondary" aria-label="Stop preview of Vikash" aria-pressed="true"><svg class="ic"><use href="#i-stop"/></svg></button></span></div>
+      <div class="voice" data-disabled="true"><span class="voice-radio" role="radio" aria-checked="false" aria-disabled="true" tabindex="-1"><span class="av av--voice av--32" aria-hidden="true">Ka</span><span><span class="voice-name" translate="no">Kavya</span><span class="voice-meta"><span class="lm"><span class="lm-g" lang="ta" aria-hidden="true">த</span>Tamil</span><span>Not available: this flow speaks Hindi and English</span></span></span></span><button class="ibtn ibtn--secondary" aria-label="Preview Kavya in Tamil"><svg class="ic"><use href="#i-play"/></svg></button></div>
+    </div>
+    <div class="stack" style="gap:var(--space-6)"><span style="font:var(--type-label-13)">Voice</span><div class="voice-compact"><span class="av av--voice" aria-hidden="true">Va</span><span style="flex:1;font:var(--type-data-13)">Vaani · Hindi + English</span><button class="ibtn" aria-label="Preview Vaani"><svg class="ic"><use href="#i-play"/></svg></button><button class="ibtn" aria-label="Change voice" aria-haspopup="listbox"><svg class="ic"><use href="#i-chevron-down"/></svg></button></div><span class="src">Used for this call only. <a href="#">Make default</a></span></div>
+  </div></div></div>
+</section>
+</main>
+
+<style>
+.dt .sticky-r{position:sticky;right:0;z-index:var(--z-raised);border-left:var(--bw-hairline) solid var(--border)}
+.dt th.sticky-r{z-index:calc(var(--z-sticky) + var(--z-raised))}
+.voice{grid-template-columns:minmax(0,1fr) auto}
+.voice-radio{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:var(--space-4) var(--space-12);border-radius:var(--radius-6)}
+.voice-radio:focus-visible{outline-offset:var(--space-4)}
+.voice[data-checked="true"]{background:var(--accent-soft);border-color:var(--accent-mark)}
+.voice[data-disabled="true"]{background:var(--surface-2);cursor:not-allowed}
+.voice[data-disabled="true"] .voice-name{color:var(--text-dis)}
+
+.player-row{flex-wrap:wrap}
+</style>
+<script>
+(function(){
+  /* 1. Render every board twice: light pane + dark pane (ids de-duplicated in the clone). */
+  var ATTRS=['aria-labelledby','aria-describedby','aria-controls','for'];
+  document.querySelectorAll('.pair').forEach(function(pair){
+    var board=pair.querySelector(':scope > .board'); if(!board) return;
+    function pane(theme,label){var p=document.createElement('div');p.className='pane';p.setAttribute('data-theme',theme);p.innerHTML='<span class="pane-label"><span>'+label+'</span></span>';return p;}
+    var light=pane('light','Light'), dark=pane('dark','Dark');
+    var clone=board.cloneNode(true);
+    var ids=new Set(Array.prototype.map.call(clone.querySelectorAll('[id]'),function(e){return e.id;}));
+    clone.querySelectorAll('[id]').forEach(function(e){e.id=e.id+'-d';});
+    clone.querySelectorAll('*').forEach(function(e){ATTRS.forEach(function(a){var v=e.getAttribute(a);if(v)e.setAttribute(a,v.split(/\s+/).map(function(x){return ids.has(x)?x+'-d':x;}).join(' '));});});
+    clone.querySelectorAll('[role="status"],[role="alert"],[aria-live]').forEach(function(e){e.removeAttribute('role');e.removeAttribute('aria-live');});
+    light.appendChild(board); dark.appendChild(clone); pair.appendChild(light); pair.appendChild(dark);
+  });
+
+  /* 2. Charts: drawn at 1:1 with the container, re-drawn on resize (ResizeObserver). */
+  var NS='http://www.w3.org/2000/svg';
+  function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+  function niceStep(max,count){var raw=max/count,p=Math.pow(10,Math.floor(Math.log10(raw))),n=raw/p;return (n<=1?1:n<=2?2:n<=5?5:10)*p;}
+  function topBar(x,y,w,h,r){r=Math.min(r,h,w/2);return 'M'+x+','+(y+h)+'V'+(y+r)+'Q'+x+','+y+' '+(x+r)+','+y+'H'+(x+w-r)+'Q'+(x+w)+','+y+' '+(x+w)+','+(y+r)+'V'+(y+h)+'Z';}
+  var DAYS=['21 Sep','22 Sep','23 Sep','24 Sep','25 Sep','26 Sep','27 Sep'];
+  function frame(box){
+    box.innerHTML='';var W=box.clientWidth,H=box.clientHeight,m={t:8,r:4,b:24,l:32};
+    var svg=el('svg',{width:W,height:H,'aria-hidden':'true'},box);return {svg:svg,W:W,H:H,m:m,iw:W-m.l-m.r,ih:H-m.t-m.b};
+  }
+  function axes(f,top,step){
+    for(var t=0;t<=top;t+=step){var y=Math.round(f.m.t+f.ih-(t/top)*f.ih)+.5;
+      el('line',{x1:f.m.l,x2:f.W-f.m.r,y1:y,y2:y,'class':t===0?'axis':'grid'},f.svg);
+      var tx=el('text',{x:f.m.l-8,y:y+4,'text-anchor':'end'},f.svg);tx.textContent=t;}
+    var bw=f.iw/DAYS.length, every=f.iw<360?2:1;
+    DAYS.forEach(function(d,i){if(i%every)return;var tx=el('text',{x:f.m.l+i*bw+bw/2,y:f.H-6,'text-anchor':'middle'},f.svg);tx.textContent=d;});
+    return bw;
+  }
+  function bars(box){
+    var v=[21,28,19,31,26,12,9],f=frame(box),max=Math.max.apply(null,v),step=niceStep(max,4),top=Math.ceil(max/step)*step;
+    var hov=3,bw=f.iw/v.length;
+    el('rect',{x:f.m.l+hov*bw,y:f.m.t,width:bw,height:f.ih,fill:'var(--surface-2)'},f.svg);
+    axes(f,top,step);
+    v.forEach(function(n,i){var h=n/top*f.ih,w=Math.min(bw*.56,48),x=f.m.l+i*bw+(bw-w)/2;el('path',{d:topBar(x,f.m.t+f.ih-h,w,h,2),'class':'bar','data-mark':''},f.svg);});
+    var tip=document.createElement('div');tip.className='ctip';tip.setAttribute('role','tooltip');
+    tip.innerHTML='<div class="ctip-h">Thu 24 Sep</div><div class="ctip-r"><span class="sw" style="background:var(--chart-1)"></span>Calls<b>31</b></div><div class="ctip-r"><span class="sw" style="background:var(--surface-3)"></span>vs previous Thu<b>+7</b></div>';
+    box.appendChild(tip);var tx=f.m.l+hov*bw+bw+8;if(tx+tip.offsetWidth>f.W){tx=f.m.l+hov*bw-tip.offsetWidth-8;}tip.style.left=Math.max(0,tx)+'px';tip.style.top=(f.m.t+4)+'px';
+  }
+  function stack(box){
+    var d=[[6,8,2,3],[7,9,1,2],[5,6,3,2],[9,8,2,3],[7,9,2,2],[4,6,1,2],[3,6,2,1]],cls=['s-pos','s-neu','s-mix','s-neg'];
+    var f=frame(box),tot=d.map(function(r){return r.reduce(function(a,b){return a+b;},0);}),max=Math.max.apply(null,tot),step=niceStep(max,4),top=Math.ceil(max/step)*step;
+    var bw=axes(f,top,step),gap=2;
+    d.forEach(function(r,i){var w=Math.min(bw*.56,48),x=f.m.l+i*bw+(bw-w)/2,y=f.m.t+f.ih;
+      r.forEach(function(n,j){if(!n)return;var h=n/top*f.ih;y-=h;var hh=Math.max(h-(j<3?gap:0),1);
+        el('rect',{x:x,y:y+(j<3?gap:0),width:w,height:hh,'class':cls[j],rx:j===r.length-1?2:0,'data-mark':''},f.svg);});});
+  }
+  function wave(box){
+    box.innerHTML='';var n=96,played=Math.round(n*62/190),seed=7;
+    for(var i=0;i<n;i++){seed=(seed*9301+49297)%233280;var r=seed/233280,h=Math.round(20+70*Math.abs(Math.sin(i/5))*(.4+.6*r));
+      var b=document.createElement('i');b.style.height=h+'%';if(i<played)b.className='is-played';box.appendChild(b);}
+  }
+  function drawAll(){document.querySelectorAll('.chart[data-chart]').forEach(function(c){(c.getAttribute('data-chart')==='bars'?bars:stack)(c);});}
+  drawAll();document.querySelectorAll('.js-wave').forEach(wave);
+  if('ResizeObserver' in window){var t;new ResizeObserver(function(){clearTimeout(t);t=setTimeout(drawAll,60);}).observe(document.body);}
+  document.querySelectorAll('.js-scroll').forEach(function(s){s.scrollLeft=180;});
+
+  /* 3. Page theme: System / Light / Dark (panes keep their own theme). */
+  var sel=document.getElementById('pageTheme');
+  try{sel.value=localStorage.getItem('vaani-gallery-theme')||'';}catch(e){}
+  sel.addEventListener('change',function(){var v=sel.value;if(v)document.documentElement.setAttribute('data-theme',v);else document.documentElement.removeAttribute('data-theme');try{localStorage.setItem('vaani-gallery-theme',v);}catch(e){}});
+})();
+</script>
+</body>
+</html>

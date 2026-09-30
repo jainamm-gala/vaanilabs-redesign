@@ -1,0 +1,3 @@
+/* Retired 2026-09-27. Baseline, BaselineList, TopBar and BottomBar live in spec/components/components.css (sections 9, 10, 15)
+   under canonical classes (.bl, .bl-seg, .bl-sep, .bl-btn, .blist, .topbar, .chip, .bbar). shell-partials.js still renders the
+   markup for data-vl placeholders and now emits those classes. Do not link this file; check-mocks.mjs fails a mock that does. */
