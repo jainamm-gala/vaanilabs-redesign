@@ -1,0 +1,110 @@
+/* Vaani Labs prototype · Rep console (03-pages/01-agent-cockpit.md §5.5). Layout only: the softphone column on the Cockpit
+   card width (--size-softphone), the context column, the control bar as the softphone's sticky footer, and one scroller
+   below 1024 with the bar above the BottomBar on phones. Components come unchanged from assets/components.css. */
+
+.rc-proto { display: inline-flex; }
+.rc-notice { flex: none; padding: var(--space-8) var(--page-margin); background: var(--surface); border-bottom: var(--bw-hairline) solid var(--border); }
+.rc-body { flex: 1 1 auto; min-height: 0; display: grid; grid-template-columns: var(--size-softphone) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; background: var(--surface); }
+.rc-col { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.rc-soft { grid-column: 1; grid-row: 1; border-right: var(--bw-hairline) solid var(--border); }
+.rc-ctx { grid-column: 2; grid-row: 1 / span 2; }
+.rc-bar { grid-column: 1; grid-row: 2; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-inline-md); padding: var(--space-12) var(--space-20); background: var(--surface); border-top: var(--bw-hairline) solid var(--border); border-right: var(--bw-hairline) solid var(--border); }
+.rc-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.rc-pad { display: grid; align-content: start; gap: var(--space-16); padding: var(--space-panel-pad-lg); }
+.rc-colhead { margin: 0; font: var(--type-title-16); color: var(--text); }
+/* Today: a short key-value list; in the wide context column the value sits next to its label, not half a column away */
+.rc-today { max-width: calc(var(--space-96) * 4); }
+.rc-stack { display: grid; gap: var(--space-20); }
+.rc-stack > * + * { padding-top: var(--space-20); border-top: var(--bw-hairline) solid var(--border); }
+.rc-block { display: grid; gap: var(--space-8); }
+.rc-block-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); }
+.rc-h3 { margin: 0; font: var(--type-title-14); color: var(--text); }
+.rc-card-title { margin: 0; font: var(--type-title-16); color: var(--text); }
+.rc-link { font: var(--type-label-13); color: var(--accent-text); text-decoration: underline; text-underline-offset: calc(var(--space-2) + var(--space-1)); }
+.rc-gap { margin-top: var(--space-8); }
+.rc-sum { margin: 0; color: var(--text); }
+
+/* AvailabilityControl */
+.rc-avail { gap: var(--space-10); }
+.rc-tagwrap { display: flex; }
+.rc-sentence { margin: 0; font: var(--type-body-14); color: var(--text-2); }
+.rc-reason { margin: 0; }
+.rc-go-row { display: flex; }
+.rc-go { width: 100%; }
+.rc-showall { justify-self: start; }
+.rc-why { margin: 0; }
+
+/* Disclosures: Audio devices, Connection details, Transcript so far */
+.rc-details > summary { display: flex; align-items: center; gap: var(--space-8); min-height: max(var(--space-32), var(--hit)); font: var(--type-label-13); color: var(--text); list-style: none; }
+.rc-details > summary::-webkit-details-marker { display: none; }
+.rc-sum-v { margin-left: auto; font: var(--type-meta-12); color: var(--text-3); }
+.rc-chev { flex: none; color: var(--text-3); transition: transform var(--dur-fast) var(--ease-standard); }
+.rc-details > summary > .rc-sum-v + .rc-chev { margin-left: 0; }
+.rc-details > summary > span:first-child + .rc-chev { margin-left: auto; }
+.rc-details[open] .rc-chev { transform: rotate(180deg); }
+.rc-details-body { display: grid; gap: var(--space-12); padding-top: var(--space-8); }
+.rc-meter-row { display: flex; align-items: center; gap: var(--space-10); }
+.rc-inline { display: flex; }
+.rc-id { display: flex; align-items: center; gap: var(--space-8); }
+
+/* IncomingCallCard (§7.12): surface, 1 px warning border (the pending state's), radius 8; nothing animates */
+.rc-incoming { display: grid; gap: var(--space-12); padding: var(--space-16); background: var(--surface); border: var(--bw-hairline) solid var(--warning-border); border-radius: var(--radius-8); }
+.rc-inc-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); }
+.rc-who { display: grid; gap: var(--space-2); min-width: 0; }
+.rc-who-meta { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-6); font: var(--type-meta-12); color: var(--text-2); }
+.rc-answer { display: flex; gap: var(--space-16); }
+.rc-answer--bar { flex: 1 1 100%; }
+.rc-grow { flex: 1 1 auto; }
+
+/* The call */
+.rc-call { display: grid; gap: var(--space-16); }
+.rc-legs { display: grid; gap: var(--space-2); }
+.rc-leg { display: flex; align-items: center; gap: var(--space-8); font: var(--type-data-13); }
+.rc-leg > .lq-key { min-width: calc(var(--space-40) * 3); }
+.rc-notes-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-8); }
+.rc-wrap { display: grid; gap: var(--space-12); }
+.rc-form { display: grid; gap: var(--space-16); margin-top: var(--space-4); }
+.rc-pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-12); }
+.rc-wrapbar { flex: 1 1 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: var(--space-inline-md); }
+.rc-wrap-main { grid-column: 1 / -1; }
+.rc-end { margin-left: auto; }
+.rc-tr { container-type: inline-size; margin-top: var(--space-8); border-top: var(--bw-hairline) solid var(--border); }
+.rc-keys { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8); margin-top: var(--space-4); }
+.rc-key { flex-direction: column; gap: 0; height: var(--size-hit-touch); }
+.rc-steps { display: grid; gap: var(--space-6); margin: 0; padding-left: var(--space-16); }
+
+/* Skeleton (loading): header and availability render; rows skeleton */
+.rc-sk-tag { width: var(--space-96); }
+.rc-sk-row { display: flex; align-items: center; gap: var(--space-10); min-height: var(--space-32); }
+.rc-sk-mark { width: var(--space-20); height: var(--space-20); }
+.rc-sk-m { width: 60%; }
+
+/* Prototype states (prototype only) */
+.rc-proto-note { margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.rc-proto-grp { display: grid; gap: var(--space-2); }
+.rc-proto-h { margin: 0 0 var(--space-2); font: var(--type-label-12); color: var(--text-3); }
+.rc-proto-list { display: grid; }
+.rc-proto-link { display: block; padding: var(--space-6) var(--space-8); border-radius: var(--radius-4); font: var(--type-data-13); color: var(--text); text-decoration: none; }
+.rc-proto-link:hover { background: var(--surface-2); }
+.rc-proto-link[aria-current="page"] { background: var(--accent-soft); color: var(--accent-soft-text); font-weight: var(--fw-medium); }
+
+/* Answer and Decline live in the incoming card on desktop and tablet; the bar carries them only on phones. */
+@media (min-width: 768px) { .rc-bar[data-kind="ringing"], .rc-bar[data-kind="answering"] { display: none; } }
+
+/* Tablet and phone: one column, softphone first, context below; the bar sticks to the bottom (above the BottomBar on phones) */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  .rc-main { display: flex; flex-direction: column; }
+  .rc-body { display: flex; flex-direction: column; flex: 1 0 auto; }
+  .rc-scroll { overflow: visible; }
+  .rc-soft { order: 0; border-right: 0; }
+  .rc-ctx { order: 1; border-top: var(--bw-hairline) solid var(--border); }
+  .rc-bar { order: 2; position: sticky; bottom: 0; z-index: var(--z-sticky); margin-top: auto; padding: var(--space-12) var(--page-margin); border-right: 0; }
+  .rc-pad { padding: var(--space-16) var(--page-margin); }
+  .rc-bar .btn { min-height: var(--size-hit-touch); }
+}
+/* TopBar call chip (rep-console.js): On hold takes the CallStateTag's hold tone; Live uses chip--live */
+@media (max-width: 767.98px) {
+  .rc-bar { bottom: calc(var(--size-bottombar) + env(safe-area-inset-bottom)); }
+  :root[data-keyboard="open"] .rc-bar { bottom: 0; }
+  .rc-answer { gap: var(--space-16); }
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Cockpit · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: the Cockpit. Start a call on purpose (test or real), watch it live with the facts that matter, step in, and close it out.">
+<meta name="theme-color" content="">
+<!-- Rep console lives at rep-console.html; the shared nav still links cockpit.html?view=rep-console, so forward it before paint. -->
+<script>(function(){var q=location.search;if(/[?&]view=rep-console\b/.test(q)){location.replace('rep-console.html'+q.replace(/[?&]view=rep-console\b/,'').replace(/^&/,'?'));}})();</script>
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/cockpit.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- Page scripts: modules register on window.VaaniCockpit; cockpit.js (last) boots the page. -->
+<script src="pages/cockpit-core.js" defer></script>
+<script src="pages/cockpit-newcall.js" defer></script>
+<script src="pages/cockpit-pickers.js" defer></script>
+<script src="pages/cockpit-gate.js" defer></script>
+<script src="pages/cockpit-call.js" defer></script>
+<script src="pages/cockpit-callcard.js" defer></script>
+<script src="pages/cockpit-feed.js" defer></script>
+<script src="pages/cockpit.js" defer></script>
+</head>
+<body data-page="cockpit">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame ck-main" tabindex="-1" data-focus-target>
+      <!-- PageHeader: H1 "Cockpit", one computed meta line; call actions only while a call is shown (CK §3.1). -->
+      <div class="ph" id="ck-ph">
+        <div class="ph-title">
+          <h1 id="page-title">Cockpit</h1>
+          <span class="ph-meta" id="ck-meta" aria-live="off">No calls in progress</span>
+        </div>
+        <div class="ph-actions">
+          <span class="ck-proto" id="ck-proto-wrap">
+            <button class="btn btn--sm btn--tertiary proto-btn" type="button" id="ck-proto-btn" data-popover="ck-proto" data-placement="bottom-end" aria-haspopup="dialog" aria-expanded="false" aria-label="Prototype states"><i data-icon="sliders-horizontal" data-size="sm"></i><span class="u-hide-phone">Prototype states</span></button>
+          </span>
+          <button class="btn ck-switcher" type="button" id="ck-switcher" data-popover="ck-switcher-pop" data-placement="bottom-end" aria-haspopup="dialog" aria-expanded="false"><span id="ck-switcher-label">Calls</span><i data-icon="chevron-down" data-size="sm"></i></button>
+          <button class="btn" type="button" id="ck-new-btn" hidden><i data-icon="plus"></i>New call</button>
+        </div>
+      </div>
+      <!-- One page notice at a time (WalletNotice or a connection notice), most severe first. -->
+      <div class="ck-notice" id="ck-notice" hidden></div>
+      <!-- Body: Calls (≥1440) · the card (400) · the transcript (rest). Each column scrolls on its own at ≥1024 (CK §2.4). -->
+      <div class="ck-body" id="ck-body" data-mode="new" data-pane="call">
+        <section class="ck-col ck-calls" id="ck-calls" aria-labelledby="ck-calls-h">
+          <h2 class="sr-only" id="ck-calls-h">Calls</h2>
+          <div class="ck-calls-scroll" id="ck-calls-list"></div>
+        </section>
+        <section class="ck-col ck-center" id="ck-card" aria-labelledby="ck-card-h"></section>
+        <section class="ck-col ck-tx" id="ck-tx" aria-labelledby="ck-tx-h"></section>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ============ PAGE OVERLAYS ============ -->
+<!-- Prototype-only: every state the spec lists, as links that reload the page into that state. -->
+<div class="pop pop--wide ck-proto-pop" id="ck-proto" aria-labelledby="ck-proto-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="ck-proto-t">Prototype states <span class="tag tag--outline">Prototype only</span></h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body" id="ck-proto-body"></div>
+</div>
+
+<!-- CallSwitcher (below 1440): the Calls column in a 320 px popover; a bottom sheet on phones (CK §3.2). -->
+<div class="pop ck-switcher-pop" id="ck-switcher-pop" aria-labelledby="ck-switcher-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="ck-switcher-t">Calls</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body ck-switcher-body" id="ck-switcher-list"></div>
+</div>
+
+<!-- The Call gate (CallGate mode="single", G §5.1): popover anchored to the card primary; bottom sheet on phones. Filled by cockpit-gate.js. -->
+<div class="gate ck-gate" id="ck-gate" role="dialog" aria-modal="true" aria-labelledby="ck-gate-t" aria-describedby="ck-gate-s" hidden></div>
+
+<!-- FlowSwitcher purpose="call" (core §5.4) -->
+<div class="listbox listbox--wide ck-flow-pop" id="ck-flow-pop" role="dialog" aria-label="Choose a flow" hidden></div>
+
+<!-- VoicePicker compact: the options in a popover -->
+<div class="pop ck-voice-pop" id="ck-voice-pop" aria-labelledby="ck-voice-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="ck-voice-t">Voice for this call</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body" id="ck-voice-body"></div>
+</div>
+
+<!-- Phone: Voice and language open as a bottom sheet (CK §2.4); the fields are moved in while it is open. -->
+<div class="pop ck-vl-pop" id="ck-vl-pop" aria-labelledby="ck-vl-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="ck-vl-t">Voice and language</h2><button class="ibtn" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body" id="ck-vl-body"></div>
+</div>
+
+<!-- Microphone steps (info popover) -->
+<div class="pop pop--info" id="ck-mic-pop" aria-labelledby="ck-mic-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="ck-mic-t">Allow the microphone</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body"><ol class="ck-steps"><li>Click the lock or site icon beside the address.</li><li>Set Microphone to Allow.</li><li>Come back and press Retry.</li></ol></div>
+</div>
+
+<!-- TransferPicker (CK §7.8) -->
+<div class="pop ck-transfer-pop" id="ck-transfer" aria-labelledby="ck-transfer-t" hidden></div>
+
+<!-- Transcript ⋯ menu -->
+<div class="menu" id="ck-tx-menu" role="menu" aria-label="Transcript options" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="download"><i data-icon="download"></i><span class="menu-text"><span>Download .txt</span></span></button>
+  <button class="menu-item" role="menuitemcheckbox" type="button" data-value="aloud" data-keep-open aria-checked="true"><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>Read new turns aloud</span></span></button>
+</div>
+
+<!-- Phone call bar ⋯ menu (Transfer… moves here below 768, CK §2.4) -->
+<div class="menu" id="ck-bar-menu" role="menu" aria-label="More call controls" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="transfer"><i data-icon="phone-forwarded"></i><span class="menu-text"><span>Transfer…</span></span></button>
+</div>
+</body>
+</html>
