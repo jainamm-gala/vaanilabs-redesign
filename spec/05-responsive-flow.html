@@ -1,0 +1,404 @@
+<!doctype html>
+<html lang="en-IN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Flow Designer at every width</title>
+<meta name="description" content="Vaani Labs (Sutradhar) responsive reference for spec/05-responsive.md §10: the Flow Designer in Full (1280+), Compact (1024-1279), Review (768-1023: Outline + read-only canvas) and Phone (below 768: the read-only Outline) modes. Steps, ruler and canvas are drawn with spec/components/components.css §17. Resize the window; ?step=1 opens the step sheet below 1024; ?theme=dark forces dark.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<script>try{var q=new URLSearchParams(location.search);var t=q.get('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);if(q.get('step')==='1')document.documentElement.setAttribute('data-step','open');}catch(e){}</script>
+<link rel="stylesheet" href="tokens/tokens.css">
+<link rel="stylesheet" href="tokens/base.css">
+<link rel="stylesheet" href="components/components.css">
+<script src="components/shell-partials.js"></script>
+<style>
+/* Page layout only. Every component (shell, chips, buttons, steps, sockets, connectors, ruler, canvas chrome) comes from
+   components/components.css; this block places them and draws the page-only parts (header row, inspector fields, Outline
+   rows, step sheet). Mock only: stands in for next/font and the rupee face. */
+:root{--font-hanken:"Hanken Grotesk","Noto Sans"}
+html,body{height:100%}
+html{scrollbar-gutter:auto} /* mock: the app document never scrolls (05 §20, base.css note) */
+body{font:var(--type-body-14);margin:0;background:var(--bg);color:var(--text);overflow:hidden}
+*,*::before,*::after{box-sizing:border-box}
+h1,h2,h3,h4,p,ul,ol{margin:0}ul,ol{padding:0;list-style:none}
+a{text-decoration:none}
+.t2{color:var(--text-2)}.t3{color:var(--text-3)}.t-ok{color:var(--success-text)}.sp{flex:1 1 auto;min-width:0}
+
+/* ---------- mode visibility (mirrors lib/viewport.ts flowMode; width only in this mock) ---------- */
+@media (max-width:1279.98px){.m-full{display:none!important}}
+@media (min-width:1280px){.m-cmp{display:none!important}}
+@media (max-width:1023.98px){.m-desk{display:none!important}}
+@media (min-width:1024px){.m-tab,.m-ph,.m-tp{display:none!important}}
+@media (min-width:768px) and (max-width:1023.98px){.m-ph{display:none!important}}
+@media (max-width:767.98px){.m-tab,.m-dt{display:none!important}}
+
+/* ---------- page-only fields ---------- */
+.vr{width:var(--bw-hairline);height:var(--space-20);background:var(--border);flex:none}
+.inp{display:flex;align-items:center;gap:var(--space-6);height:var(--control-h);padding:0 var(--space-10);border:var(--bw-hairline) solid var(--control);border-radius:var(--radius-6);background:var(--surface);font:var(--type-body-14);color:var(--text);min-width:0}
+.ro{display:block;padding:var(--space-8) var(--space-10);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-6);background:var(--surface-2);font:var(--type-body-14);color:var(--text);line-height:var(--space-20)}
+.var{font:var(--type-mono-12);background:var(--accent-soft);color:var(--accent-soft-text);border-radius:var(--radius-4);padding:0 var(--space-4)}
+.lbl{font:var(--type-label-13)}
+.hint{font:var(--type-meta-12);color:var(--text-3)}
+.long{display:inline}.short{display:none}
+@media (max-width:1279.98px){.fh .long{display:none}.fh .short{display:inline}}
+@media (max-width:1023.98px){.fh .long{display:inline}.fh .short{display:none}}
+
+/* ---------- frame ---------- */
+.app{display:grid;grid-template-columns:var(--size-rail) minmax(0,1fr);height:100vh;height:100dvh;overflow:hidden}
+@media (max-width:1023.98px){.app{display:block}}
+.fdz{display:flex;flex-direction:column;min-width:0;min-height:0;height:100%}
+.fh{display:flex;align-items:center;gap:var(--space-8);height:var(--size-flow-header);padding:0 var(--space-12);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);min-width:0;flex:none}
+.fname{display:inline-flex;align-items:center;gap:var(--space-4);font:var(--type-title-14);color:var(--text);white-space:nowrap;padding:0 var(--space-6);height:var(--space-28);border-radius:var(--radius-6);min-width:0;overflow:hidden}
+.fname span{overflow:hidden;text-overflow:ellipsis}
+.fh .acts{display:flex;align-items:center;gap:var(--space-8);flex:none}
+/* Phase ruler row: the ruler (components.css .phase-bar), the Phase columns toggle, and the one live note */
+.pr{display:flex;align-items:center;gap:var(--space-8);height:var(--size-phase-ruler);padding:0 var(--space-12);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);min-width:0;white-space:nowrap;flex:none}
+.livenote{display:flex;align-items:center;gap:var(--space-8);font:var(--type-data-13);color:var(--text-2);min-width:0;overflow:hidden}
+.livenote a{color:var(--accent-text);font-weight:var(--fw-medium);flex:none}
+.livenote .lt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.body{flex:1;min-height:0;display:grid;grid-template-columns:var(--size-tool-rail) minmax(0,1fr) var(--size-inspector);position:relative}
+@media (max-width:1279.98px){.body{grid-template-columns:var(--size-tool-rail) minmax(0,1fr)}}
+@media (max-width:1023.98px){.body{grid-template-columns:var(--size-left-panel-tablet) minmax(0,1fr)}}
+@media (max-width:767.98px){.body{display:block;overflow:hidden;background:var(--surface)}}
+.trl{background:var(--surface);border-right:var(--bw-hairline) solid var(--border);display:flex;flex-direction:column;align-items:center;padding:var(--space-8) 0;gap:var(--space-4)}
+.trl .sep{width:var(--space-24);height:var(--bw-hairline);background:var(--border);margin:var(--space-4) 0}
+.cv-main{min-width:0}
+.canvas>.ro-tag{position:absolute;right:var(--space-12);top:var(--space-12);z-index:4}
+.insp{background:var(--surface);border-left:var(--bw-hairline) solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+@media (max-width:1279.98px){.insp{position:absolute;right:0;top:0;bottom:0;width:var(--size-inspector);z-index:6;box-shadow:var(--e3);border-left-color:var(--border-overlay)}}
+.ih{display:flex;gap:var(--space-10);align-items:flex-start;padding:var(--space-12) var(--space-8) var(--space-12) var(--space-16)}
+.ih-phase{font:var(--type-phase-12);color:var(--text-3)}
+.ih h2{font:var(--type-title-16)}
+.ibody{padding:var(--space-16);display:grid;gap:var(--space-16);overflow:hidden;align-content:start}
+.fld{display:grid;gap:var(--space-6)}
+.ifoot{margin-top:auto;display:flex;gap:var(--space-8);align-items:center;padding:var(--space-10) var(--space-16);border-top:var(--bw-hairline) solid var(--border);background:var(--surface-2);font:var(--type-meta-12);color:var(--text-2)}
+.aed{border:var(--bw-hairline) solid var(--border-strong);border-radius:var(--radius-6);overflow:hidden}
+.aed .r{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-6) var(--space-8);border-bottom:var(--bw-hairline) solid var(--border)}
+.aed .r:last-child{border-bottom:0;background:var(--surface-2);padding-left:var(--space-32)}
+.aed .sel{height:var(--space-28);font:var(--type-data-13);width:128px;justify-content:space-between;flex:none}
+.pb{display:flex;align-items:center;gap:var(--space-10);height:var(--size-problems-bar);padding:0 var(--space-12);background:var(--surface);border-top:var(--bw-hairline) solid var(--border);font:var(--type-data-13);white-space:nowrap;min-width:0;flex:none}
+.pb a{color:var(--accent-text);font-weight:var(--fw-medium)}
+.pb .msg{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.legend{display:inline-flex;align-items:center;gap:var(--space-6);font:var(--type-meta-12);color:var(--text-3)}
+.legend svg{width:var(--space-24);height:var(--space-8);overflow:visible}
+
+/* ---------- Review mode (768-1023): Notice, Outline column, read-only canvas at the Compact band ---------- */
+.nrow{padding:var(--space-8) var(--space-12);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);flex:none}
+.olp{background:var(--surface);border-right:var(--bw-hairline) solid var(--border);display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.ol{display:flex;align-items:center;gap:var(--space-10);height:36px;padding:0 var(--space-12);border-radius:var(--radius-6);font:var(--type-data-13);color:var(--text)}
+.ol .t{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ol.on{background:var(--accent-soft);box-shadow:inset var(--bw-strong) 0 0 var(--accent-mark)}
+.ol-no{font:var(--type-meta-12);color:var(--text-3);font-variant-numeric:tabular-nums}
+.olb{display:flex;align-items:center;gap:var(--space-6);height:var(--space-28);font:var(--type-label-12);color:var(--text-3)}
+.olb .ex{color:var(--text-3);font-weight:var(--fw-regular)}
+.ost2{font:var(--type-meta-12);color:var(--text-3);display:inline-flex;align-items:center;gap:3px;white-space:nowrap}
+.ost2 b{font-weight:var(--fw-regular);color:var(--text-2)}
+.dash{width:18px;height:4px;flex:none;overflow:visible}
+#outline-rows{padding:var(--space-8);overflow:hidden;scrollbar-width:none}
+@media (max-width:767.98px){.ol{height:var(--space-48)}.olb{height:var(--space-32)}.olp{height:100%;border-right:0}#outline-rows{overflow:auto;height:100%}}
+/* Compact level of detail below 1024 (the canvas sits at 60 %): components.css .node--compact, and the body lines hide */
+@media (max-width:1023.98px){
+  #nl-main{--z:.6 !important}
+  #nl-main .node-sum,#nl-main .node-meta,#nl-main .ans-ex,#nl-main .ty{display:none}
+}
+
+/* ---------- Phone: chip row, view switch, sticky actions ---------- */
+.phrow{display:flex;gap:var(--space-6);align-items:center;padding:var(--space-8) var(--space-12);background:var(--surface);border-bottom:var(--bw-hairline) solid var(--border);flex-wrap:wrap;flex:none}
+.phrow .ibtn{margin:calc(var(--space-6) * -1) calc(var(--space-6) * -1) calc(var(--space-6) * -1) 0}
+.phseg{padding:var(--space-10) var(--space-12);background:var(--surface);flex:none}
+.pab{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);padding:var(--space-6) var(--space-12);background:var(--surface);border-top:var(--bw-hairline) solid var(--border);flex:none}
+
+/* ---------- Read-only step sheet below 1024 (?step=1) ---------- */
+.ssheet{display:none;flex-direction:column;background:var(--surface);z-index:20;box-shadow:var(--e3)}
+html[data-step="open"] .ssheet{display:flex}
+@media (min-width:768px) and (max-width:1023.98px){.ssheet{position:fixed;right:0;top:var(--size-topbar);bottom:0;width:min(var(--size-sheet-detail),100%);border-left:var(--bw-hairline) solid var(--border-overlay)}}
+@media (max-width:767.98px){.ssheet{position:fixed;inset:0}}
+.ssh{padding:var(--space-12) var(--space-16);border-bottom:var(--bw-hairline) solid var(--border);display:grid;gap:var(--space-10)}
+.ssh-row{display:flex;gap:var(--space-10);align-items:flex-start}
+.ssback{display:inline-flex;align-items:center;gap:var(--space-4);font:var(--type-label-13);color:var(--accent-text);height:var(--space-32)}
+.ssb{padding:var(--space-16);display:grid;gap:var(--space-16);overflow:auto;align-content:start;flex:1}
+.ssf{display:flex;gap:var(--space-8);align-items:center;padding:var(--space-10) var(--space-16);border-top:var(--bw-hairline) solid var(--border);background:var(--surface-2);font:var(--type-meta-12);color:var(--text-2)}
+.ro-list .r:last-child{padding-left:var(--space-8)}
+.goes{font:var(--type-meta-12);color:var(--text-3);white-space:nowrap}.goes b{font-weight:var(--fw-medium);color:var(--text-2)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vl-i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="vl-i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol><symbol id="vl-i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol><symbol id="vl-i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="vl-i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol><symbol id="vl-i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol><symbol id="vl-i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol><symbol id="vl-i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol><symbol id="vl-i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol><symbol id="vl-i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol><symbol id="vl-i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="vl-i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="vl-i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="vl-i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="vl-i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="vl-i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="vl-i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol><symbol id="vl-i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="vl-i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol><symbol id="vl-i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol><symbol id="vl-i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="vl-i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol><symbol id="vl-i-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"/></symbol>
+<symbol id="i-phone-in" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M16 2v6h6M22 2l-6 6"/></symbol>
+<symbol id="i-phone-fwd" viewBox="0 0 24 24"><use href="#i-phone"/><path d="m18 2 4 4-4 4M14 6h8"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><path d="M3 12h.01M3 18h.01M3 6h.01M8 12h13M8 18h13M8 6h13"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+<symbol id="i-webhook" viewBox="0 0 24 24"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2M6 17l3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06M12 6l3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"/></symbol>
+<symbol id="i-diamond" viewBox="0 0 24 24"><path d="M12 2.5 21.5 12 12 21.5 2.5 12Z"/></symbol>
+<symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-msgc" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol>
+<symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5M3 12a9 3 0 0 0 18 0"/></symbol>
+<symbol id="i-calp" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4M21 13V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8M3 10h18M16 19h6M19 16v6"/></symbol>
+<symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-tree" viewBox="0 0 24 24"><path d="M21 12h-8M21 6H8M21 18h-8M3 6v4c0 1.1.9 2 2 2h3M3 10v6c0 1.1.9 2 2 2h3"/></symbol>
+<symbol id="i-braces" viewBox="0 0 24 24"><path d="M8 3H7a2 2 0 0 0-2 2v5a2 2 0 0 1-2 2 2 2 0 0 1 2 2v5c0 1.1.9 2 2 2h1M16 21h1a2 2 0 0 0 2-2v-5c0-1.1.9-2 2-2a2 2 0 0 1-2-2V5a2 2 0 0 0-2-2h-1"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5M12 7v5l4 2"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
+<symbol id="i-tidy" viewBox="0 0 24 24"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3M12 12V8"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-cx" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m15 9-6 6M9 9l6 6"/></symbol>
+<symbol id="i-ca" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-cd" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-cu" viewBox="0 0 24 24"><path d="m18 15-6-6-6 6"/></symbol>
+<symbol id="i-cr" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-cl" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-ar" viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7"/></symbol>
+<symbol id="i-cols" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18M15 3v18"/></symbol>
+<symbol id="i-al" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></symbol>
+<symbol id="i-map" viewBox="0 0 24 24"><path d="M14.1 5.9 9.9 3.8a2 2 0 0 0-1.8 0L3.6 6.1A1 1 0 0 0 3 7v12.8a1 1 0 0 0 1.4.9l4.1-2.1a2 2 0 0 1 1.8 0l4.2 2.1a2 2 0 0 0 1.8 0l4.5-2.3a1 1 0 0 0 .6-.9V4.2a1 1 0 0 0-1.4-.9l-4.1 2.1a2 2 0 0 1-1.8 0z"/><path d="M15 5.8v15M9 3.2v15"/></symbol>
+<symbol id="i-fit" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-grip" viewBox="0 0 24 24"><circle cx="9" cy="12" r="1"/><circle cx="9" cy="5" r="1"/><circle cx="9" cy="19" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="15" cy="5" r="1"/><circle cx="15" cy="19" r="1"/></symbol>
+<symbol id="i-note" viewBox="0 0 24 24"><path d="M16 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8Z"/><path d="M15 3v4a2 2 0 0 0 2 2h4"/></symbol>
+<symbol id="i-frame" viewBox="0 0 24 24"><path d="M22 6H2M22 18H2M6 2v20M18 2v20"/></symbol>
+<symbol id="i-unlink" viewBox="0 0 24 24"><path d="m18.8 12.7 1.7-1.7a5 5 0 0 0-7.1-7.1l-1.7 1.7M5.2 11.3 3.5 13a5 5 0 0 0 7.1 7.1l1.7-1.7M8 2v3M2 8h3M16 22v-3M22 16h-3"/></symbol>
+<symbol id="i-corner" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+<symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 10v12M15 5.9 14 10h5.8a2 2 0 0 1 1.9 2.6l-2.3 8A2 2 0 0 1 17.4 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.8a2 2 0 0 0 1.8-1.1L12 2a3.1 3.1 0 0 1 3 3.9Z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+<symbol id="i-slash" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9 15 15 9"/></symbol>
+<symbol id="i-missed" viewBox="0 0 24 24"><use href="#i-phone"/><path d="M22 2l-6 6M16 2l6 6"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+<symbol id="i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+<symbol id="i-head" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-lchk" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
+</svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="i-square-pen" viewBox="0 0 24 24"><path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.4 2.6a1 1 0 0 1 3 3l-9 9a2 2 0 0 1-.85.5l-2.87.84a.5.5 0 0 1-.62-.62l.84-2.87a2 2 0 0 1 .5-.85z"/></symbol><symbol id="i-chev-l" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol></svg>
+<div class="app">
+  <nav class="rail m-desk" aria-label="Main"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><a class="rail-item" href="#" aria-label="Cockpit"><svg class="ic" aria-hidden="true"><use href="#vl-i-activity"/></svg></a><a class="rail-item" href="#" aria-label="Assistant"><svg class="ic" aria-hidden="true"><use href="#vl-i-bot"/></svg></a><a class="rail-item" href="#" aria-label="Rep console"><svg class="ic" aria-hidden="true"><use href="#vl-i-headphones"/></svg></a><a class="rail-item" href="#" aria-label="Meetings"><svg class="ic" aria-hidden="true"><use href="#vl-i-video"/></svg></a><a class="rail-item" href="#" aria-label="Personal agents"><svg class="ic" aria-hidden="true"><use href="#vl-i-list-checks"/></svg></a><span class="rail-sep" aria-hidden="true"></span><a class="rail-item" href="#" aria-label="Flows" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#vl-i-workflow"/></svg></a><a class="rail-item" href="#" aria-label="Knowledge"><svg class="ic" aria-hidden="true"><use href="#vl-i-book-open"/></svg></a><span class="rail-sep" aria-hidden="true"></span><a class="rail-item" href="#" aria-label="Leads"><svg class="ic" aria-hidden="true"><use href="#vl-i-users"/></svg></a><a class="rail-item" href="#" aria-label="Call reports"><svg class="ic" aria-hidden="true"><use href="#vl-i-file-text"/></svg></a><a class="rail-item" href="#" aria-label="Analytics"><svg class="ic" aria-hidden="true"><use href="#vl-i-chart"/></svg></a><span class="rail-sep" aria-hidden="true"></span><a class="rail-item" href="#" aria-label="Billing"><svg class="ic" aria-hidden="true"><use href="#vl-i-wallet"/></svg></a><a class="rail-item" href="#" aria-label="Settings"><svg class="ic" aria-hidden="true"><use href="#vl-i-sliders"/></svg></a></nav>
+
+  <main class="fdz" id="main">
+    <!-- Shell TopBar below 1024 (shared partial): tablet keeps the NavSheet button; phone shows Back to Flows -->
+    <div class="m-tab" data-vl="topbar" data-vl-mode="tablet" data-vl-title="Site-visit qualifier" data-vl-chips="wallet" data-vl-translate="no"></div>
+    <div class="m-ph" data-vl="topbar" data-vl-mode="phone" data-vl-back="Flows" data-vl-title="Site-visit qualifier" data-vl-chips="wallet" data-vl-translate="no"></div>
+
+    <!-- Flow header (FlowHeader): full ≥1280, compact 1024-1279, tablet under the TopBar. "Live v7" is stated here once; the chip opens Versions. -->
+    <div class="fh m-dt">
+      <nav class="crumbs m-full" aria-label="Breadcrumb"><a href="#">Flows</a><span aria-hidden="true">/</span></nav>
+      <h1 class="fname m-desk" translate="no"><span>Site-visit qualifier</span><svg class="ic ic--sm t3" aria-hidden="true"><use href="#i-cd"/></svg></h1>
+      <button type="button" class="chip" aria-haspopup="menu"><span class="long">Draft · 3 changes</span><span class="short">Draft · 3</span><svg class="ic" aria-hidden="true"><use href="#i-cd"/></svg></button>
+      <span class="chip chip--quiet m-desk"><svg class="ic t-ok" aria-hidden="true"><use href="#i-check"/></svg><span class="long">Saved 11:24 am</span><span class="short">Saved</span></span>
+      <button type="button" class="chip chip--live" aria-haspopup="dialog" aria-label="Live v7, open versions"><span class="live-dot" data-mark></span>Live v7</button>
+      <span class="vr m-desk"></span>
+      <button type="button" class="ibtn ibtn--sm m-desk" aria-label="Undo"><svg class="ic" aria-hidden="true"><use href="#i-undo"/></svg></button>
+      <button type="button" class="ibtn ibtn--sm m-desk" aria-label="Redo" aria-disabled="true"><svg class="ic" aria-hidden="true"><use href="#i-redo"/></svg></button>
+      <button type="button" class="btn btn--tertiary btn--sm m-full"><svg class="ic" aria-hidden="true"><use href="#i-tidy"/></svg>Tidy</button>
+      <span class="sp"></span>
+      <span class="acts">
+        <a class="chip m-full" href="#" aria-label="Wallet ₹2,340.50"><svg class="ic" aria-hidden="true"><use href="#i-wallet"/></svg><span class="num">₹2,340.50</span></a>
+        <button type="button" class="chip chip--warn"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg><span class="long">1 warning</span><span class="short">1</span></button>
+        <button type="button" class="btn btn--sm"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Test</button>
+        <button type="button" class="btn btn--primary btn--sm">Publish v8…</button>
+        <button type="button" class="ibtn ibtn--sm" aria-label="More flow actions"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg></button>
+      </span>
+    </div>
+
+    <!-- Phase ruler (≥1024): one connected bar, the Phase columns toggle at its end, and the one live note -->
+    <div class="pr m-desk" role="toolbar" aria-label="Phases">
+      <span class="phase-bar" role="group" aria-label="Phases"><button type="button" class="phase-seg" aria-pressed="false"><span class="gt gt--ink"><svg class="ic" aria-hidden="true"><use href="#i-phone-in"/></svg></span>Trigger <b>2</b></button><span class="phase-arrow" aria-hidden="true"><svg class="ic"><use href="#i-ar"/></svg></span><button type="button" class="phase-seg" aria-pressed="false"><span class="gt gt--line"><svg class="ic" aria-hidden="true"><use href="#i-diamond"/></svg></span>Logic <b>1</b></button><span class="phase-arrow" aria-hidden="true"><svg class="ic"><use href="#i-ar"/></svg></span><button type="button" class="phase-seg" aria-pressed="false"><span class="gt gt--tint"><svg class="ic" aria-hidden="true"><use href="#i-msg"/></svg></span>Action <b>2</b></button><span class="phase-arrow" aria-hidden="true"><svg class="ic"><use href="#i-ar"/></svg></span><button type="button" class="phase-seg" aria-pressed="false"><span class="gt gt--neutral"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span>Outcome <b>4</b></button></span>
+      <button type="button" class="ibtn ibtn--sm phase-cols" aria-pressed="false" aria-label="Phase columns" title="Phase columns"><svg class="ic" aria-hidden="true"><use href="#i-cols"/></svg></button>
+      <span class="sp"></span>
+      <span class="livenote m-full"><span class="lt">Callers hear v7 until you publish.</span><a href="#">Compare with live</a></span>
+      <span class="livenote m-cmp"><span class="lt">Callers hear v7 until you publish.</span><a href="#">Compare</a></span>
+    </div>
+
+    <!-- Review mode notice (768-1023) -->
+    <div class="nrow m-tab"><div class="notice notice--info"><svg class="ic" aria-hidden="true"><use href="#i-info"/></svg><span class="notice-body">Editing steps needs a screen at least 1024 px wide. You can review, test and publish here.</span></div></div>
+
+    <!-- Phone: chip row and the Outline | Canvas switch (FD1 §3.2) -->
+    <div class="m-ph phrow">
+      <button type="button" class="chip" aria-haspopup="menu">Draft · 3 changes<svg class="ic" aria-hidden="true"><use href="#i-cd"/></svg></button><button type="button" class="chip chip--live" aria-haspopup="dialog" aria-label="Live v7, open versions"><span class="live-dot" data-mark></span>Live v7</button><button type="button" class="chip chip--warn"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg>1 warning</button><span class="sp"></span><button type="button" class="ibtn" aria-label="More flow actions"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg></button>
+    </div>
+    <div class="m-ph phseg"><div class="seg seg--full" role="radiogroup" aria-label="View"><button type="button" role="radio" aria-checked="true">Outline</button><button type="button" role="radio" aria-checked="false">Canvas</button></div></div>
+
+    <div class="body">
+      <!-- Tool rail (≥1024) -->
+      <div class="trl m-desk" role="toolbar" aria-orientation="vertical" aria-label="Flow tools">
+        <button type="button" class="ibtn" aria-label="Add step"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button><span class="sep"></span>
+        <button type="button" class="ibtn" aria-label="Outline"><svg class="ic" aria-hidden="true"><use href="#i-tree"/></svg></button><button type="button" class="ibtn" aria-label="Variables"><svg class="ic" aria-hidden="true"><use href="#i-braces"/></svg></button><button type="button" class="ibtn" aria-label="Find"><svg class="ic" aria-hidden="true"><use href="#i-search"/></svg></button><button type="button" class="ibtn" aria-label="Version history"><svg class="ic" aria-hidden="true"><use href="#i-history"/></svg></button><button type="button" class="ibtn" aria-label="Flow settings"><svg class="ic" aria-hidden="true"><use href="#i-sliders"/></svg></button>
+      </div>
+
+      <!-- Outline column (Review mode) / the page (phone): FlowOutline > OutlineRow, read-only -->
+      <div class="olp m-tp" role="tree" aria-label="Flow outline, Site-visit qualifier">
+        <div class="vtabs vtabs--panel m-tab" role="tablist" aria-label="Left panel"><button type="button" class="vtab" role="tab" aria-selected="true">Outline</button><button type="button" class="vtab" role="tab" aria-selected="false">Problems <span class="tag tag--warning">1</span></button></div>
+        <div id="outline-rows"></div>
+      </div>
+
+      <!-- Canvas: editable at ≥1024, read-only in Review mode (Compact band, panned to the selection) -->
+      <div class="canvas cv-main m-dt" id="cv-main" role="region" aria-label="Canvas, Site-visit qualifier, 9 steps" data-e='[["h-t1","h-l3i",{"mx":28}],["h-t2","h-l3i",{"mx":28}],["h-yes","h-a4i",{"mx":14,"c":"con"}],["h-later","h-o7i",{"mx":26,"c":"con","l":"Later"}],["h-no","h-a5i",{"mx":14,"c":"con"}],["h-nr","h-o9i",{"mx":26,"fb":1,"c":"con","l":"No reply"}],["h-bk","h-o6i",{}],["h-nb","h-o7i",{"mx":40,"fb":1}],["h-a5o","h-o8i",{}]]'>
+        <svg class="edges" aria-hidden="true"></svg>
+        <div class="nl" id="nl-main" style="--z:.75">
+          <div class="node node--trigger" style="left:8px;top:170px"><div class="node-head"><span class="gt gt--ink"><svg class="ic" aria-hidden="true"><use href="#i-list"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#1</span></div><div class="node-title">Outbound batch</div><div class="node-meta">Weekend follow-ups · 10 am to 7 pm IST</div></div></div><span class="sock sock--head" id="h-t1" aria-hidden="true"></span></div>
+          <div class="node node--trigger" style="left:8px;top:290px"><div class="node-head"><span class="gt gt--ink"><svg class="ic" aria-hidden="true"><use href="#i-phone-in"/></svg></span><div class="node-text"><div class="node-phase"><span>Trigger</span><span class="node-no">#2</span></div><div class="node-title">Inbound call</div><div class="node-meta"><span class="phone-text phone-text--sm" translate="no">+91 80 •••• 2210</span></div></div></div><span class="sock sock--head" id="h-t2" aria-hidden="true"></span></div>
+          <div class="node node--logic is-selected" style="left:376px;top:120px"><span class="sock sock--in" id="h-l3i" aria-hidden="true"></span>
+            <div class="node-head"><span class="gt gt--line"><svg class="ic" aria-hidden="true"><use href="#i-diamond"/></svg></span><div class="node-text"><div class="node-phase"><span>Logic<span class="ty"> · Question · Edited</span></span><span class="node-no">#3</span></div><div class="node-title">Ask about a site visit</div><div class="node-sum"><span class="node-var">{{lead_name}}</span> ji, would you like to visit the site this week?</div><div class="node-meta"><span class="lm-g" lang="hi" aria-hidden="true">अA</span>Hinglish · waits 6 s</div></div></div>
+            <div class="ans"><span class="ans-label">Yes</span><span class="ans-ex">haan, zaroor · <span lang="hi">हाँ</span></span><span class="sock sock--active" id="h-yes" aria-hidden="true"></span></div>
+            <div class="ans"><span class="ans-label">Later</span><span class="ans-ex">baad mein, next week</span><span class="sock sock--active" id="h-later" aria-hidden="true"></span></div>
+            <div class="ans"><span class="ans-label">No</span><span class="ans-ex">nahi, not now</span><span class="sock sock--active" id="h-no" aria-hidden="true"></span></div>
+            <div class="ans ans--fallback"><span class="ans-label">No reply</span><span class="ans-ex">after 6 s · asks again once</span><span class="sock sock--active" id="h-nr" aria-hidden="true"></span></div>
+          </div>
+          <div class="node node--warning" style="left:744px;top:40px"><div class="node-badges"><span class="tag tag--warning"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg>1 warning</span></div><span class="sock sock--in" id="h-a4i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic" aria-hidden="true"><use href="#i-calp"/></svg></span><div class="node-text"><div class="node-phase"><span>Action<span class="ty"> · Book meeting · New</span></span><span class="node-no">#4</span></div><div class="node-title">Book site visit</div><div class="node-meta">Calendar, then WhatsApp</div></div></div>
+            <div class="res-row"><svg class="ic ic--xs" aria-hidden="true"><use href="#i-check"/></svg><span class="res-label">Booked</span><span class="sock" id="h-bk" aria-hidden="true"></span></div>
+            <div class="res-row res-row--fallback"><svg class="ic ic--xs" aria-hidden="true"><use href="#i-x"/></svg><span class="res-label">Not booked</span><span class="sock" id="h-nb" aria-hidden="true"></span></div></div>
+          <div class="node is-focus" style="left:744px;top:356px"><span class="sock sock--in" id="h-a5i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--tint"><svg class="ic" aria-hidden="true"><use href="#i-msg"/></svg></span><div class="node-text"><div class="node-phase"><span>Action<span class="ty"> · Speak</span></span><span class="node-no">#7</span></div><div class="node-title">Polite close</div><div class="node-meta">1 line · Hinglish</div></div></div><span class="sock sock--head" id="h-a5o" aria-hidden="true"></span></div>
+          <div class="node node--outcome" style="left:1112px;top:96px"><span class="sock sock--in" id="h-o6i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--success"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#5</span></div><div class="node-title">Visit booked</div><div class="node-status">Lead <svg class="ic ic--xs" aria-hidden="true"><use href="#i-ar"/></svg><b>Interested</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:212px"><span class="sock sock--in" id="h-o7i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--warning"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#6</span></div><div class="node-title">Callback set</div><div class="node-status">Lead <svg class="ic ic--xs" aria-hidden="true"><use href="#i-ar"/></svg><b>Callback due</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:356px"><span class="sock sock--in" id="h-o8i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#8</span></div><div class="node-title">Not interested</div><div class="node-status">Lead <svg class="ic ic--xs" aria-hidden="true"><use href="#i-ar"/></svg><b>Not interested</b></div></div></div></div>
+          <div class="node node--outcome" style="left:1112px;top:480px"><span class="sock sock--in" id="h-o9i" aria-hidden="true"></span><div class="node-head"><span class="gt gt--neutral"><svg class="ic" aria-hidden="true"><use href="#i-flag"/></svg></span><div class="node-text"><div class="node-phase"><span>Outcome</span><span class="node-no">#9</span></div><div class="node-title">No answer</div><div class="node-status">Lead <svg class="ic ic--xs" aria-hidden="true"><use href="#i-ar"/></svg><b>Not reached</b></div></div></div></div>
+        </div>
+        <span class="tag tag--outline ro-tag m-tab"><svg class="ic" aria-hidden="true"><use href="#i-eye"/></svg>Read only</span>
+        <div class="canvas-ctl"><div class="canvas-ctl-group"><button type="button" aria-label="Zoom out"><svg class="ic" aria-hidden="true"><use href="#i-minus"/></svg></button><span class="num" style="min-width:52px"><span class="m-desk">75%</span><span class="m-tab">60%</span></span><button type="button" aria-label="Zoom in"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg></button></div><div class="canvas-ctl-group"><button type="button"><svg class="ic" aria-hidden="true"><use href="#i-fit"/></svg>Fit</button></div><div class="canvas-ctl-group m-full"><button type="button" aria-label="Hide minimap" aria-pressed="true"><svg class="ic" aria-hidden="true"><use href="#i-map"/></svg></button><button type="button" aria-label="View options"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg></button></div></div>
+        <div class="minimap m-full" aria-hidden="true"><i class="is-trigger" style="left:10px;top:52px;width:22px;height:8px"></i><i class="is-trigger" style="left:10px;top:66px;width:22px;height:8px"></i><i style="left:44px;top:34px;width:28px;height:30px"></i><i style="left:84px;top:18px;width:26px;height:16px"></i><i style="left:84px;top:64px;width:26px;height:9px"></i><i style="left:122px;top:26px;width:26px;height:9px"></i><i style="left:122px;top:44px;width:26px;height:9px"></i><i style="left:122px;top:64px;width:26px;height:9px"></i><i style="left:122px;top:82px;width:26px;height:9px"></i><span class="minimap-vp" style="left:6px;top:12px;width:160px;height:92px"></span></div>
+      </div>
+
+      <!-- Inspector: docked 320 at ≥1280, overlay at 1024-1279 (StepInspector) -->
+      <aside class="insp m-desk" aria-labelledby="insp-title">
+        <div class="ih"><span class="gt gt--line"><svg class="ic" aria-hidden="true"><use href="#i-diamond"/></svg></span><div style="flex:1;min-width:0"><div class="ih-phase">Logic · Question · #3</div><h2 id="insp-title">Ask about a site visit</h2></div><button type="button" class="ibtn ibtn--sm" aria-label="More actions for Ask about a site visit"><svg class="ic" aria-hidden="true"><use href="#i-more"/></svg></button><button type="button" class="ibtn ibtn--sm" aria-label="Close inspector"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+        <div class="vtabs vtabs--panel" role="tablist" aria-label="Step inspector"><button type="button" class="vtab" role="tab" aria-selected="true">Configure</button><button type="button" class="vtab" role="tab" aria-selected="false">Test data</button><button type="button" class="vtab" role="tab" aria-selected="false">Issues <span class="vtab-count">0</span></button></div>
+        <div class="ibody">
+          <div class="fld"><label class="lbl">Label</label><span class="inp">Ask about a site visit</span></div>
+          <div class="fld"><label class="lbl">Agent asks</label><div class="inp" style="height:auto;padding:8px 10px;display:block;line-height:20px"><span class="var">{{lead_name}}</span> ji, would you like to visit the site this week? We have Saturday and Sunday slots.</div><span class="hint">Type {{ to add a variable.</span></div>
+          <div class="fld"><label class="lbl">Answers to listen for</label>
+            <div class="aed">
+              <div class="r"><svg class="ic ic--sm t3" aria-hidden="true"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div class="lbl">Yes</div><div class="hint">haan, zaroor · <span lang="hi">हाँ</span></div></div><span class="inp sel" aria-label="Answer Yes goes to">Book site visit<svg class="ic ic--sm" aria-hidden="true"><use href="#i-cd"/></svg></span></div>
+              <div class="r"><svg class="ic ic--sm t3" aria-hidden="true"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div class="lbl">Later</div><div class="hint">baad mein, next week</div></div><span class="inp sel" aria-label="Answer Later goes to">Callback set<svg class="ic ic--sm" aria-hidden="true"><use href="#i-cd"/></svg></span></div>
+              <div class="r"><svg class="ic ic--sm t3" aria-hidden="true"><use href="#i-grip"/></svg><div style="flex:1;min-width:0"><div class="lbl">No</div><div class="hint">nahi, not now</div></div><span class="inp sel" aria-label="Answer No goes to">Polite close<svg class="ic ic--sm" aria-hidden="true"><use href="#i-cd"/></svg></span></div>
+              <div class="r"><div style="flex:1;min-width:0"><div class="lbl">No reply</div><div class="hint">after 6 s · required</div></div><span class="inp sel" aria-label="No reply goes to">No answer<svg class="ic ic--sm" aria-hidden="true"><use href="#i-cd"/></svg></span></div>
+            </div>
+            <button type="button" class="btn btn--tertiary btn--sm" style="justify-self:start;margin-left:-8px"><svg class="ic" aria-hidden="true"><use href="#i-plus"/></svg>Add answer</button>
+          </div>
+        </div>
+        <div class="ifoot"><svg class="ic ic--sm" aria-hidden="true"><use href="#i-info"/></svg>Edits save to the draft.</div>
+      </aside>
+    </div>
+
+    <!-- Problems bar (≥1024) -->
+    <div class="pb m-desk">
+      <span class="chip chip--warn"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg>1 warning</span>
+      <span class="t2 msg">Book site visit: WhatsApp template "visit_confirm" is pending approval.</span><a href="#">Go to step</a>
+      <span class="sp"></span>
+      <span class="legend m-full"><svg viewBox="0 0 24 8" aria-hidden="true"><path class="fe" d="M0 4H24"/></svg>Path</span>
+      <span class="legend m-full"><svg viewBox="0 0 24 8" aria-hidden="true"><path class="fe fe--fallback" d="M0 4H24"/></svg>Fallback</span>
+      <span class="vr m-full"></span>
+      <button type="button" class="btn btn--tertiary btn--sm"><svg class="ic" aria-hidden="true"><use href="#i-tree"/></svg>Outline</button><button type="button" class="btn btn--tertiary btn--sm"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Test panel</button>
+    </div>
+
+    <!-- Phone: sticky action bar above the BottomBar (12 of 12 destinations stay reachable) -->
+    <div class="m-ph pab"><button type="button" class="btn"><svg class="ic" aria-hidden="true"><use href="#i-play"/></svg>Test</button><button type="button" class="btn btn--primary">Publish v8…</button></div>
+    <div class="m-ph" data-vl="bottombar" data-vl-current="flows"></div>
+  </main>
+</div>
+
+<!-- Read-only step sheet below 1024 (?step=1): Sheet `detail` in Review mode, full screen on phones -->
+<aside class="ssheet m-tp" aria-labelledby="ss-title" role="dialog">
+  <div class="ssh">
+    <a class="m-ph ssback" href="#"><svg class="ic" aria-hidden="true"><use href="#i-cl"/></svg>Outline</a>
+    <div class="ssh-row">
+      <span class="gt gt--line"><svg class="ic" aria-hidden="true"><use href="#i-diamond"/></svg></span>
+      <div style="flex:1;min-width:0"><div class="ih-phase">Logic · Question · #3</div><h2 id="ss-title" style="font:var(--type-title-16)">Ask about a site visit</h2></div>
+      <button type="button" class="ibtn ibtn--sm m-tab" aria-label="Close"><svg class="ic" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+  </div>
+  <div class="ssb">
+    <div class="fld"><span class="lbl">Agent asks</span><div class="ro"><span class="var">{{lead_name}}</span> ji, would you like to visit the site this week? We have Saturday and Sunday slots.</div></div>
+    <div class="fld"><span class="lbl">Answers</span>
+      <div class="aed ro-list">
+        <div class="r"><div style="flex:1;min-width:0"><div class="lbl">Yes</div><div class="hint">haan, zaroor · <span lang="hi">हाँ</span></div></div><span class="goes">Goes to <b>#4 Book site visit</b></span></div>
+        <div class="r"><div style="flex:1;min-width:0"><div class="lbl">Later</div><div class="hint">baad mein, next week</div></div><span class="goes">Goes to <b>#6 Callback set</b></span></div>
+        <div class="r"><div style="flex:1;min-width:0"><div class="lbl">No</div><div class="hint">nahi, not now</div></div><span class="goes">Goes to <b>#7 Polite close</b></span></div>
+        <div class="r"><div style="flex:1;min-width:0"><div class="lbl">No reply</div><div class="hint">after 6 s · asks again once</div></div><span class="goes">Goes to <b>#9 No answer</b></span></div>
+      </div>
+    </div>
+    <div class="fld"><span class="lbl">Language</span><div class="ro">Auto · Hindi + English</div></div>
+    <div class="fld"><span class="lbl">Issues</span><div class="hint" style="font:var(--type-data-13)">No issues on this step.</div></div>
+  </div>
+  <div class="ssf"><svg class="ic ic--sm" aria-hidden="true"><use href="#i-info"/></svg><span style="flex:1">Edit this step on a screen at least 1024 px wide. Your draft is safe.</span><button type="button" class="btn btn--sm"><svg class="ic" aria-hidden="true"><use href="#i-copy"/></svg>Copy link</button></div>
+</aside>
+
+<script>
+(function(){
+  /* FlowOutline > OutlineRow, read-only (Review mode and phone). Stable numbers; call order is the row order. GlyphTile tones from components.css. */
+  var R=[[0,'ink','i-list','Outbound batch','#1'],[0,'line','i-diamond','Ask about a site visit','#3','on'],
+    [1,'','','If Yes','haan, zaroor'],[2,'tint','i-calp','Book site visit','#4','','w'],[3,'','','If Booked',''],[4,'success','i-flag','Visit booked','#5','','','Interested'],[3,'','','If Not booked','',1,'Goes to #6 Callback set'],
+    [1,'','','If Later','baad mein'],[2,'warning','i-flag','Callback set','#6','','','Callback due'],
+    [1,'','','If No','nahi'],[2,'tint','i-msg','Polite close','#7'],[2,'neutral','i-flag','Not interested','#8','','','Not interested'],
+    [1,'','','If No reply <svg class="dash" viewBox="0 0 18 4" aria-hidden="true"><path class="fe fe--fallback" d="M0 2H18"/></svg>','after 6 s · fallback'],[2,'neutral','i-flag','No answer','#9','','','Not reached'],
+    [0,'ink','i-phone-in','Inbound call','#2'],[1,'','','Continues at #3 Ask about a site visit','',1]];
+  var h='';R.forEach(function(o){var pad=12+o[0]*14;
+    if(!o[1]){h+='<div class="olb" role="treeitem" aria-level="'+(o[0]+1)+'" style="padding-left:'+pad+'px"><svg class="ic ic--sm" aria-hidden="true"><use href="#i-corner"/></svg>'+o[3]+(o[4]?' <span class="ex">· '+o[4]+'</span>':'')+(o[6]?' <span class="ex">'+o[6]+'</span>':'')+'</div>';return;}
+    h+='<div class="ol'+(o[5]==='on'?' on':'')+'" role="treeitem" aria-level="'+(o[0]+1)+'" style="padding-left:'+pad+'px"><span class="gt gt--sm gt--'+o[1]+'"><svg class="ic ic--xs" aria-hidden="true"><use href="#'+o[2]+'"/></svg></span><span class="t" translate="no">'+o[3]+(o[7]?' <span class="ost2">· Lead<svg class="ic ic--xs" aria-hidden="true"><use href="#i-ar"/></svg><b>'+o[7]+'</b></span>':'')+'</span>'+(o[6]?'<span class="tag tag--warning"><svg class="ic" aria-hidden="true"><use href="#i-alert"/></svg>1 warning</span>':'')+'<span class="ol-no">'+o[4]+'</span></div>';});
+  document.getElementById('outline-rows').innerHTML=h;
+  /* Level of detail: below 1024 the read-only canvas sits at 60 %, so its steps take the Compact form (components.css .node--compact). */
+  var mq=window.matchMedia('(max-width:1023.98px)');
+  function lod(){Array.prototype.forEach.call(document.querySelectorAll('#nl-main > .node'),function(n){n.classList.toggle('node--compact',mq.matches);});}
+  lod();if(mq.addEventListener)mq.addEventListener('change',lod);else mq.addListener(lod);
+})();
+</script>
+<script>
+/* Mock only: orthogonal connectors (components.css .fe) with 8 px corners between sockets, drawn in screen space (non-scaling stroke, FD1 §7.1).
+   Edge labels (.elb) only on long branch edges (skipping a layer). */
+(function(){
+  var ns='http://www.w3.org/2000/svg';
+  function rp(pts,r){var d='M'+pts[0][0]+' '+pts[0][1];for(var i=1;i<pts.length-1;i++){var p0=pts[i-1],p1=pts[i],p2=pts[i+1];var l1=Math.hypot(p1[0]-p0[0],p1[1]-p0[1]),l2=Math.hypot(p2[0]-p1[0],p2[1]-p1[1]);var rr=Math.min(r,l1/2,l2/2);if(rr<0.5){d+=' L'+p1[0]+' '+p1[1];continue;}var ax=p1[0]-(p1[0]-p0[0])/l1*rr,ay=p1[1]-(p1[1]-p0[1])/l1*rr,bx=p1[0]+(p2[0]-p1[0])/l2*rr,by=p1[1]+(p2[1]-p1[1])/l2*rr;d+=' L'+ax+' '+ay+' Q'+p1[0]+' '+p1[1]+' '+bx+' '+by;}var e=pts[pts.length-1];return d+' L'+e[0]+' '+e[1];}
+  function draw(cv){
+    var svg=cv.querySelector(':scope > svg.edges');if(!svg)return;svg.innerHTML='';
+    Array.prototype.slice.call(cv.querySelectorAll(':scope > .elb')).forEach(function(c){c.remove();});
+    if(!cv.offsetParent)return;
+    var cr=cv.getBoundingClientRect(),id=cv.id;
+    var defs=document.createElementNS(ns,'defs');
+    [['e','var(--edge)'],['h','var(--edge-hover)'],['a','var(--edge-active)']].forEach(function(m){var mk=document.createElementNS(ns,'marker');mk.setAttribute('id','m'+m[0]+id);mk.setAttribute('viewBox','0 0 8 8');mk.setAttribute('refX','8');mk.setAttribute('refY','4');mk.setAttribute('markerWidth','8');mk.setAttribute('markerHeight','8');mk.setAttribute('markerUnits','userSpaceOnUse');mk.setAttribute('orient','auto');var p=document.createElementNS(ns,'path');p.setAttribute('d','M0 .5 8 4 0 7.5Z');p.style.fill=m[1];mk.appendChild(p);defs.appendChild(mk);});
+    svg.appendChild(defs);
+    var z=parseFloat(getComputedStyle(document.getElementById('nl-main')).getPropertyValue('--z'))||.75;
+    JSON.parse(cv.getAttribute('data-e')||'[]').forEach(function(it){
+      var se=document.getElementById(it[0]),te=document.getElementById(it[1]),o=it[2]||{};if(!se||!te)return;
+      var a=se.getBoundingClientRect(),b=te.getBoundingClientRect();if(!a.width||!b.width)return;
+      var sx=a.left+a.width/2-cr.left,sy=a.top+a.height/2-cr.top,tx=b.left+b.width/2-cr.left-7,ty=b.top+b.height/2-cr.top,x0=sx+5,pts;
+      if(Math.abs(ty-sy)<1.5)pts=[[x0,sy],[tx,sy]];else{var mx=x0+(o.mx!=null?o.mx*z/.75:Math.min(24,(tx-x0)/2));pts=[[x0,sy],[mx,sy],[mx,ty],[tx,ty]];}
+      var p=document.createElementNS(ns,'path');p.setAttribute('d',rp(pts,8));var c=o.c||'';
+      p.setAttribute('class','fe'+(c==='con'?' fe--connected':'')+(o.fb?' fe--fallback':''));
+      p.setAttribute('marker-end','url(#m'+(c==='con'?'h':'e')+id+')');svg.appendChild(p);
+      if(o.l){var best=null,bl=0;for(var i=0;i<pts.length-1;i++){var q1=pts[i],q2=pts[i+1];if(Math.abs(q1[1]-q2[1])<1){var L=Math.abs(q2[0]-q1[0]);if(L>bl){bl=L;best=[(q1[0]+q2[0])/2,q1[1]];}}}
+        if(best&&best[0]<cr.width-20){var d=document.createElement('span');d.className='elb';d.textContent=o.l;d.style.left=best[0]+'px';d.style.top=best[1]+'px';cv.appendChild(d);}}
+    });
+  }
+  function all(){Array.prototype.forEach.call(document.querySelectorAll('[data-e]'),draw);}
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){requestAnimationFrame(all);});
+  window.addEventListener('load',function(){requestAnimationFrame(all);});
+  var t;window.addEventListener('resize',function(){clearTimeout(t);t=setTimeout(all,150);});
+})();
+</script>
+</body>
+</html>
