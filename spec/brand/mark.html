@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vaani Labs mark</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="../components/components.css">
+<style>
+/* Specimen page layout only. The mark itself is .mark in components.css. */
+:root{--font-hanken:"Hanken Grotesk"}
+.pg{max-width:var(--size-container-page);margin:0 auto;padding:var(--space-40) var(--space-24)}
+.pg h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking);margin:0 0 var(--space-8)}
+.pg p{color:var(--text-2);max-width:var(--size-measure);margin:0 0 var(--space-16)}
+.sizes{display:flex;align-items:flex-end;gap:var(--space-32);flex-wrap:wrap;padding:var(--space-24);background:var(--surface);border:var(--bw-hairline) solid var(--border);border-radius:var(--radius-8);margin-bottom:var(--space-16)}
+.sizes figure{margin:0;display:grid;justify-items:center;gap:var(--space-8);font:var(--type-meta-12);color:var(--text-3)}
+.m16{width:16px;height:16px}.m20{width:20px;height:20px}.m28{width:28px;height:28px}.m48{width:48px;height:48px}.m96{width:96px;height:96px}.m192{width:192px;height:192px}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-16)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol></svg>
+<main class="pg">
+  <h1>Mark: the cord</h1>
+  <p>Two strands, the agent's voice and the caller's, twisted into one thread (a sutra). It replaces the letter-V tile. Working version drawn to the brief in 00-design-direction §3.1 until the commissioned mark lands; every mock uses this one symbol.</p>
+  <div class="duo">
+    <div data-theme="light" style="background:var(--bg);padding:var(--space-16);border-radius:var(--radius-8)">
+      <div class="sizes" id="light"></div>
+    </div>
+    <div data-theme="dark" style="background:var(--bg);padding:var(--space-16);border-radius:var(--radius-8)">
+      <div class="sizes" id="dark"></div>
+    </div>
+  </div>
+</main>
+<script>
+const use = s => `<svg class="mark ${s}" aria-hidden="true"><use href="#vl-mark"/></svg>`;
+for (const id of ['light','dark']) document.getElementById(id).innerHTML = ['m16','m20','m28','m48','m96','m192'].map(s=>`<figure>${use(s)}<figcaption>${s.slice(1)} px</figcaption></figure>`).join('');
+</script>
+</body>
+</html>
