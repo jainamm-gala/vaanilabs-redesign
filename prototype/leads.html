@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Leads · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Leads (03-pages/03): views, search, filters, a keyboard-first table, the Call gate, the lead sheet, New lead and Import.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/leads.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- the one call ledger (Call reports' fixture): lead calls link to their reports with ?call= (03 §6.9) -->
+<script src="pages/call-reports-data.js" defer></script>
+<script src="pages/leads-data.js" defer></script>
+<script src="pages/leads.js" defer></script>
+<script src="pages/leads-table.js" defer></script>
+<script src="pages/leads-filters.js" defer></script>
+<script src="pages/leads-gate.js" defer></script>
+<script src="pages/leads-sheet.js" defer></script>
+<script src="pages/leads-forms.js" defer></script>
+<script src="pages/leads-import.js" defer></script>
+<script src="pages/leads-proto.js" defer></script>
+</head>
+<body data-page="leads">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame leads-main" tabindex="-1" data-focus-target>
+      <!-- PageHeader (03 §6.2): H1 · computed meta · Export (tertiary) · Import… (secondary) · New lead (primary). Below 1024 Export and Import… fold into ⋯. -->
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title">Leads</h1>
+          <span class="ph-meta u-hide-phone" id="leads-meta">1,284 leads · synced 11:24&nbsp;am</span>
+          <span class="ph-meta u-only-phone leads-meta-phone" id="leads-meta-phone">1,284 leads</span>
+        </div>
+        <div class="ph-actions">
+          <button class="btn btn--sm btn--tertiary ph-fold leads-proto-btn proto-btn" type="button" id="leads-proto-btn" aria-haspopup="dialog" aria-expanded="false" data-tooltip="For reviewers: switch empty, loading, error and gate states"><i data-icon="sliders-horizontal"></i>Prototype states</button>
+          <button class="btn btn--tertiary ph-fold" type="button" id="leads-export-btn" aria-haspopup="dialog" aria-expanded="false"><i data-icon="download"></i>Export</button>
+          <button class="btn ph-fold" type="button" id="leads-import-btn" aria-haspopup="dialog"><i data-icon="upload"></i>Import…</button>
+          <button class="btn btn--tertiary u-only-phone" type="button" id="leads-selall-btn" hidden>All</button>
+          <button class="btn btn--tertiary u-only-phone" type="button" id="leads-select-btn" aria-pressed="false"><span>Select</span></button>
+          <button class="ibtn ph-more u-hide-phone" type="button" id="leads-more-btn" aria-label="More actions" aria-haspopup="menu" aria-controls="page-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+          <button class="btn btn--primary" type="button" id="leads-new-btn" aria-haspopup="dialog" data-tooltip="New lead" data-kbd="n" aria-label="New lead"><i data-icon="plus"></i><span class="u-hide-phone">New lead</span><span class="u-only-phone" aria-hidden="true">New</span></button>
+        </div>
+      </div>
+
+      <div class="with-sheet leads-body">
+        <div class="leads-col" id="leads-col">
+          <div class="leads-notice" id="leads-page-notice" hidden></div>
+          <div class="leads-state" id="leads-state" hidden></div>
+          <!-- ViewTabs (§6.4): pipeline-wide counts; manual activation; folds into "View: All ▾" at ≤ 720 px tall -->
+          <div class="vtabs vtabs--foldable" id="leads-vtabs">
+            <div class="vtabs-list" role="tablist" aria-label="Views" data-activation="manual" id="leads-tabs"></div>
+            <button class="ibtn ibtn--sm leads-viewmore" type="button" id="leads-view-more" aria-haspopup="menu" aria-controls="leads-view-menu" aria-expanded="false" aria-label="More actions for this view" hidden><i data-icon="ellipsis"></i></button>
+            <button class="vtab vtab--add" type="button" id="leads-saveview" aria-haspopup="dialog" aria-expanded="false"><i data-icon="plus" data-size="sm"></i>Save view</button>
+          </div>
+          <!-- FilterBar (§6.5): search · Filter · tokens · Clear ···· count (opens the totals) · Columns · density -->
+          <div class="tb leads-tb" id="leads-tb">
+            <span class="view-select"><button type="button" class="select select--quiet select--auto" data-select id="leads-viewsel" aria-controls="leads-viewsel-lb" aria-label="View"><span class="select-value" id="leads-viewsel-v">View: All</span><i data-icon="chevron-down" data-size="sm"></i></button><span class="listbox" id="leads-viewsel-lb" role="listbox" aria-label="Views" hidden></span></span>
+            <form class="search" role="search" aria-label="Search leads" id="leads-q-form"><i data-icon="search"></i><input id="leads-q" type="search" aria-label="Search leads" placeholder="Search name, phone or city…" enterkeyhint="search" autocomplete="off" spellcheck="false" data-page-search><button type="button" class="search-clear" id="leads-q-clear" aria-label="Clear search" hidden><i data-icon="x" data-size="sm"></i></button><kbd class="kbd" data-single-key aria-hidden="true">/</kbd></form>
+            <div class="tb-group tb-scroll" role="group" aria-label="Filters">
+              <button class="btn" type="button" id="leads-filter-btn" aria-haspopup="menu" aria-expanded="false"><i data-icon="list-filter"></i>Filter<span class="fcount" id="leads-fcount" hidden>0</span></button>
+              <button class="btn u-only-phone" type="button" id="leads-sort-btn" aria-haspopup="dialog" aria-expanded="false"><i data-icon="chevrons-up-down"></i><span id="leads-sort-v">Last call</span></button>
+              <span class="leads-tokens" id="leads-tokens"></span>
+              <button class="btn btn--sm btn--tertiary" type="button" id="leads-clear" hidden>Clear</button>
+              <button class="btn btn--sm btn--tertiary" type="button" id="leads-view-save" hidden>Save changes to view</button>
+              <button class="btn btn--sm btn--tertiary" type="button" id="leads-view-reset" hidden>Reset</button>
+            </div>
+            <span class="tb-spacer"></span>
+            <button class="tb-count" type="button" id="leads-count" data-popover="leads-sum-pop" data-placement="bottom-end" aria-haspopup="dialog" aria-expanded="false">1,284 leads</button>
+            <button class="btn btn--tertiary u-hide-phone" type="button" id="leads-cols-btn" data-popover="leads-cols-pop" data-placement="bottom-end" aria-haspopup="dialog" aria-expanded="false" aria-label="Columns"><i data-icon="columns-3"></i><span class="u-hide-below-xl leads-cols-label" aria-hidden="true">Columns</span></button>
+            <div class="seg seg--sm" role="radiogroup" aria-label="Row density" id="leads-density" data-density-for="#leads-table" data-density-key="leads"><button type="button" role="radio" aria-checked="true" data-value="standard">Standard</button><button type="button" role="radio" aria-checked="false" data-value="compact">Compact</button></div>
+          </div>
+          <div class="leads-secnotice" id="leads-sec-notice" hidden></div>
+          <!-- DataTable (§6.6): one tab stop for the body; the header row sticks; key, selection and actions pin when it scrolls sideways -->
+          <div class="dt-wrap leads-dtwrap" id="leads-dtwrap">
+            <table class="dt leads-table" id="leads-table" role="grid" aria-labelledby="page-title" aria-multiselectable="true" data-shortcut-scope="leads-table">
+              <caption class="sr-only" id="leads-caption">Leads, sorted by last call, newest first</caption>
+              <colgroup id="leads-colgroup"></colgroup>
+              <thead id="leads-thead"></thead>
+              <tbody id="leads-tbody"></tbody>
+            </table>
+          </div>
+          <!-- Phones: ListRows (data-nav §7.13); no per-row Call button, so a mis-tap never dials -->
+          <ul class="leads-list" id="leads-list" aria-label="Leads"></ul>
+          <nav class="pager" id="leads-pager" aria-label="Pages">
+            <span id="leads-range">Loading…</span><span class="pager-sp"></span>
+            <span class="u-hide-phone" id="leads-size-l">Rows per page</span>
+            <button type="button" class="select select--sm select--auto" data-select id="leads-size" aria-controls="leads-size-lb" aria-labelledby="leads-size-l leads-size-v"><span class="select-value" id="leads-size-v">50</span><i data-icon="chevron-down" data-size="sm"></i></button>
+            <span class="listbox" id="leads-size-lb" role="listbox" aria-labelledby="leads-size-l" hidden><span class="option" role="option" data-value="25" aria-selected="false"><span class="option-main"><span class="option-label">25</span></span></span><span class="option" role="option" data-value="50" aria-selected="true"><span class="option-main"><span class="option-label">50</span></span></span><span class="option" role="option" data-value="100" aria-selected="false"><span class="option-main"><span class="option-label">100</span></span></span></span>
+            <span id="leads-pageof">Page 1 of 26</span>
+            <span class="pager-btns"><button class="ibtn ibtn--sm" type="button" id="leads-prev" aria-label="Previous page"><i data-icon="chevron-left"></i></button><button class="ibtn ibtn--sm" type="button" id="leads-next" aria-label="Next page"><i data-icon="chevron-right"></i></button></span>
+          </nav>
+          <div class="bulk" id="leads-bulk" role="toolbar" aria-label="Leads selected" hidden></div>
+        </div>
+
+        <!-- Lead sheet (§6.9): record 440; docked ≥ 1440, overlay 1024–1439, modal below -->
+        <div class="sheet leads-sheet" id="lead-sheet" role="dialog" aria-labelledby="lead-sheet-t" data-dockable hidden>
+          <div class="sheet-head" data-shortcut-scope="leads-sheet-head">
+            <a class="topbar-back sheet-back" href="leads.html" data-drawer-close aria-label="Back to Leads"><i data-icon="chevron-left"></i>Leads</a>
+            <div class="sheet-heading"><h2 class="sheet-title" id="lead-sheet-t" translate="no">Lead</h2><p class="sheet-meta" id="lead-sheet-meta"></p></div>
+            <div class="sheet-actions">
+              <button class="ibtn" type="button" id="ls-prev" aria-label="Previous lead" data-kbd="k"><i data-icon="chevron-up"></i></button>
+              <button class="ibtn" type="button" id="ls-next" aria-label="Next lead" data-kbd="j"><i data-icon="chevron-down"></i></button>
+              <button class="ibtn" type="button" id="ls-copy" aria-label="Copy link"><i data-icon="link"></i></button>
+              <button class="ibtn" type="button" id="ls-more" aria-haspopup="menu" aria-controls="leads-sheet-menu" aria-expanded="false" aria-label="More actions for this lead"><i data-icon="ellipsis"></i></button>
+              <button class="ibtn sheet-close" type="button" data-drawer-close aria-label="Close lead"><i data-icon="x"></i></button>
+            </div>
+          </div>
+          <div class="leads-sheet-notice" id="ls-notice" hidden></div>
+          <div class="vtabs vtabs--panel"><div class="vtabs-list" role="tablist" aria-label="Lead details">
+            <button class="vtab" type="button" role="tab" id="ls-tab-overview" data-value="overview" aria-controls="ls-p-overview" aria-selected="true">Overview</button>
+            <button class="vtab" type="button" role="tab" id="ls-tab-calls" data-value="calls" aria-controls="ls-p-calls" aria-selected="false" tabindex="-1">Calls</button>
+            <button class="vtab" type="button" role="tab" id="ls-tab-notes" data-value="notes" aria-controls="ls-p-notes" aria-selected="false" tabindex="-1">Notes</button>
+          </div></div>
+          <div class="sheet-body" id="lead-sheet-body"></div>
+          <div class="sheet-foot" id="lead-sheet-foot"></div>
+        </div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+<!-- PAGE OVERLAYS: menus -->
+<div class="menu" id="page-more-menu" role="menu" aria-label="More actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="export"><i data-icon="download"></i><span class="menu-text"><span>Export…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="import"><i data-icon="upload"></i><span class="menu-text"><span>Import…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="shortcuts"><i data-icon="keyboard"></i><span class="menu-text"><span>Keyboard shortcuts</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item" role="menuitem" type="button" data-value="proto"><i data-icon="sliders-horizontal"></i><span class="menu-text"><span>Prototype states…</span><span class="menu-desc">For reviewers, not part of the product</span></span></button>
+</div>
+<div class="menu" id="leads-row-menu" role="menu" aria-label="More actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="call" hidden><i data-icon="phone"></i><span class="menu-text"><span>Call…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="open"><i data-icon="maximize-2"></i><span class="menu-text"><span>Open lead</span></span><span class="menu-end">Enter</span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="copy"><i data-icon="link"></i><span class="menu-text"><span>Copy link</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="status" data-submenu="leads-status-menu" aria-haspopup="menu" aria-expanded="false"><i data-icon="circle-dot"></i><span class="menu-text"><span>Set status</span></span><span class="menu-end"><i data-icon="chevron-right" data-size="sm"></i></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="flow"><i data-icon="workflow"></i><span class="menu-text"><span>Assign flow…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="note"><i data-icon="sticky-note"></i><span class="menu-text"><span>Add note…</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item menu-item--danger" role="menuitem" type="button" data-value="delete"><i data-icon="trash-2"></i><span class="menu-text"><span>Delete lead…</span><span class="menu-desc" hidden>Only admins can delete leads</span></span></button>
+</div>
+<div class="menu" id="leads-status-menu" role="menu" aria-label="Set status" hidden></div>
+<div class="menu" id="leads-flow-menu" role="menu" aria-label="Assign flow" hidden></div>
+<div class="menu" id="leads-bulk-more" role="menu" aria-label="More actions for the selection" hidden>
+  <div id="leads-bulk-phone-items" role="none" hidden>
+    <button class="menu-item" role="menuitem" type="button" data-value="status"><i data-icon="circle-dot"></i><span class="menu-text"><span>Set status…</span></span></button>
+    <button class="menu-item" role="menuitem" type="button" data-value="flow"><i data-icon="workflow"></i><span class="menu-text"><span>Assign flow…</span></span></button>
+    <button class="menu-item" role="menuitem" type="button" data-value="export"><i data-icon="download"></i><span class="menu-text"><span>Export…</span></span></button>
+    <div class="menu-sep" role="separator"></div>
+  </div>
+  <button class="menu-item" role="menuitem" type="button" data-value="note" id="leads-bulk-more-note"><i data-icon="sticky-note"></i><span class="menu-text"><span>Add note to 2 leads…</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item menu-item--danger" role="menuitem" type="button" data-value="delete" id="leads-bulk-more-del"><i data-icon="trash-2"></i><span class="menu-text"><span>Delete 2 leads…</span></span></button>
+</div>
+<div class="menu" id="leads-filter-menu" role="menu" aria-label="Add a filter" hidden></div>
+<div class="menu" id="leads-view-menu" role="menu" aria-label="View actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="rename"><i data-icon="pencil"></i><span class="menu-text"><span>Rename…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="update"><i data-icon="refresh-cw"></i><span class="menu-text"><span>Update with current filters</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="copy"><i data-icon="link"></i><span class="menu-text"><span>Copy link</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item menu-item--danger" role="menuitem" type="button" data-value="delete"><i data-icon="trash-2"></i><span class="menu-text"><span>Delete view…</span></span></button>
+</div>
+<div class="menu" id="leads-sheet-menu" role="menu" aria-label="Lead actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="edit"><i data-icon="pencil"></i><span class="menu-text"><span>Edit details…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="export"><i data-icon="download"></i><span class="menu-text"><span>Export lead</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="copynum"><i data-icon="copy"></i><span class="menu-text"><span>Copy full number</span><span class="menu-desc">Admins only · logged in Activity &amp; audit</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item menu-item--danger" role="menuitem" type="button" data-value="delete"><i data-icon="trash-2"></i><span class="menu-text"><span>Delete lead…</span></span></button>
+</div>
+
+<!-- PAGE OVERLAYS: popovers -->
+<div class="pop pop--wide" id="leads-picker" aria-labelledby="leads-picker-t" data-density="standard" hidden><div class="pop-head"><h2 class="pop-title" id="leads-picker-t">Filter</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-picker-body"></div><div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="leads-picker-clear">Clear</button><button class="btn btn--sm btn--primary" type="button" id="leads-picker-done">Done</button></div></div>
+<div class="pop pop--wide" id="leads-tokens-pop" aria-labelledby="leads-tokens-t" hidden><div class="pop-head"><h2 class="pop-title" id="leads-tokens-t">Filters</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-tokens-body"></div><div class="pop-foot"><button class="btn btn--sm" type="button" id="leads-addfilter"><i data-icon="plus"></i>Add filter</button></div></div>
+<div class="pop pop--wide" id="leads-sum-pop" aria-labelledby="leads-sum-t" hidden><div class="pop-head"><h2 class="pop-title" id="leads-sum-t">In this view</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-sum-body"></div></div>
+<div class="pop pop--wide" id="leads-cols-pop" aria-labelledby="leads-cols-t" hidden><div class="pop-head"><h2 class="pop-title" id="leads-cols-t">Columns</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-cols-body"></div><div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="leads-cols-reset">Reset columns</button></div></div>
+<form class="pop" id="leads-sv-pop" aria-labelledby="leads-sv-t" novalidate hidden><div class="pop-head"><h2 class="pop-title" id="leads-sv-t">Save view</h2></div><div class="pop-body" id="leads-sv-form-body"><div class="field"><label class="field-label" for="leads-sv-name">Name</label><div class="input"><input id="leads-sv-name" autocomplete="off" aria-describedby="leads-sv-err leads-sv-scope"></div><p class="field-error" id="leads-sv-err" hidden><i data-icon="circle-alert"></i>Enter a name for the view.</p></div><p class="field-hint" id="leads-sv-scope"></p><label class="check check--dense"><input type="checkbox" class="cb" id="leads-sv-share" aria-describedby="leads-sv-share-h"><span class="check-text"><span>Share with workspace</span><span class="check-desc" id="leads-sv-share-h"></span></span></label></div><div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" data-popover-close>Cancel</button><button class="btn btn--sm btn--primary" type="submit" id="leads-sv-go">Save view</button></div></form>
+<div class="pop" id="leads-sort-pop" aria-labelledby="leads-sort-t" hidden><div class="pop-head"><h2 class="pop-title" id="leads-sort-t">Sort leads</h2></div><div class="pop-body"><fieldset class="fieldset"><legend class="sr-only">Sort by</legend><div id="leads-sort-list"></div></fieldset><div class="seg seg--full" role="radiogroup" aria-label="Direction" id="leads-sort-dir"></div></div><div class="pop-foot"><button class="btn btn--primary" type="button" data-popover-close>Done</button></div></div>
+<div class="pop pop--wide" id="leads-exp-pop" aria-labelledby="leads-exp-t" data-density="standard" hidden><div class="pop-head"><h2 class="pop-title" id="leads-exp-t">Export leads</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-exp-body"></div><div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" data-popover-close>Cancel</button><button class="btn btn--sm btn--primary" type="button" id="leads-exp-go">Export</button></div></div>
+<div class="pop pop--wide" id="leads-proto-pop" aria-labelledby="leads-proto-t" data-density="standard" hidden><div class="pop-head"><h2 class="pop-title" id="leads-proto-t">Prototype states</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div><div class="pop-body" id="leads-proto-body"></div></div>
+<form class="pop" id="leads-cb-form" aria-labelledby="leads-cb-t" novalidate hidden><div class="pop-head"><h2 class="pop-title" id="leads-cb-t">Callback</h2></div><div class="pop-body" id="leads-cb-body"></div><div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="leads-cb-clear">Clear callback</button><button class="btn btn--sm btn--primary" type="submit">Save callback</button></div></form>
+
+<!-- PAGE OVERLAYS: the Call gate (02-components-gate §5.1): a modal popover, focus trapped, no scrim; bottom sheet on phones -->
+<div class="gate" id="leads-gate" role="dialog" aria-modal="true" aria-labelledby="leads-gate-t" aria-describedby="leads-gate-cons" data-density="standard" hidden>
+  <div class="gate-head">
+    <h2 class="gate-title" id="leads-gate-t" tabindex="-1" data-focus-target>Call</h2><button class="ibtn ibtn--sm gate-close" type="button" data-gate-close aria-label="Close"><i data-icon="x"></i></button>
+    <div class="gate-sub"><span class="u-fg-2" id="leads-gate-cons">Nothing dials until you start.</span><span aria-hidden="true">·</span><span id="leads-gate-fresh">Checking…</span></div>
+  </div>
+  <div class="gate-body" id="leads-gate-body"></div>
+  <div class="gate-foot"><span class="gate-reason" id="leads-gate-why"></span><button class="btn btn--tertiary" type="button" data-gate-cancel>Cancel</button><button class="btn btn--primary" type="button" id="leads-gate-go" aria-describedby="leads-gate-why" aria-keyshortcuts="Control+Enter">Start</button></div>
+</div>
+
+<!-- PAGE OVERLAYS: dialogs -->
+<div class="dlg" id="leads-new" role="dialog" aria-modal="true" aria-labelledby="leads-new-t" aria-describedby="leads-new-d" data-discard="Discard this lead? What you typed will be lost." data-density="standard" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="leads-new-t">New lead</h2><p class="dlg-desc" id="leads-new-d">Add one person. To add many, use <button type="button" class="btn btn--link" data-new-import>Import…</button></p><button class="ibtn dlg-close" type="button" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <form class="dlg-body" id="leads-new-form" novalidate>
+    <div id="leads-new-err"></div>
+    <div class="field"><label class="field-label" for="nl-name">Name</label><div class="input"><input id="nl-name" autocomplete="off" spellcheck="false" data-autofocus></div><p class="field-error" id="nl-name-e" hidden></p></div>
+    <div class="field field--medium"><label class="field-label" for="nl-phone">Phone number</label><div class="input"><span class="input-prefix" aria-hidden="true">+91</span><input id="nl-phone" type="tel" inputmode="tel" autocomplete="tel-national" aria-describedby="nl-phone-h nl-phone-sr"></div><p class="field-hint" id="nl-phone-h">10-digit mobile, like 98765 43210</p><p class="field-error" id="nl-phone-e" hidden></p><span class="sr-only" id="nl-phone-sr">Indian number, +91</span></div>
+    <div class="field field--medium"><span class="field-label" id="nl-lang-l">Language <span class="field-opt">(optional)</span></span><button type="button" class="select" data-select id="nl-lang" data-value="none" aria-controls="nl-lang-lb" aria-labelledby="nl-lang-l nl-lang-v"><span class="select-value" id="nl-lang-v">Not set</span><i data-icon="chevron-down"></i></button><div class="listbox" id="nl-lang-lb" role="listbox" aria-labelledby="nl-lang-l" hidden></div></div>
+    <div class="field"><label class="field-label" for="nl-email">Email <span class="field-opt">(optional)</span></label><div class="input"><input id="nl-email" type="email" autocomplete="off" spellcheck="false"></div><p class="field-error" id="nl-email-e" hidden></p></div>
+    <div class="field field--medium"><label class="field-label" for="nl-city">City <span class="field-opt">(optional)</span></label><div class="input"><input id="nl-city" autocomplete="off"></div></div>
+    <div><button type="button" class="btn btn--tertiary btn--sm" id="nl-more" aria-expanded="false" aria-controls="nl-more-body"><i data-icon="chevron-down" data-size="sm"></i>More details</button></div>
+    <div class="form-group" id="nl-more-body" hidden></div>
+  </form>
+  <div class="dlg-foot"><button class="btn btn--tertiary" type="button" data-dialog-close>Cancel</button><button class="btn" type="button" id="nl-another">Create and add another</button><button class="btn btn--primary" type="button" id="nl-create">Create lead</button></div>
+</div>
+<div class="dlg" id="leads-import" role="dialog" aria-modal="true" aria-labelledby="leads-imp-t" aria-describedby="leads-imp-d" data-density="standard" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="leads-imp-t" tabindex="-1" data-focus-target>Import leads</h2><p class="dlg-desc" id="leads-imp-d">CSV or XLSX, up to 5 MB. A phone column is required.</p><button class="ibtn dlg-close" type="button" data-dialog-close aria-label="Close"><i data-icon="x"></i></button><div class="leads-imp-steps" id="leads-imp-steps"></div></div>
+  <div class="dlg-body" id="leads-imp-body"></div>
+  <div class="dlg-foot" id="leads-imp-foot"></div>
+  <input type="file" id="leads-file" class="sr-only" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" tabindex="-1" aria-hidden="true">
+</div>
+<div class="dlg dlg--sm" id="leads-note" role="dialog" aria-modal="true" aria-labelledby="leads-note-t" data-discard="Discard this note?" data-density="standard" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="leads-note-t">Add a note</h2><button class="ibtn dlg-close" type="button" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body"><div class="field"><label class="field-label" for="leads-note-text">Note</label><textarea class="textarea" id="leads-note-text" rows="3" placeholder="Asked for the brochure in Hindi…" data-autofocus aria-describedby="leads-note-e"></textarea><p class="field-error" id="leads-note-e" hidden><i data-icon="circle-alert"></i>Write the note first.</p></div></div>
+  <div class="dlg-foot"><button class="btn btn--tertiary" type="button" data-dialog-close>Cancel</button><button class="btn btn--primary" type="button" id="leads-note-go">Add note</button></div>
+</div>
+</body>
+</html>

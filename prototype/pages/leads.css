@@ -1,0 +1,112 @@
+/* Vaani Labs prototype · pages/leads.css — Leads layout only (03-pages/03 §5). Tokens only; component classes are
+   placed, never restyled. Page classes carry the .leads- prefix. */
+
+/* ---------- frame (≥1024): header, then the list column and the lead sheet side by side ---------- */
+.leads-body { flex: 1 1 auto; min-height: 0; }
+.leads-col { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+.leads-dtwrap { flex: 1 1 auto; min-height: 0; }
+.leads-state { flex: 1 1 auto; min-height: 0; overflow: auto; }
+.leads-state-pad { padding: var(--space-16) var(--page-margin); }
+.leads-notice { padding: var(--space-8) var(--page-margin); }
+.leads-secnotice { padding: var(--space-8) var(--page-margin); }
+.leads-list { display: none; margin: 0; padding: 0; list-style: none; }
+.leads-proto-btn { margin-right: var(--space-8); }
+
+/* ---------- toolbar ---------- */
+.leads-tokens { display: inline-flex; align-items: center; gap: var(--space-8); }
+.leads-tokens:empty { display: none; }
+.leads-viewmore { align-self: center; }
+/* The Filter button's count shows wherever no token is inline; leads-filters.js sets [hidden] per width and fit. */
+/* The toolbar answers to its own column (a docked sheet narrows it): density hides, Columns goes icon-only. Only at
+   ≥ 768, because a container is a containing block for fixed children (the phone BulkBar). */
+@media (min-width: 768px) { .leads-col { container-type: inline-size; } }
+@container (min-width: 900px) and (max-width: 1099.98px) { .leads-tb .search { flex-basis: calc(var(--space-40) * 5); } }
+.leads-tb--nodensity .seg { display: none; }
+@container (max-width: 959.98px) { .leads-tb .seg { display: none; } .leads-cols-label { display: none; } }
+@media (min-width: 768px) and (max-width: 1023.98px) { .leads-tokens { display: none; } }
+
+/* ---------- table: pinned key column, row scroll margins, truncation ---------- */
+.leads-table .leads-c-key { left: var(--space-40); }
+.leads-table:not(.leads-pinned) .sticky-l, .leads-table:not(.leads-pinned) .sticky-r { position: static; }
+.leads-table:not(.leads-pinned) thead .sticky-l, .leads-table:not(.leads-pinned) thead .sticky-r { position: sticky; }
+.leads-table tbody tr { scroll-margin-top: var(--size-table-head); scroll-margin-bottom: calc(var(--size-toolbar) + var(--space-16)); }
+.leads-t20 { max-width: 20ch; }
+.leads-inline { display: inline-flex; align-items: center; gap: var(--space-4); vertical-align: middle; }
+.leads-sk-meta { display: inline-block; width: calc(var(--space-40) * 4); vertical-align: middle; }
+.leads-sk-tag { height: var(--size-tag); }
+.leads-sk-num { margin-left: auto; }
+@media (pointer: coarse) { .leads-rowcall { display: none; } }
+
+/* ---------- phone ListRows and selection mode ---------- */
+.leads-li { display: flex; align-items: center; }
+.leads-li > .li { flex: 1 1 auto; min-width: 0; }
+.leads-li > .cb { margin-left: var(--page-margin); }
+.leads-li--sel { box-shadow: inset 0 calc(-1 * var(--bw-hairline)) 0 var(--border); }
+.leads-li-lang { font: var(--type-meta-12); }
+.leads-li-empty { padding: var(--space-24) var(--page-margin); }
+.leads-sk-li { height: var(--space-10); }
+.leads-sk-tagw { width: calc(var(--space-40) * 2); justify-self: end; }
+
+/* ---------- lead sheet ---------- */
+/* "Not in the current results" sits above the tabs, whichever tab is open (overlay §4.3) */
+.leads-sheet-notice { flex: none; padding: var(--space-12) var(--space-panel-pad) var(--space-4); }
+.leads-sheet-notice[hidden] { display: none; }
+.leads-panel { display: flex; flex-direction: column; gap: var(--space-20); }
+.leads-panel[hidden] { display: none; }
+.leads-sec { display: grid; gap: var(--space-6); min-width: 0; }
+.leads-sec-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: var(--control-h-sm); }
+.leads-sec-head > h3 { margin: 0; }
+.leads-save { display: inline-flex; margin-left: var(--space-4); }
+.leads-edit { padding-top: var(--space-4); }
+
+/* ---------- Call gate ---------- */
+.leads-gate-edit { display: grid; gap: var(--space-12); }
+.leads-gacts { display: inline-grid; justify-items: end; gap: var(--space-4); }
+.leads-gate-when { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); }
+#leads-gate-sum:focus { outline: none; }
+#leads-gate-sum:focus-visible { outline: var(--focus-width) solid var(--focus); outline-offset: var(--focus-offset); }
+
+/* ---------- filter pickers, columns, tokens popover ---------- */
+.leads-pick-list { display: grid; gap: var(--space-2); max-height: calc(var(--space-40) * 7); overflow: auto; overscroll-behavior: contain; }
+.leads-pick-row { display: flex; width: 100%; }
+.leads-pick-range { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); }
+.leads-pick-range[hidden] { display: none; }
+.leads-col-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.leads-col-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); min-height: var(--space-32); }
+.leads-col-move { display: inline-flex; gap: var(--space-2); }
+.leads-tokens-stack { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+
+/* ---------- Import ---------- */
+.leads-imp-steps { grid-column: 1 / -1; }
+.leads-steps { display: flex; flex-wrap: wrap; gap: var(--space-4) var(--space-20); margin: var(--space-4) 0 0; padding: 0; list-style: none; font: var(--type-data-13); color: var(--text); }
+.leads-step { display: inline-flex; align-items: center; gap: var(--space-6); }
+.leads-imp-map { flex: none; }
+.leads-imp-sample { max-width: 22ch; }
+.leads-imp-as { min-width: calc(var(--space-40) * 3); }
+.leads-imp-opts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-12); }
+.leads-imp-dup { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-16); margin-top: var(--space-6); }
+
+/* ---------- tablet 768–1023: the list column is its own frame, so the header row stays visible (F-RWD-012) ---------- */
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .leads-body { height: calc(100dvh - var(--size-topbar) - var(--size-toolbar)); }
+  .leads-col { height: 100%; }
+  .leads-sheet { width: min(var(--size-sheet-detail), 100%); }
+}
+
+/* ---------- phone < 768: one page scroller, ListRows, the toolbar sticks under the TopBar ---------- */
+@media (max-width: 767.98px) {
+  .leads-col { display: block; }
+  .leads-dtwrap { display: none; }
+  .leads-list { display: block; --tag-h: var(--size-tag); }
+  .leads-tb { position: sticky; top: var(--size-topbar); z-index: var(--z-sticky); }
+  .leads-tb .tb-count, .leads-tb .tb-spacer { display: none; }
+  .leads-main .ph-title { flex: 1 1 0; }
+  .leads-meta-phone { min-width: 0; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .leads-foot-btn { flex: 1 1 0; }
+  .leads-imp-opts { grid-template-columns: minmax(0, 1fr); }
+  .leads-gate-when { grid-template-columns: minmax(0, 1fr); }
+  #main[data-leads-bulk] .leads-col { padding-bottom: calc(var(--size-hit-touch) + var(--space-24)); }
+}
+/* R3D-09: the blocked reason sits on its own line above the footer buttons */
+#lead-sheet-foot:has(> .leads-foot-why) { flex-wrap: wrap; }
+.leads-foot-why { flex: 1 0 100%; margin: 0; }
