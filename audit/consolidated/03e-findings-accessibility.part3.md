@@ -1,0 +1,190 @@
+
+### F-A11Y-011 — Flow Builder toolbar menus are impractical to use with a keyboard
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** QA-A-06
+- **Pages:** /flow-builder
+- **Evidence:** WCAG 2.2: **2.1.1 Keyboard (A)**, **2.4.3 Focus Order (A)**.
+  - The "More actions" (⋯, `aria-haspopup="menu"`) and "Destructive actions" triggers open `role="menu"` popovers.
+  - The popovers are portaled into the last child of `<body>`. Opening with ArrowDown or Enter leaves focus on the trigger.
+  - The first menu item is at tab index 87 against the trigger's 40, so it is about 47 Tab presses away. The count varies with the flow's size.
+  - Tab from the trigger goes Private → Destructive actions → Save while the menu stays open.
+  - The items (Export JSON, Import JSON, New flow, Reset to default, Delete flow) are plain focusable buttons. They can be reached, but not practically.
+  - Verifier refuted the claim that Escape does not close the menus. One Escape sets `aria-expanded=false`, the menus fade out within about 600ms, and focus stays on the trigger.
+- **Screenshots:** audit/screenshots/va-qa-a/flow_more_menu.png, audit/screenshots/va-qa-a/flow_destructive_menu.png, audit/screenshots/va-verify-qa-a/flow_more_menu_after_tab.png, audit/screenshots/va-verify-qa-a/fb_more_after_esc_tab.png
+- **Recommendation:**
+  - Use a standard menu-button primitive (Radix DropdownMenu or Headless UI Menu), the same family as the app's Settings and AI-draft dialogs, which already behave correctly. It should:
+    - focus the first item on open;
+    - move between items with Arrow, Home and End;
+    - close on Esc and return focus to the trigger;
+    - close on Tab;
+    - keep `aria-expanded` in sync.
+  - Keep a confirm step on Reset to default and Delete flow.
+
+### F-A11Y-012 — No skip link, and every sidebar item is two tab stops (33 stops before page content)
+- **Severity:** medium · **Confidence:** verified
+- **Source findings:** A11Y-MANUAL-08, A11Y-AUTO-14 (skip-link part)
+- **Pages:** global app shell (all authenticated pages)
+- **Evidence:** WCAG 2.2: **2.4.1 Bypass Blocks (A)**, **2.4.3 Focus Order (A)**, **4.1.2 Name, Role, Value (A)** (a focusable div with no name).
+  - There is no `a[href^="#"]` anywhere in the app.
+  - Sidebar item markup: `<a title="Leads" href="/leads"><div tabindex="0"><svg/></div><div>Leads</div></a>`. So 12 items produce 24 tab stops, and every second stop is a `div` with no name and no role.
+  - Tab order on a fresh /dashboard load:
+    - logo;
+    - 24 sidebar stops;
+    - Sign Out, dark mode, Expand;
+    - Top up, Enable autopay, Dismiss;
+    - Select flow, Refresh flows.
+    - "Enter customer name" is stop 34.
+  - The link's own focus ring is clipped to its top and bottom edges by the sidebar's overflow. The inner div's ring is fully visible.
+  - Verifier reproduced this. It lowered the finding to medium because `main`, `nav` and an H1 exist, so landmark navigation partly meets 2.4.1.
+- **Screenshots:** audit/screenshots/va-a11y-manual/06-sidebar-link-focus.png, audit/screenshots/va-a11y-manual/07-sidebar-innerdiv-focus.png, audit/screenshots/va-verify-a11y-manual/08-sidebar-link-focus.png, audit/screenshots/va-verify-a11y-manual/08b-sidebar-inner-focus.png, audit/screenshots/va-a11y-auto/leads-focus-tab22.png
+- **Recommendation:**
+  - Remove `tabindex="0"` from the inner icon div, which is decoration.
+  - Add a "Skip to main content" link as the first element in the DOM. It should be visible on focus and target `<main id="main" tabindex="-1">`.
+  - Move the wallet banner's controls after the page header in DOM order, or wrap them in `role="region" aria-label="Wallet"`.
+  - Give rail links `outline-offset: -2px` so their focus ring is not clipped.
+
+### F-A11Y-013 — Every route has the same document title, and route changes are silent
+- **Severity:** medium · **Confidence:** verified
+- **Source findings:** A11Y-MANUAL-09, A11Y-AUTO-13, EXPLORE-CORE-23, QA-B-22, PUBLIC-SITE-18 (title part)
+- **Pages:**
+  - App routes: /dashboard, /leads, /call-reports, /settings and its sub-pages, /analytics, /knowledge, /billing, /assistant, /personal-agents, /meeting-agent, /flow-builder.
+  - Auth and error: /login, /forgot-password, the 404 page.
+  - Public: /, /pricing, /docs, /contact, /changelog, /about, /status.
+- **Evidence:** WCAG 2.2: **2.4.2 Page Titled (A)**. Route announcements relate to 4.1.3 (advisory).
+  - `document.title` is "Vaani Labs - The Voice AI that speaks India" on all 11 app routes, on login, on the 404 page and on 10 public pages. Browser tabs, history entries and screen-reader page announcements can't tell pages apart.
+  - Pressing Enter on a focused sidebar link changes the route, but focus stays on the link and nothing is announced. The only live region is the wallet `role="alert"`.
+  - Verifier reproduced this on 11 routes. It rated the finding medium rather than high because each page has a distinct H1.
+- **Screenshots:** —
+- **Recommendation:**
+  - Drive titles from one nav config: "<Page> · Vaani Labs" (for example "Leads · Vaani Labs" and "Page not found · Vaani Labs"). Add context where useful, such as the flow name on Flow Builder or "On call" on the cockpit during a live call.
+  - On a client-side route change, either move focus to the H1 (`tabindex="-1"`) or announce "<Page> loaded" in a polite live region.
+
+### F-A11Y-014 — Status changes are not announced (call state, transcript, result and selection counts)
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** A11Y-MANUAL-14, A11Y-AUTO-09 (status part)
+- **Pages:** /dashboard, /leads, /call-reports (and every page that runs async actions)
+- **Evidence:** WCAG 2.2: **4.1.3 Status Messages (AA)**.
+  - On Dashboard, Leads and Call Reports the only live region is the wallet banner.
+  - Dashboard: "SESSION: IDLE", "IDLE", "STANDBY" and "Awaiting connection…" are outside any live region, and the Transcript Feed is not `role="log"`.
+  - No toast container exists (no sonner, Toastify or react-hot-toast), so Refresh and other async actions give no audible confirmation.
+  - Leads: "0 / 0 SHOWN", "No leads match." and "1 SELECTED" all change silently, and the j/k highlight isn't exposed.
+  - Flow Builder is the good reference: it has a `role="status"` "Up to date", an sr-only polite status and React Flow's own live region.
+  - Verifier confirmed the structure. What happens during a live call remains inferred, because no call was placed.
+- **Screenshots:** audit/screenshots/va-a11y-manual/12-leads-noresults.png, audit/screenshots/va-a11y-manual/15-leads-checkbox-checked.png, audit/screenshots/va-a11y-auto/dashboard.png
+- **Recommendation:**
+  - Add one polite `role="status"` region to the app shell, fed by an `announce(message)` helper. Use it for result counts, selection counts, refresh and save outcomes.
+  - Call state: a `role="status"` element that announces "Connecting", "Connected" and "Call ended".
+  - Transcript: `role="log" aria-live="polite" aria-relevant="additions"`.
+  - Add a toast region (polite for success, assertive only for failures) for async outcomes.
+
+### F-A11Y-015 — The persistent "Wallet empty" banner is an assertive alert, and dismissing it drops focus
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** A11Y-MANUAL-15, A11Y-AUTO-09 (banner part), EXPLORE-SETTINGS-16 (banner part), QA-A-18
+- **Pages:** global (every authenticated route)
+- **Evidence:** WCAG 2.2: **4.1.3 Status Messages (AA)**, **2.4.3 Focus Order (A)**.
+  - `<div role="alert">` "Wallet empty — top up now to keep calls flowing." sits inside `main` on every route and is announced assertively on every full page load.
+  - Verifier: a MutationObserver saw 0 re-insertions after Leads Refresh and after client-side navigation (the same node was kept). So re-announcement on every refresh or in-app navigation is **not** reproduced. It happens on full page loads only.
+  - After "Dismiss" (22x22), `document.activeElement` is `<body>`. The dismissal is stored in `sessionStorage` and so lasts only for that tab.
+- **Screenshots:** audit/screenshots/va-a11y-manual/01-dashboard.png, audit/screenshots/va-verify-a11y-auto/banner-topup-zoom.png
+- **Recommendation:**
+  - For the persistent state, use `role="region" aria-label="Wallet status"` or `role="status"`. Keep `role="alert"` for new, time-sensitive errors, such as a call rejected for insufficient balance.
+  - Remember the dismissal per balance state for the session, and afterwards show a compact pill in the header.
+  - On dismiss, move focus to the page H1.
+
+### F-A11Y-016 — Toggle, selection and expansion states are visual only
+- **Severity:** medium · **Confidence:** multi-agent
+- **Source findings:** A11Y-AUTO-15, A11Y-MANUAL-13, QA-A-13 (state part)
+- **Pages:** /meeting-agent, /leads and its lead drawer, /call-reports, /personal-agents, /flow-builder, sidebar
+- **Evidence:** WCAG 2.2: **4.1.2 Name, Role, Value (A)**, **1.3.1 Info and Relationships (A)**.
+  - No `aria-pressed`, no `aria-checked` and no radio role on:
+    - Meeting Agent Session Mode (Presentation / Conversation flow) and Meeting Privacy (Open / Encrypted);
+    - Leads status chips (8) and source chips (7);
+    - Call Reports sentiment chips (4);
+    - the lead-drawer VIKASH/VAANI choice.
+  - The chips are `button type="submit"`, and the selected one is shown only by tint and border.
+  - No `aria-expanded` on Personal Agents NEW TASK, the sidebar Expand/Collapse button or the Meeting Agent "joinees" expander. No `aria-pressed` on Toggle Interactivity.
+  - The pattern already exists elsewhere: the Dashboard Vaani/Vikash toggle and the Flow Private and Full-screen buttons use `aria-pressed` correctly.
+  - The A11Y-MANUAL-04 verifier also confirmed that VIKASH/VAANI in the drawer has no `aria-pressed`.
+- **Screenshots:** audit/screenshots/va-a11y-auto/meeting-agent.png, audit/screenshots/va-qa-a/meeting_presentation_mode.png, audit/screenshots/va-a11y-manual/13-leads-tab-chips.png, audit/screenshots/va-a11y-manual/91-personal-agents-newtask.png
+- **Recommendation:**
+  - Single-select groups (status, sentiment, session mode, privacy, voice): `role="radiogroup"` with `role="radio"` and `aria-checked`, and arrow keys to move between options.
+  - Multi-select chips: `aria-pressed`.
+  - Make every chip `type="button"`, and add a non-colour selected cue (a check icon or heavier weight).
+  - Disclosure buttons: `aria-expanded` plus `aria-controls`.
+
+### F-A11Y-017 — Navigation semantics: no `aria-current`, unlabelled navs, and rail tooltips only via `title`
+- **Severity:** medium · **Confidence:** multi-agent
+- **Source findings:** A11Y-MANUAL-21, A11Y-AUTO-14 (nav part), DESIGN-SYSTEM-20, QA-A-13 (aria-current part), EXPLORE-DATA-27 (aria-current part), EXPLORE-SETTINGS-16 (aria-current part)
+- **Pages:** global sidebar rail, mobile bottom bar, /settings sub-nav
+- **Evidence:** WCAG 2.2: **1.3.1 Info and Relationships (A)**, **4.1.2 Name, Role, Value (A)**. The clipped rail focus ring also relates to 2.4.7 (AA).
+  - None of these has `aria-current="page"`: the desktop rail, the mobile bottom bar, or the 17-item Settings sub-nav. The active item is shown only by a 3px left bar and a tint.
+  - Each page has 2–3 unnamed `<nav>` elements (rail, footer or bottom bar, Settings), so a screen reader lists "navigation, navigation, navigation". axe flags `landmark-unique` on /assistant and /settings.
+  - The 13 rail links (44x44) get their names from hidden text plus `title`. Hover shows no visible tooltip, and keyboard focus shows none at all. The footer theme button has a custom tooltip, which is inconsistent.
+  - The Settings sub-nav mixes `<button>` items (Profile, Meetings Billing, Docs) with `<a>` links.
+- **Screenshots:** audit/screenshots/va-a11y-manual/06-sidebar-link-focus.png, audit/screenshots/va-design-system/sidebar-hover-tooltip.png, audit/screenshots/va-a11y-auto/mobile390-leads.png, audit/screenshots/va-a11y-manual/52-settings-subnav-focus.png
+- **Recommendation:**
+  - Set `aria-current="page"` on the active link in every nav.
+  - Label each nav with `aria-label`: "Main", "Account", "Settings sections", "Mobile".
+  - Build a Tooltip component that shows on hover and on keyboard focus (300ms delay, 12px text) and use it instead of native `title`.
+  - Make every sub-nav destination a link. Drive rail tooltips, mobile labels, H1s and document titles from one nav config.
+
+### F-A11Y-018 — Data lists and tables lack structure: Leads has none, and the Call Reports table lacks a caption, scope and sort state
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** A11Y-MANUAL-22, A11Y-AUTO-07 (table-semantics part), EXPLORE-DATA-27 (grid part)
+- **Pages:** /leads, /call-reports
+- **Evidence:** WCAG 2.2: **1.3.1 Info and Relationships (A)**.
+  - Leads is built from divs. The column headers LEAD / STATUS / INTEREST / CALL are visual only, and there are no table, grid or row roles.
+  - Call Reports `<table>`:
+    - 18 `th` elements, none with `scope`;
+    - no `<caption>`;
+    - 1 empty `th` (axe `empty-table-header`);
+    - sort shown only by the "▼" in "Started", with no `aria-sort`, and the header is not a button;
+    - duplicate dynamic headers ("Condition Check" ×4).
+  - The verifier confirmed the Call Reports details. The Leads structure is single-source.
+- **Screenshots:** audit/screenshots/va-a11y-manual/60-call-reports.png, audit/screenshots/va-a11y-auto/call-reports.png, audit/screenshots/va-a11y-manual/10-leads.png
+- **Recommendation:**
+  - Leads: use a `<table>` with `<caption class="sr-only">Leads</caption>` and `<th scope="col">`. If j/k navigation stays, use `role="grid"` with row and cell roles instead.
+  - Call Reports:
+    - add a `<caption>`;
+    - set `scope="col"` on headers;
+    - make sortable headers `<button>`s inside `<th aria-sort="descending|ascending|none">`;
+    - name the empty header ("Actions");
+    - disambiguate dynamic columns, for example "Condition Check: Residential".
+
+### F-A11Y-019 — Status chips, semantic-colour text, empty-cell fillers and canvas node titles fall below 4.5:1
+- **Severity:** medium · **Confidence:** verified
+- **Source findings:** A11Y-AUTO-04, A11Y-AUTO-11 (node-text part)
+- **Pages:** /call-reports, /leads, /analytics, /knowledge, /settings, /flow-builder
+- **Evidence:** WCAG 2.2: **1.4.3 Contrast (Minimum) (AA)**.
+  - Call Reports:
+    - em-dash fillers (#b7bcc8, which is muted at 50%, on #f4f6fa): **1.75:1** across 498 nodes;
+    - BROWSER (#3aa79e on #e9f1f4): 2.56 (46);
+    - MIXED: 2.31 (3);
+    - NEUTRAL (#b5820e): 2.83 (26);
+    - IN PROGRESS: 3.08 (11);
+    - COMPLETED: 3.57 (47);
+    - NEGATIVE: 3.67 (10);
+    - teal "Re-analyze" text buttons, 13px: 3.46 (43).
+  - Leads: the 9px NEW badge is 3.08 (25).
+  - Analytics: "+200%" is 3.76, "0.0% drop" 3.49, and the section numerals 3.54 (8).
+  - Other pages:
+    - Knowledge "Embed": 3.54 (5).
+    - Settings "Delete Account": 3.25.
+    - Flow Builder "FLOW VALIDATED": 2.58. "Private" at 40% alpha: 1.99.
+  - Flow canvas node titles are 13px in CSS but render at 9.3px at `scale(0.7119)`:
+    - "Schedule Visit" (amber): 3.01;
+    - "Confirm Interest" (teal): 3.31;
+    - YES/NO badges: 3.24 and 3.30, rendered at 7.1px;
+    - Start/End pills: 3.37 and 3.44.
+  - Verifier reproduced the values (MIXED and +200% were not re-measured). It rated the finding medium because the worst case is an empty-cell filler and the badges are secondary metadata. The 1.4.1 (use of colour) claim is refuted, because every chip has a text label.
+- **Screenshots:** audit/screenshots/va-a11y-auto/call-reports.png, audit/screenshots/va-a11y-auto/leads.png, audit/screenshots/va-a11y-auto/analytics.png, audit/screenshots/va-a11y-auto/flow-builder-loaded.png
+- **Recommendation:**
+  - Add "-700" semantic text tokens, measured on #f4f6fa:
+    - success `#127a4b` (4.96:1);
+    - teal `#0b756b` (5.15:1, and 4.58 on the #dcecee chip tint);
+    - warning `#7a4b00` (6.85:1);
+    - danger `#a8352b` (5.28:1 on the negative tint).
+  - Chips: dark text on the tint, with colour only in the background and border.
+  - Empty cells: leave them blank with an sr-only "No value", or render "—" in the solid muted token (4.5:1 or more).
+  - Remove alpha from status text (FLOW VALIDATED, Delete Account, Private).
+  - Canvas: put node titles in text-primary and keep the category colour on the icon only. Clamp the fit-view minimum zoom so node text renders at 12px or more.

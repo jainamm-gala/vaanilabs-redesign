@@ -1,0 +1,169 @@
+
+### F-A11Y-005 — Modals and drawers have no dialog semantics, no focus trap and no focus return
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** A11Y-MANUAL-05, QA-B-16, EXPLORE-DATA-13, EXPLORE-SETTINGS-16 (webhook-modal part), RESPONSIVE-B-20
+- **Pages:** /leads (New Lead, Import leads, and the lead drawer on phones), /settings webhooks (New webhook), / (marketing mobile menu)
+- **Evidence:** WCAG 2.2: **4.1.2 Name, Role, Value (A)**, **2.4.3 Focus Order (A)**, **2.4.11 Focus Not Obscured (Minimum) (AA)**, **1.3.1 Info and Relationships (A)**.
+  - With New Lead open, /leads has no `role="dialog"`, no `role="alertdialog"`, no `<dialog>` and no `aria-modal` (count 0). The title "New lead" is an H3 directly under the page H1. The Import leads modal is the same.
+  - Focus moves to Name on open, which is good. But Tab after "Create lead" goes to `<body>`, the logo, the Assistant link, and then "Agent View", which sits behind the blurred overlay, so focus is invisible.
+  - The X close button contains only an SVG, with no text, `aria-label` or `title`, so it is announced as just "button". The New-webhook modal's close button is also unnamed.
+  - Esc (both straight after opening and after typing) and a backdrop click close New Lead and drop focus to `<body>`. Reopening shows empty fields, so typed input is discarded without confirmation.
+  - At 390px:
+    - The lead drawer (z-40) sits under the tab bar (z-50), so its last 56px are covered.
+    - The New Lead and Import overlays have no `aria-modal`.
+    - The marketing mobile menu ignores Escape, and `aria-expanded` stays `true`.
+  - Verifier reproduced the missing role, the Tab escape to the page behind the overlay, the unnamed X, and focus landing on `<body>` after Esc.
+- **Screenshots:** audit/screenshots/va-a11y-manual/20-newlead-modal-open.png, audit/screenshots/va-verify-a11y-manual/21-newlead-tabbed.png, audit/screenshots/va-qa-b/leads-newlead-open.png, audit/screenshots/va-qa-b/leads-newlead-fake.png, audit/screenshots/va-responsive-b/leads_390_drawer_bottom.png, audit/screenshots/va-responsive-b/home_390_menu.png
+- **Recommendation:**
+  - Adopt one Dialog primitive for New Lead, Import, New webhook and the flow node editor: Radix Dialog, Headless UI, or native `<dialog>` with `showModal()`. It must provide:
+    - `aria-labelledby` pointing to the title and `aria-describedby` pointing to the hint;
+    - a focus trap and an `inert` background;
+    - Esc to close, with focus returned to the trigger.
+  - Close button: `aria-label="Close"`, with a hit area of at least 24x24.
+  - If the form is dirty, Esc or a backdrop click asks "Discard this lead?" before closing.
+  - Phone sheets: raise them above the tab bar, or hide the bar while a sheet is open. Add `padding-bottom: calc(56px + env(safe-area-inset-bottom))`.
+  - Marketing mobile menu: Esc closes it, `aria-expanded` stays in sync, and focus returns to the menu button.
+
+### F-A11Y-006 — Focus indicators are missing on checkboxes and the password toggle, and below 3:1 on inputs and selects
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** A11Y-AUTO-08, A11Y-MANUAL-07, DESIGN-SYSTEM-12, EXPLORE-DATA-27 (focus part)
+- **Pages:** /leads, /dashboard, /login, /knowledge, and form controls on all app pages
+- **Evidence:** WCAG 2.2: **2.4.7 Focus Visible (AA)**, **1.4.11 Non-text Contrast (AA)**.
+  - Leads row and select-all checkboxes:
+    - The focused element is a 1x1 `peer sr-only` input, and its 0.8px outline is invisible.
+    - The visible 16px span keeps `outline:none`, `box-shadow:none` and border `#cbd3e1` while `:focus-visible` is true, so there is no visible change.
+    - The checkbox is also unnamed (see F-A11Y-003).
+  - Selects: the Leads language and outcome selects and the Dashboard flow select have `outline:none`. Focus shows only a 50%-alpha blue border or a faint background tint.
+  - Dashboard intel inputs: on focus the 0.8px border turns `#92abed`, which is 2.11:1 against the surrounding surface.
+  - `.input-vani:focus` draws `0 0 0 2px #2f63e024`, a 14%-alpha halo at about 1.2:1.
+  - The login show-password toggle has `outline:none` and `box-shadow:none`.
+  - There is no focus token:
+    - 0 of 49 buttons on Leads and 0 of 13 on Knowledge carry a `focus-visible` class.
+    - `.btn-saffron` and `.btn-outline` define no `:focus-visible` style.
+    - Buttons fall back to the browser `outline:auto`, and its colour varies (`#3e475a`, `#0e9488`, `#7a8397`). It is 0.8px on some buttons ("EXPORT").
+  - A good pattern already exists: the Vaani/Vikash toggle has a clear 2.4px dark ring.
+  - Verifier reproduced the checkbox, select and input results. It rated A11Y-MANUAL-07 medium: the 1x1 sr-only input is the standard custom-checkbox pattern, and the real defects are the missing name and the missing focus style.
+- **Screenshots:** audit/screenshots/va-a11y-auto/leads-focus-checkbox.png, audit/screenshots/va-verify-a11y-auto/leads-focus-checkbox.png, audit/screenshots/va-a11y-auto/dashboard-input-focus.png, audit/screenshots/va-a11y-auto/dashboard-input-nofocus.png, audit/screenshots/va-a11y-manual/05-select-focus.png, audit/screenshots/va-a11y-manual/32-login-showpw-focus.png, audit/screenshots/va-design-system/focus-state-sample.png
+- **Recommendation:**
+  - Add a base-layer token and rule: `:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px }`, with `--ring: #2f5fe0` in light mode (5.48:1 on white, 5.06:1 on #f4f6fa) and a value of at least 3:1 in dark mode.
+  - Remove `outline:none` from `.input-vani`, the selects and the password toggle. Replace the 14% halo with the 2px solid ring.
+  - Custom checkbox: add `peer-focus-visible:ring-2 peer-focus-visible:ring-[var(--ring)] peer-focus-visible:ring-offset-2` to the visible span.
+  - Add visual-regression snapshots of the focused state for Button, Input, Select, Checkbox and the icon buttons.
+
+### F-A11Y-007 — Flow Builder: keyboard-focused and selected nodes look the same as every other node
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** A11Y-MANUAL-02
+- **Pages:** /flow-builder
+- **Evidence:** WCAG 2.2: **2.4.7 Focus Visible (AA)**. The selected state also falls under 1.4.11 Non-text Contrast (AA).
+  - A node focused with Tab matches `:focus-visible`, but its computed style is `outline: none 2.4px`, `box-shadow: none` and an inner border of 1.6px `rgb(225,230,239)`, which is identical to an unfocused node.
+  - After Enter (selected), the computed style is unchanged. Only a mouse click, which also opens the editor, produces the 1.6px `rgb(17,23,37)` selected border.
+  - The canvas has 53 tab stops (26 nodes plus 27 edges). In the screenshot, the 8th tabbed node cannot be told apart from its neighbours.
+  - Arrow keys move the selected node and Backspace deletes it, so keyboard users edit a live flow without seeing what they are acting on.
+  - Verifier reproduced this. It rated the finding high rather than critical because it is part of the barrier already covered by F-A11Y-001.
+- **Screenshots:** audit/screenshots/va-a11y-manual/49-flow-node-focused-only.png, audit/screenshots/va-a11y-manual/49b-flow-node-selected.png, audit/screenshots/va-a11y-manual/44-flow-tab-edges.png, audit/screenshots/va-verify-a11y-manual/49-flow-node-focused.png, audit/screenshots/va-verify-a11y-manual/49b-flow-node-enter.png
+- **Recommendation:**
+  - Focus: `.react-flow__node:focus-visible { outline: 2px solid var(--ring); outline-offset: 3px }`.
+  - Selection: give `.react-flow__node.selected` a 2px brand border plus an 8% brand tint, at least 3:1 against the `#eef1f7` canvas (`#2f5fe0` gives 4.84:1). Use the same style for keyboard and mouse selection.
+  - Focused edges: a 3px stroke plus a halo.
+
+### F-A11Y-008 — Muted text token #7A8397 and 8–10px tracked mono type fail AA across the light app
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** A11Y-AUTO-02, UX-AUDIT-13, VISUAL-AUDIT-06, DESIGN-SYSTEM-02, EXPLORE-CORE-08, EXPLORE-DATA-14, EXPLORE-SETTINGS-16 (helper-text part), RESPONSIVE-B-16
+- **Pages:** all authenticated pages and /login. Worst on /call-reports, /meeting-agent, /leads, /analytics, /dashboard, /settings and /personal-agents.
+- **Evidence:** WCAG 2.2: **1.4.3 Contrast (Minimum) (AA)**. Fixed 8–10px px type also puts **1.4.4 Resize Text (AA)** and 1.4.12 Text Spacing (AA) at risk.
+  - `text-text-muted` `#7a8397` on each surface:
+    - 3.80:1 on #fff;
+    - 3.60 on #f7f9fb (15 Settings sub-nav links, 12px);
+    - 3.55 on #f5f7fb (Dashboard 9px uppercase field labels);
+    - 3.52 on #f4f6fa (Leads meta, 51–63 nodes);
+    - 3.36 on #eef1f7 (Meeting Agent room meta, the "IDLE" chip);
+    - 2.2 on #c3c5c8 (Personal Agents example cards, which look disabled).
+  - It is the most common text colour on Analytics (105 nodes) and Leads (101).
+  - Failing text per page (scanner):
+    - Call Reports 730/949 (77%), mostly em-dash fillers (F-A11Y-019);
+    - Meeting Agent 64/111 (58%);
+    - Leads 131/240 (55%);
+    - Analytics 124/242 (51%);
+    - Dashboard 26/52 (50%).
+    - The design-system scan totals 969 of 1,473 nodes (66%).
+  - Type:
+    - Analytics has 63 elements at 9px, 75 at 10px and 5 at 8px. Letter-spacing goes up to 4px, and 101 elements are uppercase (94 of them mono).
+    - Leads has 92 elements at 10px, 46 at 9px and 24 at 8px, with 112 uppercase.
+    - Sizes are px utilities (`text-[9px]`) and are not enlarged on phones: Analytics still has 120 text nodes under 12px at 390px, and bottom-tab labels are 11px.
+    - A `.type-floor` class that lifts 7–12px text to 13px already exists, but no element uses it.
+  - Worst samples, computed on the effective background by the verifier:
+    - "Awaiting connection…": 3.0:1 (#7a8397 at 0.9 opacity).
+    - "STANDBY": #2f5fe0 with an opacity pulse of 0.50–0.89, so 2.1–4.4:1.
+    - Personal Agents card descriptions: 2.2:1.
+    - "LAT: 0ms": 3.74:1.
+    - Meeting Agent hint text #a2a8b6 on white: 2.38:1.
+    - Disabled Test Call: 1.64:1. It is exempt, but it looks broken.
+  - Dark theme: muted #7b8196 on #1a1d26 is 4.35:1.
+- **Screenshots:** audit/screenshots/va-a11y-auto/analytics.png, audit/screenshots/va-a11y-auto/leads.png, audit/screenshots/va-a11y-auto/meeting-agent.png, audit/screenshots/va-a11y-auto/personal-agents.png, audit/screenshots/va-a11y-auto/settings.png, audit/screenshots/va-visual-audit/analytics.png, audit/screenshots/va-verify-visual-audit/standby_zoom.png
+- **Recommendation:**
+  - Change the token once: `--text-muted: #5b6478`. That gives 5.93 on #fff, 5.62 on #f7f9fb, 5.48 on #f4f6fa and 5.24 on #eef1f7. In dark mode use at least `#8a90a4` (5.29 on #1a1d26).
+  - Ban alpha and opacity on text colours (`text-text-muted/50`, `/70`, `opacity-60`) and use solid tokens. Stop the STANDBY opacity pulse, or keep its lowest point at 4.5:1 or more.
+  - Personal Agents example cards: `#3e475a` text on the grey card (5.39:1), or switch to a white card.
+  - Type floor:
+    - 12px minimum for informative text, with 11px allowed only for uppercase badges at weight 600;
+    - letter-spacing of 0.06em or less;
+    - 13–14px for body and table text.
+  - Move px utilities to rem. Apply `.type-floor` globally, then remove the arbitrary `text-[8px]` to `text-[10px]` classes and block them with a lint rule.
+
+### F-A11Y-009 — Primary buttons use black or ink text on brand blue (3.27–3.83:1)
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** VISUAL-AUDIT-03, A11Y-AUTO-03, DESIGN-SYSTEM-01, EXPLORE-CORE-07, PUBLIC-SITE-16
+- **Pages:**
+  - Every authenticated page (the wallet banner).
+  - Pages with primary buttons: /dashboard, /leads, /personal-agents, /flow-builder, /call-reports, /billing, /knowledge, /settings, /assistant, /onboarding, /login.
+  - Meeting Agent's own violet: /meeting-agent.
+  - Marketing: /, /build.html, /docs/api.
+- **Evidence:** WCAG 2.2: **1.4.3 Contrast (Minimum) (AA)**.
+  - `.btn-saffron { color: rgb(0,0,0) }` on `--saffron` `#2f5fe0` is **3.83:1**. It is used for:
+    - CONNECT, New Lead, New task, Export CSV;
+    - Flow Save;
+    - Enable UPI Auto-Debit, the ₹500 chip, Pay with UPI;
+    - Upload & Embed, Knowledge Search;
+    - Settings Save Changes and Upload;
+    - Assistant Send and Login Sign In.
+  - Wallet banner (all pages):
+    - "Top up" (`bg-saffron text-ink`, #111725, 12px/600) is **3.27:1**.
+    - "Enable autopay" (#2f5fe0 on #d7dff6) is 4.12:1.
+    - In dark mode "Top up" (#e8eaf2 on #7c6bf5) is 3.31:1.
+  - Meeting Agent's hard-coded violet: white on #8b5cf6 is 4.23:1 (CTAs and the segmented control). The H1 accent is 3.91:1 and the URL links 3.68:1.
+  - Marketing:
+    - White on #7c6bf5 is 3.98:1 ("Get started", "Start free", "Talk to sales", 12–15px).
+    - The build.html nav "Get started" is #8b90a6 on a violet gradient, 1.43–1.82:1.
+    - docs/api "GET A KEY" is black on blue, 3.83:1.
+  - Likely cause: the primary token was re-pointed from saffron (where dark text was correct) to blue, without adding a foreground token.
+  - The two verifiers disagreed. VISUAL-AUDIT-03's verifier kept high. A11Y-AUTO-03's verifier confirmed the values but lowered it to medium because all are above 3:1. We keep **high**: 12–14px semibold labels are not "large text", so the 4.5:1 threshold applies, and these are the most-used controls on every page.
+- **Screenshots:** audit/screenshots/va-visual-audit/dashboard_connect_zoom.png, audit/screenshots/va-visual-audit/billing.png, audit/screenshots/va-visual-audit/login.png, audit/screenshots/va-design-system/zoom-primary-buttons-callreports.png, audit/screenshots/va-verify-a11y-auto/banner-topup-zoom.png, audit/screenshots/va-verify-a11y-auto/connect-btn.png, audit/screenshots/va-public-site/build_nav_zoom.png
+- **Recommendation:**
+  - Add a per-theme `--primary-foreground`, using `#ffffff` in light mode (5.48:1 on #2f5fe0). Remove `color:#000` from `.btn-saffron`, and remove `text-black` and `text-ink` from primary buttons and the banner CTA. Rename the `saffron` token to `primary`.
+  - Meeting Agent: use the brand primary, or darken the violet to `#7c3aed` (5.70:1 with white).
+  - Marketing violet: use `#6a58f0` (4.92:1) or darker. Fix the build.html nav rule that overrides button text colour.
+  - Dark-mode "Top up": use white on a primary shade that reaches at least 4.5:1.
+  - Add an axe contrast check on the Button stories in both themes to CI.
+
+### F-A11Y-010 — Leads: rows cannot take focus, and the lead drawer opens only via j/k + Enter and never receives focus
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** A11Y-MANUAL-04, A11Y-AUTO-07 (Leads part), EXPLORE-DATA-27 (list and drawer part)
+- **Pages:** /leads
+- **Evidence:** WCAG 2.2: **2.4.3 Focus Order (A)**, **4.1.2 Name, Role, Value (A)**, **1.3.1 Info and Relationships (A)**. 2.1.1 is technically met through the visible J/K legend.
+  - Rows are `div[data-lead-row][data-index]` with `cursor:pointer`, no role and no tabindex. There are 267–324 pointer elements without roles.
+  - Each row gives exactly 2 tab stops (checkbox and call button), so 24 rows give 48 stops.
+  - `j` then Enter opens the drawer, an `<aside>` with no role, label or `aria-modal`. Focus stays on `<body>`, and the next Tab goes to a list checkbox, not into the drawer.
+  - Inside the drawer:
+    - The Language `<select>` is unnamed.
+    - The VIKASH/VAANI voice buttons have no `aria-pressed`.
+    - The Close button and the Flow select ("Flow for this call") are correctly named.
+  - Verifier confirmed the structure and the focus behaviour. Two claims were refuted: Esc does close the drawer, and the J/K legend is visible on screen, so the path isn't hidden from sighted keyboard users.
+- **Screenshots:** audit/screenshots/va-a11y-manual/16-leads-jk-nav.png, audit/screenshots/va-a11y-manual/17-leads-after-enter.png, audit/screenshots/va-verify-a11y-manual/12-leads-drawer.png, audit/screenshots/va-verify-a11y-manual/18-leads-after-esc.png
+- **Recommendation:**
+  - Render the lead name as a `<button>` that opens the drawer, and delegate the row click to it.
+  - Drawer on open:
+    - make it a non-modal `role="dialog"`, with `aria-labelledby` pointing to the lead-name heading;
+    - move focus to that heading;
+    - Esc closes it, and focus returns to the row's button.
+  - Name the Language select. Give the voice choice a radiogroup (see F-A11Y-016).
+  - Implement j/k as roving focus (F-A11Y-004).

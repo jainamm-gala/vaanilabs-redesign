@@ -1,0 +1,158 @@
+
+### F-UX-008 — Phone navigation reaches only 6 of 12 sections and has no "More" menu
+- **Severity:** high · **Confidence:** partially-verified
+- **Source findings:** RESPONSIVE-A-01, RESPONSIVE-B-01
+- **Pages:** all authenticated pages at ≤767 px
+- **Evidence:**
+  - At 390×844 the rail (13 links) is `display:none`. The only navigation is the bottom bar (y=788, 56 px tall): Assistant, Agent, Leads, Reports, Billing, Knowledge and **Exit** (a sign-out button).
+  - There is no More, menu or drawer control. A probe for menu|navigation|sidebar|drawer|expand found nothing.
+  - No visible link on any checked page reaches /analytics, /flow-builder, /meeting-agent, /personal-agents or /rep-console, even though those routes render mobile layouts when opened by URL.
+  - Settings is reachable only through the wallet banner's wrong-target links (F-UX-002), and only while the balance is ₹0 and the banner has not been dismissed.
+  - There is no `aria-current`. On /analytics and /settings no tab is shown as active, and the bar has no safe-area padding.
+  - At 390 px the Cockpit also hides the flow selector and Customer Intel (width 0).
+  - The verifier downgraded this from critical: core phone tasks (calls, leads, reports, billing) still work.
+- **Screenshots:** va-verify-responsive-a/dashboard_390.png, va-verify-responsive-a/settings_390.png, va-verify-responsive-b/analytics_390.png, va-verify-responsive-b/settings_390.png, va-explore-core/dashboard_mobile.png
+- **Recommendation:**
+  - Use 4 tabs plus "More", for example Assistant · Agent · Leads · Reports · More.
+  - "More" opens a full-height sheet that lists every destination, grouped like the desktop rail. It ends with Settings, Billing, the account and Sign out, with Sign out separated and confirmed.
+  - Add `aria-current="page"`, an active state for sections opened from More, and `padding-bottom: env(safe-area-inset-bottom)`.
+  - Keep the flow picker visible on the phone Cockpit.
+
+### F-UX-009 — The Call Reports table is 2,617 px wide with 17 columns, no anchor column, only 50 of 121 calls, and mouse-only rows
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** UX-AUDIT-09, EXPLORE-DATA-04
+- **Pages:** /call-reports
+- **Evidence:**
+  - A 2,617 px `<table>` sits in a 1,358 px scroller that is 601 px tall and scrolls vertically on its own.
+  - It has 17 data columns plus an action column:
+    - 7 core columns
+    - 10 extracted-field columns, the union across all flows, including 3× "Condition Check", "Condition Check (Residential)" and the typo "Green & Identity"
+  - Most cells are "—", and the filled ones hold raw caller utterances.
+  - Type, To and Started are not sticky, so after scrolling right a value can't be tied to its call. Row actions sit at x≈2,450.
+  - Only 50 `tbody` rows render for "121 calls", with no pager, load-more or infinite scroll. QA-B-01 reports this separately as a critical functional bug.
+  - Rows have `cursor:pointer`, `tabIndex -1` and no role. Their only focusable children are Re-analyze and Download CSV, so a keyboard user cannot open a call (verified).
+  - The only filters are sentiment chips: there is no date, flow, agent, status or direction filter.
+- **Screenshots:** va-verify-ux-audit/15_call_reports.png, va-explore-data/r2_callreports_hscroll.png, va-explore-data/r2_callreports_bottom.png, va-ux-audit/37_call_reports.png
+- **Recommendation:**
+  - Pin Started, Lead/To, Outcome and Sentiment on the left and the actions on the right, using `position:sticky`.
+  - Collapse the extracted fields into one "Captured" chip column with a column picker. Show per-field columns only when a flow filter is applied, and label duplicates by node ("Condition Check · step 3").
+  - Add server pagination or virtual scrolling with a "1–50 of 121" counter.
+  - Make each row a link to `/call-reports/:id` that Enter or Space opens.
+  - Add Date range, Flow, Direction and Status filters.
+
+### F-UX-010 — The call detail panel buries the transcript at the bottom of a cramped 373 px panel with nested scrolling
+- **Severity:** high · **Confidence:** verified
+- **Source findings:** UX-AUDIT-09, EXPLORE-DATA-23
+- **Pages:** /call-reports (detail panel)
+- **Evidence:**
+  - The panel is about 373 px wide (`w-96`) and holds 2,504 px of content in a 601 px scroll area.
+  - Its order is: details → key elements extracted → Analysis → Topics → AI suggestions → Flow Builder fields → Re-analyze → Learn from this call → Recording → Transcript → Export. The transcript sits in a nested 384 px (`max-h-96`) scroller, and reading it takes about 1,500 px of scrolling.
+  - The page header promises "Recordings, transcripts…", but the opened call says "No recording is available for this call."
+  - The key-elements "question" column is about 90 px wide, so text wraps one word per line.
+  - "FLOW BUILDER FIELDS: not collected" contradicts the captured answers shown above it.
+  - Duration reads "87s" here and "1:27" in the table. The dialled number is "—".
+  - The Call ID is truncated with no copy button, and the close × has no accessible name. Esc does nothing.
+  - After a no-match search the panel stays open on a call that is no longer in the results.
+- **Screenshots:** va-verify-ux-audit/16_call_detail.png, va-verify-ux-audit/18_call_reports_nomatch.png, va-explore-data/r2_callreports_detail.png, va-explore-data/r2_callreports_detail_low.png, va-ux-audit/40_call_detail_scrolled2.png
+- **Recommendation:**
+  - Use a `/call-reports/:id` route or a drawer at least 640 px wide, with tabs:
+    - Summary: outcome, sentiment, 3-line summary
+    - Transcript: with the audio player on top when a recording exists
+    - Extracted data
+    - Actions
+  - Keep one scroll container.
+  - Close on Esc and on × (`aria-label="Close call details"`). Close or re-select when the row drops out of the results.
+  - Add a Copy ID button and use one duration formatter.
+  - Take "not collected" and captured answers from the same source.
+  - Stop promising recordings in the header when recording is off.
+
+### F-UX-011 — The same metrics and call types disagree across Analytics, Call Reports and Billing
+- **Severity:** high · **Confidence:** partially-verified
+- **Source findings:** EXPLORE-DATA-17, EXPLORE-DATA-20, UX-AUDIT-09
+- **Pages:** /analytics, /call-reports, /billing
+- **Evidence:**
+  - Average duration is 1m 18s on Analytics and 90s on Call Reports for the same 121 calls. The verifier re-observed both values.
+  - Call type is INBOUND/OUTBOUND on Analytics and BROWSER on Call Reports.
+  - Each browser test call appears as two rows 1 s apart: one with To "—" and one with the masked number (Analytics §07 shows "— → — INBOUND" plus "OUTBOUND"). Counts are probably inflated.
+  - Analytics §06 Phone shows CALLS ON LINE 0, UNIQUE CALLERS 0, 24 empty hour bars and "No callers yet", while §07 lists inbound calls. The scope (DID calls only) is never stated.
+  - §08 says "No call recordings yet" despite 121 calls and gives no reason.
+  - 158 minutes are used against a ₹0.00 balance and 0 transactions, with no explanation.
+  - One duration appears in four formats: 1m 27s, 1:27, 87s, 90s.
+- **Screenshots:** va-verify-ux-audit/28_analytics_avg.png, va-verify-ux-audit/15_call_reports.png, va-explore-data/analytics_s2400.png, va-explore-data/analytics_s3200.png, va-explore-data/analytics_s3700.png, va-ux-audit/crop_callreports_paired_rows.png
+- **Recommendation:**
+  - Use one metrics service with documented definitions (mean or median; completed calls only or all), and give each KPI a definition tooltip.
+  - Merge call legs into one call record before counting.
+  - Use one enum for channel (Phone / Browser) and one for direction.
+  - Label scopes, for example "Calls to your number: none yet (number not allocated)", with a setup CTA.
+  - Explain missing recordings, for example "Recording is off for browser tests".
+  - Add a usage ledger that reconciles minutes with free credits and wallet debits.
+  - Use one shared `formatDuration`.
+
+### F-UX-012 — Settings "Save Changes" is always enabled, covers only two fields, and silently discards unsaved edits
+- **Severity:** high · **Confidence:** multi-agent
+- **Source findings:** EXPLORE-SETTINGS-06, QA-B-17
+- **Pages:** /settings (Profile) and all Settings sub-pages
+- **Evidence:**
+  - A blue "Save Changes" button (141×37) sits in the page header next to "SETTINGS". Its `disabled` state is always false and it has no dirty styling.
+  - It covers only Full Name and Phone. Subdomain (Edit), WhatsApp brochure (Upload) and Google/Microsoft (Connect) each have their own action.
+  - It disappears on Meetings Billing and Docs, and the header shifts 9 px when it does.
+  - Settings uses 7 save models:
+    - autosave (Notifications)
+    - "Save preference", disabled until the value changes (Call channel)
+    - "Send code"
+    - "Send confirmation links"
+    - "Create webhook"
+    - "Mint key"
+    - "Save Changes"
+  - Two agents typed into Profile, then clicked the Organization sub-nav. The app navigated immediately with no confirm or `beforeunload`, and the edits were lost.
+  - Unsaved edits do survive switching between in-page tabs, but with no dirty indicator.
+- **Screenshots:** va-explore-settings/c17_profile_dirty.png, va-explore-settings/c3_meetings_billing.png, va-qa-b/settings-profile-dirty.png, va-qa-b/settings-call-channel.png, va-qa-b/settings-notifications.png
+- **Recommendation:**
+  - Remove the header Save.
+  - Apply one rule everywhere:
+    - Forms get a section-scoped sticky bar ("Unsaved changes · Discard · Save") that appears only when the form is dirty.
+    - Switches autosave, confirm with a "Saved" toast, and roll back with an error on failure.
+  - Add route-change and `beforeunload` guards for dirty forms.
+  - Validate phone numbers as E.164 with a +91 default and an inline error.
+
+### F-UX-013 — Paid, real-world call actions show no pre-flight check, and bulk "CALL n" and the single-key "C" shortcut dial real leads
+- **Severity:** medium · **Confidence:** partially-verified
+- **Source findings:** UX-AUDIT-04, EXPLORE-DATA-07, QA-B-21
+- **Pages:** /leads, /dashboard
+- **Evidence:**
+  - With the wallet at ₹0.00 and the DID PENDING, every call control is enabled:
+    - bulk "CALL 2", or "CALL 24" after `A` selects all 24 leads
+    - the lead panel's "Call Now"
+    - the per-row phone buttons (titled "Call <name> (c)")
+    - the unmodified `C` shortcut
+    - Cockpit CONNECT, which has no title
+    - Test Call, which enables for "abc"
+  - The 766 px bulk bar holds only voice, language, a "Default flow" select and CALL n. It shows no cost, calling window, DND/consent note or retry policy.
+  - Calling is the only bulk action: no status change, export, tag or delete.
+  - The j/k row focus is visual only (`activeElement` stays BODY).
+  - Buttons were not clicked. The verifier confirmed that no check appears before the click. Whether a confirmation or balance check appears after the click is unverified, so the verifier rated this medium.
+- **Screenshots:** va-verify-ux-audit/04_leads_bulk.png, va-ux-audit/31_leads_two_selected.png, va-ux-audit/34_lead_panel_actions.png, va-explore-data/r2_leads_kbd_selectall.png, va-qa-b/leads-kbd-a.png
+- **Recommendation:**
+  - Build a shared `CallPreflight` used by every call control. It checks wallet, calling number, channel and calling hours. When blocked, it shows the reason and a fix link ("Add ₹100 to call", "Verify a calling number").
+  - For more than one lead, show a confirmation sheet with count × estimated cost against the balance, the flow name and version, voice, caller-ID, calling window and the DND scrub result.
+  - Move the shortcut to Shift+C (or add a confirm popover), and disable it while blocked.
+  - Add bulk Set status, Export, Add to campaign and Delete.
+  - Use a roving tabindex for j/k.
+
+### F-UX-014 — The Cockpit's flow and voice pickers silently save the account default, and silently revert on failure
+- **Severity:** medium · **Confidence:** verified
+- **Source findings:** QA-A-04, EXPLORE-CORE-03
+- **Pages:** /dashboard (the change also affects /meeting-agent)
+- **Evidence:**
+  - Every flow-select change and every Vaani/Vikash click sends `PATCH /api/auth/profile` (`{voice_preference}` or `{active_flow_id}`). Clicking the voice that is already selected also sends a PATCH.
+  - No toast or inline status appears. The only `role=alert` on the page is the wallet banner.
+  - Under simulated failure the UI keeps the new value with no error. After a reload it reverts to Vaani and to the original flow.
+  - The same profile value drives Meeting Agent's "Active flow (from profile)".
+  - The Cockpit has no "Edit in Flow Builder" link and no voice preview. The voice descriptions ("male / direct", "female / warm") exist only in the lead panel.
+  - The default voice is VAANI in the Cockpit and VIKASH in Leads.
+  - The verifier notes that saving a preference instantly is a normal pattern. The defects are the missing feedback and the hidden cross-page effect, so it rated this medium.
+- **Screenshots:** va-verify-qa-a/dash_vikash_after_click.png, va-verify-qa-a/dash_vikash_after_fail.png, va-qa-a/dash_flow_changed_blocked.png, va-explore-core/cockpit_flow_switched.png, va-explore-core/cockpit_vikash_selected.png
+- **Recommendation:**
+  - Make the Cockpit selection session-only ("for this test"). Add an explicit "Set as default" that saves and toasts "Default flow updated · used by Cockpit, Meeting Agent, Leads".
+  - If the pickers stay global, label them "Default flow" and "Default voice", apply the change optimistically with rollback and an error toast, and don't send a PATCH when nothing changed.
+  - Show the voice descriptors, add a voice preview, and link "Open in Flow Builder".
