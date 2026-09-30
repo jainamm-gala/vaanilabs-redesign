@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Sign in · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: sign in (08-public-auth §8) with password, email link and code, Google and Facebook, two-factor code, reasons on arrival, errors and the signed-in panel.">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): the same pre-paint script and vaani:theme key as the app (PA2). Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/auth.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/auth.js" defer></script>
+<script src="pages/auth-forms.js" defer></script>
+<script src="pages/auth-login.js" defer></script>
+</head>
+<!-- AuthLayout, bare shell (08-public-auth §4.2): no navigation, one centred 400 px column in a 464 px panel on --bg.
+     Routes served by this file (the prototype keeps each step addressable by URL):
+       login.html                      /login                  Sign in (password)
+       login.html?method=link          /login?method=link      Sign in with an email link
+       login.html?step=check-email     /login/check-email      Check your email (link or 6-digit code)
+       login.html?step=code            /login/code             Two-factor code (or a recovery code)
+       login.html?step=signing-in      /auth/link, /auth/callback/<provider>   "Signing you in…" (transient)
+       login.html?step=link-other      magic link opened while someone else is signed in
+       login.html?session=1            a signed-in visitor: SignedInPanel, never a silent redirect (PA10)
+     Query: next (a same-origin app page), reason (expired · signed-out · password-changed · link-expired · link-used ·
+     oauth-cancelled · oauth-failed · oauth-link · approved · verified), access=approval, cookies=blocked. -->
+<body data-page="login" class="auth-body">
+<a class="skip-link" href="#main">Skip to main content</a>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <!-- Provider marks (08 §8.5): the product’s only non-token colours, full colour as the providers require. -->
+  <symbol id="auth-b-google" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.52 12.27c0-.85-.08-1.67-.22-2.45H12v4.64h6.46a5.52 5.52 0 0 1-2.4 3.62v3h3.88c2.27-2.09 3.58-5.17 3.58-8.81z"/><path fill="#34A853" d="M12 24c3.24 0 5.96-1.07 7.94-2.91l-3.88-3.01c-1.07.72-2.45 1.15-4.06 1.15-3.13 0-5.78-2.11-6.72-4.95H1.28v3.11A12 12 0 0 0 12 24z"/><path fill="#FBBC05" d="M5.28 14.28A7.2 7.2 0 0 1 4.9 12c0-.79.14-1.56.38-2.28V6.61H1.28A12 12 0 0 0 0 12c0 1.94.46 3.77 1.28 5.39l4-3.11z"/><path fill="#EA4335" d="M12 4.77c1.76 0 3.34.61 4.59 1.8l3.44-3.44C17.95 1.19 15.23 0 12 0A12 12 0 0 0 1.28 6.61l4 3.11C6.22 6.88 8.87 4.77 12 4.77z"/></symbol>
+  <symbol id="auth-b-facebook" viewBox="0 0 24 24"><clipPath id="auth-b-fb-c"><circle cx="12" cy="12" r="12"/></clipPath><circle cx="12" cy="12" r="12" fill="#0866FF"/><path clip-path="url(#auth-b-fb-c)" fill="#FFFFFF" d="M16.67 15.47 17.2 12h-3.33V9.75c0-.95.47-1.87 1.96-1.87h1.51V4.93s-1.37-.23-2.68-.23c-2.74 0-4.53 1.66-4.53 4.66V12H7.08v3.47h3.05V24h3.74v-8.53z"/></symbol>
+</svg>
+
+<div class="auth-page" data-layout="single" data-inert-root>
+  <header class="auth-head">
+    <!-- The lockup links home (/). It replaces "← Back to home". The public site is not part of this prototype. -->
+    <a class="auth-lockup" href="#" data-offsite="The home page" aria-label="Vaani Labs home"><svg class="mark" aria-hidden="true" focusable="false"><use href="#vl-mark"/></svg><span aria-hidden="true">Vaani Labs</span></a>
+  </header>
+
+  <main id="main" class="auth-main" tabindex="-1" data-focus-target>
+    <!-- ============ The panel. This static markup is the password view; auth-login.js reuses it as that view’s template
+         and renders the other steps into the same element. ============ -->
+    <div class="auth-panel" data-view-root>
+      <h1 class="auth-h1" id="auth-title">Sign in</h1>
+      <p class="auth-sub" data-crosslink>New to Vaani Labs? <a class="auth-link" href="signup.html" data-keep-next>Create an account</a></p>
+      <div class="auth-notice-slot" data-notice></div>
+      <div class="auth-oauth" role="group" aria-label="Sign in with another account">
+        <a class="btn btn--lg btn--full has-lead" href="login.html?step=signing-in&amp;via=google&amp;intent=login" data-oauth-provider="google"><svg class="auth-brand" aria-hidden="true" focusable="false"><use href="#auth-b-google"/></svg><span data-label>Continue with Google</span></a>
+        <a class="btn btn--lg btn--full has-lead" href="login.html?step=signing-in&amp;via=facebook&amp;intent=login" data-oauth-provider="facebook"><svg class="auth-brand" aria-hidden="true" focusable="false"><use href="#auth-b-facebook"/></svg><span data-label>Continue with Facebook</span></a>
+      </div>
+      <div class="auth-or" aria-hidden="true">or</div>
+      <form class="auth-form" id="login-form" action="login.html" method="post" novalidate>
+        <div class="field">
+          <label class="field-label" for="login-email">Email</label>
+          <div class="input input--lg"><input id="login-email" name="email" type="email" autocomplete="username" inputmode="email" autocapitalize="none" spellcheck="false" enterkeyhint="next" required></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="login-password">Password</label>
+          <div class="input input--lg"><input id="login-password" name="password" type="password" autocomplete="current-password" enterkeyhint="go" required><button type="button" class="input-btn" data-password-toggle aria-controls="login-password" aria-pressed="false" aria-label="Show password"><i data-icon="eye"></i></button></div>
+          <div class="auth-field-foot"><a class="auth-link auth-link--block" href="forgot-password.html">Forgot password?</a></div>
+        </div>
+        <div class="auth-actions">
+          <div class="auth-formerr" data-formerr></div>
+          <button type="submit" class="btn btn--primary btn--lg btn--full" data-auth-primary data-offline="You’re offline. Connect to sign in."><span data-label>Sign in</span></button>
+          <a class="auth-link auth-link--block" href="login.html?method=link" data-mode="link">Email me a sign-in link instead</a>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <nav class="auth-legal" aria-label="Legal">
+    <ul>
+      <li><a href="#" data-offsite="The privacy policy">Privacy</a></li>
+      <li><a href="#" data-offsite="The terms">Terms</a></li>
+      <li><a href="#" data-offsite="The security overview">Security</a></li>
+      <li><a href="#" data-offsite="The status page">Status</a></li>
+    </ul>
+  </nav>
+
+  <!-- Prototype-only control (not part of the design): opens "Prototype states". Filled by pages/auth.js. -->
+  <aside class="auth-proto" aria-label="Prototype controls"></aside>
+</div>
+
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+</body>
+</html>

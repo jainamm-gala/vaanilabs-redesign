@@ -1,0 +1,175 @@
+/* =====================================================================================================
+   Vaani Labs prototype · pages/auth.css — AuthLayout, the bare shell of every auth route (08-public-auth §4.2):
+   login.html, signup.html (with /signup/verify, /signup/confirm, /signup/workspace, /signup/pending and invites)
+   and forgot-password.html (with /reset-password).
+   Layout and page-local parts only. Buttons, fields, notices, tags, checkboxes, radio cards, stage marks, InlineError,
+   StatusText and dialogs come from assets/components.css unchanged. Tokens only; no gradients, glow or texture.
+   ===================================================================================================== */
+
+/* ---------- Page frame: one centred column on --bg (no grid texture, no glow) ---------- */
+.auth-body { background: var(--bg); }
+.auth-page { display: grid; align-content: center; justify-items: center; gap: var(--space-24); min-height: 100dvh; padding: var(--space-48) var(--page-margin); }
+.auth-head { display: flex; justify-content: center; }
+.auth-lockup { display: inline-flex; align-items: center; gap: var(--space-8); min-height: var(--size-hit-min); padding-inline: var(--space-2); border-radius: var(--radius-4); font: var(--type-title-16); color: var(--text); text-decoration: none; }
+.auth-lockup:hover { color: var(--text); }
+.auth-lockup .mark { width: var(--space-24); height: var(--space-24); }
+.auth-main { display: flex; justify-content: center; width: 100%; min-width: 0; }
+
+/* ---------- Panel: 464 = container-narrow 400 + 2 × 32 (--size-auth-panel) ---------- */
+.auth-panel { width: var(--size-auth-panel); max-width: 100%; min-width: 0; padding: var(--space-32); background: var(--surface); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-12); box-shadow: var(--e0); }
+.auth-panel > * + * { margin-top: var(--space-16); }
+.auth-h1 { margin: 0; font: var(--type-title-24); letter-spacing: var(--type-title-24-tracking); color: var(--text); text-wrap: balance; }
+.auth-panel > .auth-h1 + .auth-sub { margin-top: var(--space-6); }
+.auth-sub { font: var(--type-body-14); color: var(--text-2); text-wrap: pretty; }
+.auth-strong { font-weight: var(--fw-medium); color: var(--text); overflow-wrap: anywhere; }
+.auth-panel > .auth-oauth { margin-top: var(--space-24); }
+.auth-oauth { display: grid; gap: var(--space-8); }
+.auth-brand { width: var(--icon-md); height: var(--icon-md); flex: none; }
+[aria-disabled="true"] > .auth-brand { opacity: var(--opacity-dim); }
+/* The "or" divider: meta-12 between hairlines, 20 above and below; aria-hidden (headings already structure the page). */
+.auth-panel > .auth-or { margin-block: var(--space-20); }
+.auth-or { display: flex; align-items: center; gap: var(--space-12); font: var(--type-meta-12); color: var(--text-3); }
+/* A border, not a fill, so the hairline survives forced colours. */
+.auth-or::before, .auth-or::after { content: ""; flex: 1 1 auto; border-top: var(--bw-hairline) solid var(--border); }
+.auth-panel > .auth-notice-slot:empty, .auth-panel > .auth-summary-slot:empty { display: none; }
+
+/* Fields and actions: 16 between fields (--space-field-gap), 24 from the last field to the primary. */
+.auth-form { display: grid; gap: var(--space-field-gap); min-width: 0; }
+.auth-actions { display: grid; gap: var(--space-16); margin-top: var(--space-8); }
+.auth-panel > .auth-actions { margin-top: var(--space-24); }
+.field-error .auth-link { color: inherit; font-weight: var(--fw-medium); }
+.auth-actions > .auth-link, .auth-actions > .auth-center { justify-self: center; text-align: center; }
+.auth-formerr:empty { display: none; }
+.auth-field-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-4) var(--space-12); }
+
+/* ---------- Links: Neel text, underlined, a hit area of at least 24 (44 on touch) without changing the line ---------- */
+.auth-link { position: relative; display: inline; padding: 0; border: 0; background: none; font: inherit; color: var(--accent-text); text-decoration: underline; text-underline-offset: calc(var(--space-2) + var(--space-1)); text-align: inherit; cursor: pointer; }
+.auth-link::after { content: ""; position: absolute; inset: calc(-1 * var(--space-4)) calc(-1 * var(--space-2)); }
+.auth-link:hover { color: var(--link-hover); }
+.auth-link--block { display: inline-flex; align-items: center; min-height: var(--size-hit-min); font: var(--type-label-13); }
+.auth-link[aria-disabled="true"] { color: var(--text-3); text-decoration: none; cursor: not-allowed; }
+.auth-link .tag { margin-inline-start: var(--space-6); }
+.ierr .auth-link { color: inherit; font-weight: var(--fw-medium); }
+@media (pointer: coarse) {
+  .auth-link::after { inset: calc((var(--type-body-14-lh) - var(--size-hit-touch)) / 2) calc(-1 * var(--space-4)); }
+  .auth-link--block { min-height: var(--size-hit-touch); }
+}
+.auth-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--space-8) var(--space-16); font: var(--type-label-13); }
+.auth-row--start { justify-content: flex-start; }
+.auth-hint { font: var(--type-meta-12); color: var(--text-3); text-wrap: pretty; }
+.auth-hint a { color: var(--text-2); }
+.auth-terms { font: var(--type-meta-12); color: var(--text-3); text-wrap: pretty; }
+.auth-panel > .auth-terms--oauth { margin-top: var(--space-8); }
+.auth-terms a { color: var(--text-2); text-decoration: underline; text-underline-offset: var(--space-2); }
+.auth-terms a:hover { color: var(--text); }
+.auth-center { text-align: center; }
+
+/* PasswordInput extras (core §3.3): Caps Lock hint in text-2; the rules list sits under the box. */
+.auth-caps { display: flex; align-items: center; gap: var(--space-4); font: var(--type-meta-12); color: var(--text-2); }
+/* OneTimeCodeInput (§18): one input, mono-20 digits, 180 wide; never six boxes. */
+.auth-otp .input { width: var(--field-w-short); }
+.auth-otp input { font: var(--type-mono-20); letter-spacing: var(--space-2); font-variant-numeric: tabular-nums; }
+.auth-otp--recovery input { font: var(--type-mono-13); font-size: var(--field-font); letter-spacing: 0; }
+.auth-check-line:empty { display: none; }
+/* ResendLink row and its StatusText ("Sent again at 11:42 am."); the status line keeps its live region in the tree. */
+.auth-resend { display: grid; }
+.auth-panel > .auth-resend + .auth-row { margin-top: var(--space-4); }
+.auth-panel > .stages { margin-top: var(--space-12); }
+.auth-status-line:not(:empty) { margin-top: var(--space-4); }
+/* Error summary (core §8.2 V4, forms with more than three fields): one link per field. */
+.notice .auth-sum-list { display: grid; gap: 0; margin: var(--space-2) 0 0; padding: 0; list-style: none; }
+.auth-sum-list a { display: inline-flex; align-items: center; min-height: var(--size-hit-min); }
+@media (pointer: coarse) { .auth-sum-list a { min-height: var(--size-hit-touch); } }
+
+/* Read-only email (reset, invite) keeps its full address visible. */
+.auth-inline { display: grid; gap: var(--space-8); padding: var(--space-12); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); background: var(--surface-2); }
+.auth-inline-acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-12); }
+
+/* SignedInPanel: avatar, name, masked address and workspace. */
+.auth-who { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-12); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); background: var(--surface-2); }
+.auth-who-text { display: grid; min-width: 0; }
+.auth-who-name { font: var(--type-title-14); color: var(--text); }
+.auth-who-meta { font: var(--type-meta-12); color: var(--text-3); overflow-wrap: anywhere; }
+
+/* Transient landing ("Signing you in…"): nothing for 200 ms, then one quiet line. Never a lone spinner. */
+.auth-transient { font: var(--type-title-16); color: var(--text-2); text-align: center; }
+.auth-panel--transient { display: grid; justify-items: center; gap: var(--space-8); padding-block: var(--space-48); }
+.auth-panel--transient > * + * { margin-top: 0; }
+
+/* Workspace goal: RadioCards two across (one below 480). */
+.auth-goals { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); margin: 0; padding: 0; border: 0; min-width: 0; }
+.auth-goals > legend { grid-column: 1 / -1; margin-bottom: var(--space-6); padding: 0; font: var(--type-label-13); color: var(--text); }
+@media (max-width: 359.98px) { .auth-goals { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- "What happens next" aside (/signup at ≥1024) and its one-line fallback ---------- */
+.auth-aside { display: none; }
+.auth-aside-title { margin: 0; font: var(--type-title-16); color: var(--text); }
+.auth-aside .auth-steps { display: grid; gap: var(--space-16); margin: var(--space-16) 0 0; padding: 0; list-style: none; }
+.auth-steps > li { display: grid; grid-template-columns: var(--space-20) minmax(0, 1fr); gap: var(--space-2) var(--space-10); }
+.auth-steps > li > :not(.smark) { grid-column: 2; }
+.auth-step-n { font: var(--type-label-12); color: var(--text-2); }
+.auth-step-title { margin: 0; font: var(--type-title-14); color: var(--text); }
+.auth-step-body { margin: 0; font: var(--type-body-14); color: var(--text-2); text-wrap: pretty; }
+.auth-aside .auth-facts { display: grid; gap: var(--space-8); margin: var(--space-20) 0 0; padding: var(--space-16) 0 0; border-top: var(--bw-hairline) solid var(--border); list-style: none; font: var(--type-body-14); color: var(--text-2); }
+.auth-facts li { display: flex; align-items: flex-start; gap: var(--space-8); }
+.auth-fact-ic { margin-top: var(--space-2); color: var(--text-3); }
+.auth-actions > .auth-terms + .auth-next { margin-top: calc(-1 * var(--space-8)); }
+.auth-facts .auth-link { white-space: nowrap; }
+.auth-next { font: var(--type-meta-12); color: var(--text-3); }
+@media (min-width: 1024px) {
+  .auth-page[data-layout="pair"] { grid-template-columns: var(--size-auth-panel) var(--size-inspector); column-gap: var(--space-40); justify-content: center; }
+  .auth-page[data-layout="pair"] > .auth-head, .auth-page[data-layout="pair"] > .auth-legal, .auth-page[data-layout="pair"] > .auth-proto { grid-column: 1; }
+  .auth-page[data-layout="pair"] > .auth-main { grid-column: 1 / -1; display: grid; grid-template-columns: subgrid; align-items: start; }
+  .auth-page[data-layout="pair"] .auth-aside { display: block; padding-top: calc(var(--space-32) + var(--bw-hairline)); }
+  .auth-page[data-layout="pair"] .auth-next { display: none; }
+}
+
+/* ---------- Legal footer: Privacy · Terms · Security · Status (replaces "Neural Platform v2.0.4") ---------- */
+.auth-legal ul { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 0 var(--space-16); margin: 0; padding: 0; list-style: none; }
+.auth-legal a { display: inline-flex; align-items: center; min-height: var(--size-hit-min); font: var(--type-meta-12); color: var(--text-2); text-decoration: none; }
+.auth-legal a:hover { color: var(--text); text-decoration: underline; text-underline-offset: var(--space-2); }
+@media (pointer: coarse) { .auth-legal a { min-height: var(--size-hit-touch); } }
+
+/* ---------- ConsentBar (§4.4): non-modal, never takes focus, after main in the DOM ---------- */
+.auth-consent { position: fixed; left: var(--page-margin); bottom: var(--page-margin); z-index: var(--z-toast); display: grid; gap: var(--space-6); width: min(var(--size-toast), calc(100vw - 2 * var(--page-margin))); padding: var(--space-16); background: var(--surface-raised); border: var(--bw-hairline) solid var(--border-overlay); border-radius: var(--radius-8); box-shadow: var(--e3); }
+.auth-consent-title { margin: 0; font: var(--type-label-13); color: var(--text); }
+.auth-consent-text { margin: 0; font: var(--type-body-14); color: var(--text-2); text-wrap: pretty; }
+.auth-consent-text a { color: var(--accent-text); }
+.auth-consent-acts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-8); margin-top: var(--space-6); }
+/* "Never blocks the page" and "never covers a focused element": while the bar shows, pages/auth.js puts has-consent on
+   body and --consent-h (bar top to viewport bottom) on :root. The layout reserves that footprint at its end, so the
+   Terms line, the primary and the Legal links can always scroll clear of the bar, and focus scrolling stops above it.
+   Nothing moves at the top (the bar still overlays, CLS); both rules drop as soon as the visitor chooses. */
+.auth-body.has-consent .auth-page { padding-bottom: calc(var(--consent-h, 0px) + var(--space-16)); }
+/* Auth pages have no TopBar or BottomBar, so the app shell's scroll-padding does not apply here. */
+:root:has(> body.auth-body) { scroll-padding-block: auto; }
+:root:has(> body.auth-body.has-consent) { scroll-padding-bottom: calc(var(--consent-h, 0px) + var(--space-16)); }
+
+/* ---------- Prototype controls (not part of the design) ---------- */
+.auth-proto { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--space-4) var(--space-8); padding-top: var(--space-12); font: var(--type-meta-12); color: var(--text-3); }
+.auth-proto-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-24) var(--space-32); }
+.auth-proto-sec { display: grid; align-content: start; gap: var(--space-8); min-width: 0; }
+.auth-proto-sec--wide { grid-column: 1 / -1; }
+.auth-proto-h { margin: 0; font: var(--type-label-12); color: var(--text-3); }
+.auth-proto-sec .auth-proto-list { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; font: var(--type-data-13); color: var(--text-2); }
+.auth-proto-list a[aria-current="page"] { font-weight: var(--fw-semibold); text-decoration-thickness: var(--bw-strong); }
+.auth-proto-radios { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-6) var(--space-16); margin: 0; padding: 0; border: 0; min-width: 0; }
+.auth-proto-radios > legend { grid-column: 1 / -1; margin-bottom: var(--space-4); padding: 0; font: var(--type-label-12); color: var(--text-3); }
+
+@media (max-width: 767.98px) {
+  .auth-proto-grid, .auth-proto-radios { grid-template-columns: minmax(0, 1fr); }
+}
+
+/* ---------- Tablet and phone ---------- */
+/* Phones: no panel frame; the page becomes --surface; the lockup sits top-left; 44 px controls and 16 px text come
+   from the touch density in tokens.css. */
+@media (max-width: 767.98px) {
+  .auth-body { background: var(--surface); }
+  .auth-page { align-content: start; justify-items: stretch; gap: var(--space-24); padding: var(--space-24) var(--page-margin) var(--space-32); }
+  .auth-head { justify-content: flex-start; }
+  .auth-panel { width: 100%; padding: 0; border: 0; border-radius: 0; background: none; }
+  .auth-panel--transient { padding-block: var(--space-48); }
+  .auth-legal ul { justify-content: flex-start; }
+  .auth-proto { justify-content: flex-start; }
+  .auth-consent { left: 0; right: 0; bottom: 0; width: auto; padding-bottom: calc(var(--space-16) + env(safe-area-inset-bottom)); border-width: var(--bw-hairline) 0 0; border-radius: 0; }
+}
