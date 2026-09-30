@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Assistant · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: the Assistant (03-pages/02). Insert-only suggestions, a quiet streamed conversation, a plan shown before anything runs, approval cards, and the Call and Publish gates for every consequential step.">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/assistant.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<!-- Page scripts: modules register on window.VaaniAssistant; assistant.js (last) boots the page. -->
+<script src="pages/assistant-data.js" defer></script>
+<script src="pages/assistant-ui.js" defer></script>
+<script src="pages/assistant-plan.js" defer></script>
+<script src="pages/assistant-cards.js" defer></script>
+<script src="pages/assistant-actions.js" defer></script>
+<script src="pages/assistant-gates.js" defer></script>
+<script src="pages/assistant-scripts.js" defer></script>
+<script src="pages/assistant-engine.js" defer></script>
+<script src="pages/assistant-composer.js" defer></script>
+<script src="pages/assistant-history.js" defer></script>
+<script src="pages/assistant-proto.js" defer></script>
+<script src="pages/assistant.js" defer></script>
+</head>
+<body data-page="assistant">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <!-- Workbench archetype: the header stays put; the conversation and the plan each scroll on their own at ≥ 1024;
+         below 1024 the document scrolls and the PlanBar + composer dock at the bottom (02 §5). -->
+    <main id="main" class="app-main app-main--frame as-main" tabindex="-1" data-focus-target>
+      <!-- PageHeader: "page" on a new chat (H1 Assistant, meta = the mode sentence); "nested" on a saved chat. No primary. -->
+      <div class="ph as-ph" id="as-ph">
+        <div class="ph-title">
+          <nav class="crumbs as-crumbs" id="as-crumbs" aria-label="Breadcrumb" hidden><a href="assistant.html" id="as-crumb-link">Assistant</a><i data-icon="chevron-right" data-size="sm"></i></nav>
+          <h1 id="page-title">Assistant</h1>
+          <span class="ph-meta as-meta"><span class="as-meta-t" id="as-meta">Asks before changing anything.</span></span>
+        </div>
+        <div class="ph-actions as-actions">
+          <button class="btn btn--sm btn--tertiary has-lead as-proto-btn proto-btn" type="button" id="as-proto-btn" aria-label="Prototype states" aria-haspopup="dialog" aria-expanded="false" aria-controls="as-proto" data-tooltip="For reviewers: every state in the spec. Not part of the product."><i data-icon="sliders-horizontal" data-size="sm"></i><span class="as-proto-l">Prototype states</span></button>
+          <button class="btn btn--tertiary has-lead as-wide" type="button" id="as-hist-btn" aria-haspopup="dialog" aria-expanded="false" aria-controls="as-history"><i data-icon="history"></i>History</button>
+          <button class="ibtn ibtn--lg as-narrow" type="button" id="as-hist-ibtn" aria-label="History" aria-haspopup="dialog" aria-expanded="false" aria-controls="as-history"><i data-icon="history" data-size="lg"></i></button>
+          <button class="btn has-lead as-wide" type="button" id="as-new-btn"><i data-icon="square-pen"></i>New chat</button>
+          <button class="ibtn ibtn--lg as-narrow" type="button" id="as-new-ibtn" aria-label="New chat"><i data-icon="square-pen" data-size="lg"></i></button>
+          <button class="ibtn as-more-btn" type="button" id="as-more-btn" aria-label="More actions" aria-haspopup="menu" aria-controls="as-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+          <button class="ibtn as-wide" type="button" id="as-plan-toggle" aria-label="Plan panel" aria-pressed="true" aria-controls="as-plan" data-tooltip="Hide plan"><i data-icon="panel-right"></i></button>
+        </div>
+      </div>
+      <div class="as-notices" id="as-notices"></div>
+      <div class="as-work" id="as-work">
+        <section class="as-convo" id="as-convo" aria-labelledby="as-convo-h">
+          <h2 class="sr-only" id="as-convo-h">Conversation</h2>
+          <div class="as-scroll" id="as-scroll">
+            <div class="as-col" id="as-col"></div>
+          </div>
+          <!-- Drop target while files are dragged over the conversation (not a tab stop; Attach is the keyboard path). -->
+          <div class="as-drop" id="as-drop" aria-hidden="true" hidden><i data-icon="paperclip" data-size="lg"></i><span>Drop to attach · PDF, DOCX, TXT, CSV, XLSX or JSON · up to 10 MB each</span></div>
+          <div class="as-dock" id="as-dock">
+            <button class="btn btn--sm has-lead jump-latest as-jump" type="button" id="as-jump" hidden><i data-icon="arrow-down" data-size="sm"></i>Jump to latest</button>
+            <button class="as-planbar" type="button" id="as-planbar" aria-haspopup="dialog" aria-controls="as-plan-sheet" hidden></button>
+            <div class="as-limit" id="as-limit"></div>
+            <!-- Composer (02 §8): a labelled form; Send is filled only when there is text; Stop replaces it while a reply streams. -->
+            <form class="as-composer" id="as-composer" aria-label="Message the Assistant" novalidate>
+              <div class="as-box" id="as-box">
+                <ul class="as-atts" id="as-atts" aria-label="Attachments" hidden></ul>
+                <div class="as-dict" id="as-dict" hidden></div>
+                <div class="as-interim" id="as-interim" aria-hidden="true" hidden></div>
+                <label class="sr-only" for="as-input">Message the Assistant</label>
+                <textarea class="as-input" id="as-input" rows="1" placeholder="Plan today’s calls…" enterkeyhint="send" autocomplete="off" aria-describedby="as-hint as-cerr"></textarea>
+                <div class="as-tools">
+                  <button class="ibtn as-attach" type="button" id="as-attach" aria-label="Attach files" data-tooltip="Attach files · PDF, DOCX, TXT, CSV, XLSX or JSON · up to 10 MB"><i data-icon="paperclip"></i></button>
+                  <span class="as-tools-sp"></span>
+                  <button class="ibtn as-dictate" type="button" id="as-dictate" aria-label="Dictate" aria-pressed="false" data-tooltip="Dictate"><i data-icon="mic"></i></button>
+                  <button class="btn btn--primary has-lead as-send" type="submit" id="as-send" aria-label="Send" aria-disabled="true" aria-describedby="as-send-why" data-tooltip="Type a message to send"><i data-icon="arrow-up"></i><span class="as-send-l" aria-hidden="true">Send</span></button>
+                  <button class="btn has-lead as-stop" type="button" id="as-stop" data-tooltip="Stop answering" data-kbd="Esc" hidden><i data-icon="square"></i>Stop</button>
+                  <span class="sr-only" id="as-send-why">Type a message to send</span>
+                </div>
+              </div>
+              <input class="sr-only" type="file" id="as-file" multiple tabindex="-1" aria-label="Attach files">
+              <div class="as-cerr" id="as-cerr"></div>
+              <p class="as-hint" id="as-hint">Enter to send · Shift+Enter for a new line</p>
+            </form>
+          </div>
+        </section>
+        <!-- Plan panel (≥ 1024, 02 §9.4): docked 440 (320 at 1024–1279), its own scroll, sticky header and footer. -->
+        <aside class="as-plan" id="as-plan" aria-labelledby="as-plan-title">
+          <div class="as-plan-head">
+            <h2 class="as-plan-h" id="as-plan-title">Plan</h2>
+            <span class="as-plan-tag" id="as-plan-tag"></span>
+            <span class="as-plan-meta num" id="as-plan-meta"></span>
+            <span class="as-sp"></span>
+            <button class="btn btn--sm btn--tertiary" type="button" id="as-stop-plan" hidden>Stop plan</button>
+          </div>
+          <div class="vtabs vtabs--panel"><div class="vtabs-list" role="tablist" aria-label="Plan views" id="as-tabs">
+            <button class="vtab" role="tab" type="button" id="as-tab-plan" aria-controls="as-plan-body" aria-selected="true" data-value="plan">Plan</button>
+            <button class="vtab" role="tab" type="button" id="as-tab-changes" aria-controls="as-plan-body" aria-selected="false" data-value="changes">Changes <span class="vtab-count" id="as-ch-count">0</span></button>
+          </div></div>
+          <div class="as-plan-body" id="as-plan-body" role="tabpanel" aria-labelledby="as-tab-plan"></div>
+          <p class="as-plan-foot" id="as-plan-foot"></p>
+        </aside>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ============ PAGE OVERLAYS ============ -->
+<!-- Plan sheet (below 1024): the same plan as a modal detail sheet from the right; full screen on phones (02 §5.5). -->
+<div class="sheet sheet--detail as-psheet" id="as-plan-sheet" role="dialog" aria-labelledby="as-ps-t" hidden>
+  <div class="sheet-head">
+    <button class="ibtn sheet-back" type="button" data-drawer-close aria-label="Back to the conversation"><i data-icon="chevron-left"></i></button>
+    <div class="sheet-heading"><h2 class="sheet-title" id="as-ps-t">Plan</h2><p class="sheet-meta" id="as-ps-meta"></p></div>
+    <div class="sheet-actions"><button class="ibtn sheet-close" type="button" data-drawer-close aria-label="Close plan"><i data-icon="x"></i></button></div>
+  </div>
+  <div class="vtabs"><div class="vtabs-list" role="tablist" aria-label="Plan views" id="as-stabs">
+    <button class="vtab" role="tab" type="button" id="as-stab-plan" aria-controls="as-ps-body" aria-selected="true" data-value="plan">Plan</button>
+    <button class="vtab" role="tab" type="button" id="as-stab-changes" aria-controls="as-ps-body" aria-selected="false" data-value="changes">Changes <span class="vtab-count" id="as-sch-count">0</span></button>
+  </div></div>
+  <div class="sheet-body" id="as-ps-body" role="tabpanel" aria-labelledby="as-stab-plan"></div>
+  <div class="sheet-foot"><p class="as-plan-foot as-plan-foot--sheet" id="as-ps-foot"></p></div>
+</div>
+
+<!-- History (02 §12.3): a popover at ≥ 768, a bottom sheet on phones. -->
+<div class="pop as-hist" id="as-history" aria-labelledby="as-hist-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="as-hist-t">History</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close history"><i data-icon="x"></i></button></div>
+  <div class="pop-body as-hist-body">
+    <div class="input input--sm"><i data-icon="search" data-size="sm"></i><label class="sr-only" for="as-hist-q">Search chats</label><input id="as-hist-q" type="search" placeholder="Search chats…" autocomplete="off" spellcheck="false" data-autofocus aria-describedby="as-hist-count"></div>
+    <p class="sr-only" id="as-hist-count" role="status"></p>
+    <div id="as-hist-notice"></div>
+    <div class="as-hist-list" id="as-hist-list"></div>
+  </div>
+  <div class="pop-foot as-hist-foot"><span class="as-hist-note">Chats and their files are kept for 90 days.</span><button class="btn btn--sm has-lead" type="button" id="as-hist-new"><i data-icon="square-pen" data-size="sm"></i>New chat</button></div>
+</div>
+
+<!-- Menus -->
+<div class="menu" id="as-more-menu" role="menu" aria-label="More actions" hidden></div>
+<div class="menu" id="as-turn-menu" role="menu" aria-label="More actions for this answer" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="helpful"><i data-icon="thumbs-up"></i><span class="menu-text"><span>Helpful</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="unhelpful"><i data-icon="thumbs-down"></i><span class="menu-text"><span>Not helpful…</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="report"><i data-icon="flag"></i><span class="menu-text"><span>Report a problem…</span></span></button>
+</div>
+<div class="menu" id="as-row-menu" role="menu" aria-label="Chat actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="rename"><i data-icon="pencil"></i><span class="menu-text"><span>Rename…</span></span></button>
+  <div class="menu-sep" role="separator"></div>
+  <button class="menu-item menu-item--danger" role="menuitem" type="button" data-value="delete"><i data-icon="trash-2"></i><span class="menu-text"><span>Delete chat…</span></span></button>
+</div>
+
+<!-- Dictate: first-use explainer (02 §11.1), anchored to the Dictate button. Nothing is asked of the browser before "Allow microphone". -->
+<div class="pop as-mic-pop" id="as-mic-pop" aria-labelledby="as-mic-t" aria-describedby="as-mic-d" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="as-mic-t">Dictate your request</h2></div>
+  <div class="pop-body">
+    <p id="as-mic-d">Speak in English, Hindi or Hinglish. Your words appear in the message box so you can check them. Nothing is sent until you press Send.</p>
+    <div class="field"><span class="field-label" id="as-mic-script-l">Write Hindi as</span>
+      <button type="button" class="select" data-select aria-controls="as-mic-script" aria-labelledby="as-mic-script-l as-mic-script-v"><span class="select-value" id="as-mic-script-v">Auto</span><i data-icon="chevron-down"></i></button>
+      <div class="listbox" id="as-mic-script" role="listbox" aria-labelledby="as-mic-script-l" hidden>
+        <div class="option" role="option" aria-selected="true" data-value="auto"><span class="option-main"><span class="option-label">Auto</span></span><i data-icon="check" class="option-check"></i></div>
+        <div class="option" role="option" aria-selected="false" data-value="deva"><span class="option-main"><span class="option-label">Devanagari (<span lang="hi">हिंदी</span>)</span></span><i data-icon="check" class="option-check"></i></div>
+        <div class="option" role="option" aria-selected="false" data-value="latn"><span class="option-main"><span class="option-label">Latin (Hinglish)</span></span><i data-icon="check" class="option-check"></i></div>
+      </div></div>
+  </div>
+  <div class="pop-foot"><button class="btn btn--tertiary" type="button" id="as-mic-no">Not now</button><button class="btn btn--primary has-lead" type="button" id="as-mic-yes"><i data-icon="mic"></i>Allow microphone</button></div>
+</div>
+
+<!-- Voice conversation (Beta, 02 §11.2): explainer first; nothing connects on click. -->
+<div class="pop as-mic-pop" id="as-voice-pop" aria-labelledby="as-voice-t" aria-describedby="as-voice-d" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="as-voice-t">Voice conversation <span class="tag tag--outline">Beta</span></h2></div>
+  <div class="pop-body"><p id="as-voice-d">Talk with the Assistant hands-free. Replies are spoken and written in the conversation. Voice never approves a step: calls and changes still wait for you on screen.</p></div>
+  <div class="pop-foot"><button class="btn btn--tertiary" type="button" data-popover-close>Not now</button><button class="btn btn--primary has-lead" type="button" id="as-voice-yes"><i data-icon="mic"></i>Start voice conversation</button></div>
+</div>
+
+<!-- Call gate (02-components-gate §5.1, batch): anchored popover from "Review and call…"; a bottom sheet on phones. Filled by assistant-gates.js. -->
+<div class="gate as-cgate" id="as-call-gate" role="dialog" aria-modal="true" aria-labelledby="as-cg-t" aria-describedby="as-cg-s" data-density="standard" hidden></div>
+<!-- Publish gate (§5.2): a modal gate sheet (640), full screen on phones. -->
+<div class="gate gate--sheet as-pgate" id="as-pub-gate" role="dialog" aria-modal="true" aria-labelledby="as-pg-t" aria-describedby="as-pg-s" data-density="standard" hidden></div>
+
+<!-- Dialogs -->
+<div class="dlg dlg--sm" id="as-rename" role="dialog" aria-modal="true" aria-labelledby="as-rename-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="as-rename-t">Rename chat</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body"><div class="field"><label class="field-label" for="as-rename-in">Chat name</label><div class="input"><input id="as-rename-in" maxlength="60" autocomplete="off" data-autofocus aria-describedby="as-rename-err"></div><p class="field-error" id="as-rename-err" hidden></p></div></div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Cancel</button><button type="button" class="btn btn--primary" id="as-rename-save">Save</button></div>
+</div>
+<div class="dlg dlg--lg" id="as-rcp" role="dialog" aria-modal="true" aria-labelledby="as-rcp-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="as-rcp-t">Recipients</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body" id="as-rcp-body"></div>
+  <div class="dlg-foot"><button type="button" class="btn" data-dialog-close>Done</button></div>
+</div>
+<div class="dlg dlg--sm" id="as-fb" role="dialog" aria-modal="true" aria-labelledby="as-fb-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="as-fb-t">Not helpful</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body"><div class="field"><label class="field-label" for="as-fb-in" id="as-fb-l">What was wrong? <span class="field-opt">(optional)</span></label><textarea class="textarea" id="as-fb-in" rows="3" data-autofocus></textarea><p class="field-hint">Your note goes to the Vaani Labs team with this answer. Lead names are removed.</p></div></div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Cancel</button><button type="button" class="btn btn--primary" id="as-fb-send">Send feedback</button></div>
+</div>
+<div class="dlg dlg--sm" id="as-session" role="alertdialog" aria-modal="true" aria-labelledby="as-session-t" aria-describedby="as-session-d" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="as-session-t">Your session expired</h2></div>
+  <div class="dlg-body"><p id="as-session-d">Sign in again to keep working. Your unsent message stays on this device.</p></div>
+  <div class="dlg-foot"><button type="button" class="btn btn--primary" id="as-session-in" data-autofocus>Sign in</button></div>
+</div>
+
+<!-- Prototype-only: every state the spec lists, as links that reload the page into that state (not product UI). -->
+<div class="pop pop--wide as-proto" id="as-proto" aria-labelledby="as-proto-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="as-proto-t">Prototype states <span class="tag tag--outline">Prototype only</span></h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body as-proto-body" id="as-proto-body"></div>
+</div>
+</body>
+</html>
