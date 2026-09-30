@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Billing · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Billing (wallet, UPI top-up, autopay, usage, plans, invoices). Spec 03-pages/05 §2.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/billing.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/billing-data.js" defer></script>
+<script src="pages/billing.js" defer></script>
+<script src="pages/billing-wallet.js" defer></script>
+<script src="pages/billing-topup.js" defer></script>
+<script src="pages/billing-usage.js" defer></script>
+<script src="pages/billing-plans.js" defer></script>
+<script src="pages/billing-autopay.js" defer></script>
+</head>
+<body data-page="billing">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame" tabindex="-1" data-focus-target>
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title">Billing</h1>
+          <span class="ph-meta" id="bill-meta"></span>
+        </div>
+        <div class="ph-actions">
+          <!-- Prototype-only states control (not product UI). It lives in the PageHeader, as on assistant.html, so it never
+               covers content; icon-only below 1280. The menu (#bill-proto-menu) is at the end of the body. -->
+          <button class="btn btn--sm btn--tertiary has-lead bill-proto-btn proto-btn proto-btn--fold" type="button" aria-label="Prototype states" aria-haspopup="menu" aria-controls="bill-proto-menu" aria-expanded="false" data-placement="bottom-end" data-tooltip="For reviewers: every state in the spec. Not part of the product."><i data-icon="sliders-horizontal" data-size="sm"></i><span class="bill-proto-l">Prototype states</span></button>
+          <button class="btn btn--primary" id="bill-topup" type="button"><i data-icon="wallet"></i>Top up</button>
+        </div>
+      </div>
+      <!-- RouteTabs: five links (hash routes in this static prototype for /billing/wallet … /billing/autopay) -->
+      <nav class="vtabs bill-tabs" id="bill-tabs" aria-label="Billing sections">
+        <a class="vtab" href="#wallet" data-tab="wallet">Wallet</a>
+        <a class="vtab" href="#usage" data-tab="usage">Usage</a>
+        <a class="vtab" href="#plans" data-tab="plans">Plans</a>
+        <a class="vtab" href="#invoices" data-tab="invoices">Invoices</a>
+        <a class="vtab" href="#autopay" data-tab="autopay">Autopay<span class="bill-tab-warn" id="bill-ap-warn" hidden><i data-icon="triangle-alert" data-size="xs"></i><span class="sr-only"> needs attention</span></span></a>
+      </nav>
+      <div class="with-sheet bill-work" id="bill-work">
+        <div class="bill-scroll" id="bill-scroll">
+          <div class="l-container l-page bill-page" id="bill-panel" tabindex="-1" data-focus-target></div>
+        </div>
+        <!-- Record sheet: a transaction or an invoice (docked ≥1440, overlay 1024–1439, modal below) -->
+        <div class="sheet sheet--record" id="bill-rec" role="dialog" aria-labelledby="bill-rec-t" data-dockable hidden></div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ================= PAGE OVERLAYS ================= -->
+<!-- Top-up sheet: a money gate (Sheet gate 640, modal; G §5.6). Body and footer rendered by billing-topup.js -->
+<div class="gate gate--sheet bill-gate" id="bill-topup-sheet" role="dialog" aria-modal="true" aria-labelledby="bill-tu-t" aria-describedby="bill-tu-sub" hidden>
+  <div class="gate-head"><h2 class="gate-title" id="bill-tu-t">Top up wallet</h2><button class="ibtn gate-close" type="button" data-drawer-close aria-label="Close top-up"><i data-icon="x"></i></button><span class="gate-sub" id="bill-tu-sub"></span></div>
+  <div class="bill-gate-scroll"><div class="gate-body" id="bill-tu-body"></div></div>
+  <div class="gate-foot" id="bill-tu-foot"></div>
+</div>
+
+<!-- Plan change sheet (money gate) -->
+<div class="gate gate--sheet bill-gate" id="bill-plan-sheet" role="dialog" aria-modal="true" aria-labelledby="bill-pl-t" hidden>
+  <div class="gate-head"><h2 class="gate-title" id="bill-pl-t">Switch plan</h2><button class="ibtn gate-close" type="button" data-drawer-close aria-label="Close plan change"><i data-icon="x"></i></button><span class="gate-sub" id="bill-pl-sub"></span></div>
+  <div class="bill-gate-scroll"><div class="gate-body" id="bill-pl-body"></div></div>
+  <div class="gate-foot" id="bill-pl-foot"></div>
+</div>
+
+<!-- Autopay gate sheet (mandate approval in the UPI app; no in-app primary while waiting) -->
+<div class="gate gate--sheet bill-gate" id="bill-ap-sheet" role="dialog" aria-modal="true" aria-labelledby="bill-ap-t" hidden>
+  <div class="gate-head"><h2 class="gate-title" id="bill-ap-t">Set up autopay</h2><button class="ibtn gate-close" type="button" data-drawer-close aria-label="Close autopay setup"><i data-icon="x"></i></button><span class="gate-sub" id="bill-ap-sub"></span></div>
+  <div class="bill-gate-scroll"><div class="gate-body" id="bill-ap-body"></div></div>
+  <div class="gate-foot" id="bill-ap-foot"></div>
+</div>
+
+<!-- Dialogs, popovers and menus -->
+<div class="dlg" id="bill-details-dlg" role="dialog" aria-modal="true" aria-labelledby="bill-dt-t" aria-describedby="bill-dt-d" data-discard="Discard these changes? The billing details stay as they were." hidden></div>
+<div class="dlg" id="bill-rule-dlg" role="dialog" aria-modal="true" aria-labelledby="bill-rule-t" data-discard="Discard these changes? Autopay keeps its current rule." hidden></div>
+<div class="pop bill-kind-pop" id="bill-kind-pop" aria-labelledby="bill-kind-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="bill-kind-t">Filter transactions</h2></div>
+  <div class="pop-body" id="bill-kind-body"></div>
+  <div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="bill-kind-clear">Clear</button><button class="btn btn--sm" type="button" id="bill-kind-apply" data-popover-close>Show transactions</button></div>
+</div>
+<div class="pop" id="bill-custom-pop" aria-labelledby="bill-custom-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="bill-custom-t">Custom range</h2></div>
+  <div class="pop-body"><div class="l-pair"><div class="field"><label class="field-label" for="bill-from">From</label><div class="input"><input id="bill-from" type="date" min="2026-08-01" max="2026-09-27" value="2026-09-01"></div></div><div class="field"><label class="field-label" for="bill-to">To</label><div class="input"><input id="bill-to" type="date" min="2026-08-01" max="2026-09-27" value="2026-09-27"></div></div></div><p class="field-error" id="bill-custom-e" hidden></p></div>
+  <div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" data-popover-close>Cancel</button><button class="btn btn--sm" type="button" id="bill-custom-apply">Apply</button></div>
+</div>
+<div class="menu" id="bill-inv-menu" role="menu" aria-label="Invoice actions" hidden>
+  <button class="menu-item" role="menuitem" type="button" data-value="copy"><i data-icon="copy"></i><span class="menu-text"><span>Copy invoice number</span></span></button>
+  <button class="menu-item" role="menuitem" type="button" data-value="email"><i data-icon="mail"></i><span class="menu-text"><span>Email to accounts…</span></span></button>
+</div>
+
+<!-- Prototype-only states menu (not product UI); its trigger is the first PageHeader action -->
+<div class="menu bill-proto-menu" id="bill-proto-menu" role="menu" aria-label="Prototype states (not product UI)" hidden></div>
+</body>
+</html>

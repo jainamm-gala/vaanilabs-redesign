@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Knowledge · Vaani Labs</title>
+<meta name="description" content="Vaani Labs redesign prototype: Knowledge (sources, indexing status, Add knowledge, Test a question, proposals). Spec 03-pages/05 §1.">
+<meta name="theme-color" content="">
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/knowledge.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/knowledge-data.js" defer></script>
+<script src="pages/knowledge.js" defer></script>
+<script src="pages/knowledge-table.js" defer></script>
+<script src="pages/knowledge-sheet.js" defer></script>
+<script src="pages/knowledge-test.js" defer></script>
+<script src="pages/knowledge-add.js" defer></script>
+<script src="pages/knowledge-proposals.js" defer></script>
+</head>
+<body data-page="knowledge">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main app-main--frame" tabindex="-1" data-focus-target>
+      <div class="ph">
+        <div class="ph-title">
+          <h1 id="page-title">Knowledge</h1>
+          <span class="ph-meta" id="kn-meta" aria-live="off"></span>
+        </div>
+        <div class="ph-actions">
+          <!-- Prototype-only states control (reviewers; not product UI). In the header like Leads and Call reports, never over content; in ⋯ below 1024 -->
+          <button class="btn btn--tertiary btn--sm ph-fold kn-proto proto-btn proto-btn--fold-wide" type="button" aria-haspopup="menu" aria-controls="kn-proto-menu" aria-expanded="false" data-placement="bottom-end" aria-label="Prototype states" data-tooltip="Prototype states: demo data for reviewers, not product UI"><i data-icon="sliders-horizontal"></i><span class="kn-proto-l">Prototype states</span></button>
+          <button class="btn btn--tertiary ph-fold kn-how-label" type="button" data-popover="kn-how" aria-haspopup="dialog" aria-expanded="false" data-placement="bottom-end"><i data-icon="info"></i>How knowledge works</button>
+          <button class="ibtn ph-fold kn-how-icon" type="button" data-popover="kn-how" aria-haspopup="dialog" aria-expanded="false" data-placement="bottom-end" aria-label="How knowledge works"><i data-icon="info"></i></button>
+          <button class="btn ph-fold" id="kn-test-open" type="button"><i data-icon="search"></i>Test a question</button>
+          <button class="ibtn ph-more" type="button" aria-label="More actions" aria-haspopup="menu" aria-controls="kn-more-menu" aria-expanded="false"><i data-icon="ellipsis"></i></button>
+          <button class="btn btn--primary" id="kn-add" type="button" aria-label="Add knowledge"><i data-icon="plus"></i><span class="u-hide-phone">Add knowledge</span><span class="u-only-phone" aria-hidden="true">Add</span></button>
+        </div>
+      </div>
+      <div class="menu" id="kn-more-menu" role="menu" aria-label="More actions" hidden>
+        <button class="menu-item" role="menuitem" type="button" data-act="how"><i data-icon="info"></i><span class="menu-text"><span>How knowledge works</span></span></button>
+        <button class="menu-item" role="menuitem" type="button" data-act="proto"><i data-icon="sliders-horizontal"></i><span class="menu-text"><span>Prototype states…</span><span class="menu-desc">For reviewers, not part of the product</span></span></button>
+      </div>
+
+      <!-- RouteTabs (admins only; members see no tab row): Sources · Proposals n -->
+      <nav class="vtabs" id="kn-routes" aria-label="Knowledge sections" hidden>
+        <a class="vtab" href="knowledge.html" data-view="sources" aria-current="page">Sources</a>
+        <a class="vtab" href="knowledge.html?view=proposals" data-view="proposals">Proposals <span class="vtab-count" id="kn-prop-count">3</span><span class="sr-only"> pending</span></a>
+      </nav>
+
+      <!-- ================= Sources view ================= -->
+      <div class="with-sheet kn-work" id="kn-sources-view">
+        <section class="kn-col l-cq" id="kn-col" aria-labelledby="page-title" data-shortcut-scope="kn-table">
+          <div class="kn-pane" id="kn-pane-wrap">
+            <div class="seg seg--full" role="radiogroup" aria-label="Show" id="kn-pane">
+              <button type="button" role="radio" aria-checked="true" data-value="sources">Sources</button>
+              <button type="button" role="radio" aria-checked="false" data-value="test">Test</button>
+            </div>
+          </div>
+          <div class="kn-list" id="kn-list">
+            <div class="kn-notice" id="kn-notice" hidden></div>
+            <div class="tb" id="kn-tb">
+              <form class="search" role="search" aria-label="Search sources" id="kn-search-form">
+                <i data-icon="search"></i>
+                <input type="search" id="kn-search" aria-label="Search sources" placeholder="Search sources…" autocomplete="off" data-page-search>
+                <kbd class="kbd" data-single-key>/</kbd>
+              </form>
+              <div class="tb-group tb-scroll" role="group" aria-label="Filters" id="kn-filters">
+                <button class="btn" type="button" data-popover="kn-filter-pop" aria-haspopup="dialog" aria-expanded="false" id="kn-filter-btn"><i data-icon="list-filter"></i>Filter</button>
+              </div>
+              <span class="tb-spacer"></span>
+              <span class="tb-count tb-count--static kn-count" id="kn-count" role="status"></span>
+              <button class="btn btn--tertiary u-hide-phone" type="button" aria-haspopup="menu" aria-controls="kn-cols-menu" aria-expanded="false" id="kn-cols-btn"><i data-icon="columns-3"></i>Columns</button>
+              <div class="seg seg--sm kn-density" role="radiogroup" aria-label="Density" data-density-for="#kn-table" data-density-key="knowledge">
+                <button type="button" role="radio" aria-checked="true" data-value="standard">Standard</button>
+                <button type="button" role="radio" aria-checked="false" data-value="compact">Compact</button>
+              </div>
+            </div>
+            <div class="kn-scroll" id="kn-scroll">
+              <div class="dt-wrap kn-dt-wrap" id="kn-dt-wrap">
+                <table class="dt" id="kn-table">
+                  <caption class="sr-only" id="kn-caption">Sources, sorted by updated, newest first</caption>
+                  <thead><tr>
+                    <th class="c-sel kn-c-sel"><input type="checkbox" class="cb" data-select-all aria-label="Select all sources on this page"></th>
+                    <th scope="col" class="kn-c-src sticky-l" aria-sort="none" data-col="title"><button class="th-sort" type="button">Source<i data-icon="chevrons-up-down" data-size="xs"></i></button></th>
+                    <th scope="col" class="kn-c-status" aria-sort="none" data-col="status"><button class="th-sort" type="button">Status<i data-icon="chevrons-up-down" data-size="xs"></i></button></th>
+                    <th scope="col" class="kn-c-used">Used by</th>
+                    <th scope="col" class="kn-c-upd" aria-sort="descending" data-col="updated"><button class="th-sort" type="button">Updated<i data-icon="arrow-down" data-size="xs"></i></button></th>
+                    <th scope="col" class="kn-c-type">Type · size</th>
+                    <th scope="col" class="kn-c-by">Added by</th>
+                    <th scope="col" class="c-act sticky-r"><span class="sr-only">Actions</span></th>
+                  </tr></thead>
+                  <tbody id="kn-tbody"></tbody>
+                </table>
+              </div>
+              <ul class="kn-rows" id="kn-rows" aria-label="Sources"></ul>
+              <div id="kn-region-state"></div>
+            </div>
+            <div class="bulk" role="toolbar" aria-label="Selected sources" id="kn-bulk" hidden></div>
+            <div class="pager" id="kn-pager"></div>
+          </div>
+        </section>
+
+        <!-- Test a question: docked at ≥1440, non-modal overlay sheet at 1024–1439, the "Test" pane below 1024 -->
+        <aside class="sheet sheet--record kn-test" id="kn-test" aria-labelledby="kn-test-t" hidden>
+          <div class="sheet-head"><div class="sheet-heading"><h2 class="sheet-title" id="kn-test-t">Test a question</h2></div>
+            <div class="sheet-actions"><button class="ibtn kn-test-close" type="button" id="kn-test-close" aria-label="Close Test a question"><i data-icon="x"></i></button></div></div>
+          <div class="sheet-body" id="kn-test-body"></div>
+        </aside>
+
+        <!-- Source sheet (record 440): docked at ≥1440 (swaps with Test), overlay 1024–1439, modal below -->
+        <div class="sheet sheet--record" id="kn-source" role="dialog" aria-labelledby="kn-source-t" data-dockable hidden></div>
+      </div>
+
+      <!-- ================= Proposals view (admins) ================= -->
+      <div class="with-sheet kn-work" id="kn-props-view" hidden>
+        <section class="kn-col l-cq" id="kn-props-col" aria-labelledby="page-title" data-shortcut-scope="kn-props"></section>
+        <div class="sheet sheet--record" id="kn-prop-sheet" role="dialog" aria-labelledby="kn-prop-t" data-dockable hidden></div>
+      </div>
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ================= PAGE OVERLAYS ================= -->
+<!-- How knowledge works (Popover, info variant) -->
+<div class="pop kn-how" id="kn-how" aria-labelledby="kn-how-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="kn-how-t">How knowledge works</h2><button class="ibtn ibtn--sm" type="button" data-popover-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="pop-body"><ol class="kn-steps" id="kn-how-steps"></ol></div>
+  <div class="pop-foot"><a class="btn btn--link" href="flow-designer.html" data-kn-docs>Knowledge lookup in Flows</a></div>
+</div>
+
+<!-- Filter popover: Type · Status · Used by -->
+<div class="pop kn-filter-pop" id="kn-filter-pop" aria-labelledby="kn-filter-t" hidden>
+  <div class="pop-head"><h2 class="pop-title" id="kn-filter-t">Filter sources</h2></div>
+  <div class="pop-body" id="kn-filter-body"></div>
+  <div class="pop-foot"><button class="btn btn--sm btn--tertiary" type="button" id="kn-filter-clear">Clear</button><button class="btn btn--sm" type="button" id="kn-filter-apply" data-popover-close>Show sources</button></div>
+</div>
+
+<!-- Columns menu -->
+<div class="menu" id="kn-cols-menu" role="menu" aria-label="Columns" hidden>
+  <span class="menu-group-label" aria-hidden="true">Show columns</span>
+  <button class="menu-item" role="menuitemcheckbox" aria-checked="true" type="button" data-col-toggle="type" data-keep-open><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>Type · size</span></span></button>
+  <button class="menu-item" role="menuitemcheckbox" aria-checked="false" type="button" data-col-toggle="by" data-keep-open><span class="menu-check"><i data-icon="check"></i></span><span class="menu-text"><span>Added by</span></span></button>
+</div>
+
+<!-- Row ⋯ menu (items rendered for the row that opened it) -->
+<div class="menu" id="kn-row-menu" role="menu" aria-label="Source actions" hidden></div>
+<!-- BulkBar ⋯ menu -->
+<div class="menu" id="kn-bulk-menu" role="menu" aria-label="More bulk actions" hidden></div>
+<!-- Source sheet ⋯ menu -->
+<div class="menu" id="kn-sheet-menu" role="menu" aria-label="Source actions" hidden></div>
+
+<!-- Add knowledge (Dialog md; lg for the table step). Body rendered by knowledge-add.js -->
+<div class="dlg" id="kn-add-dlg" role="dialog" aria-modal="true" aria-labelledby="kn-add-t" aria-describedby="kn-add-d" data-discard="Discard this source? What you typed will be lost." hidden></div>
+
+<!-- Rename (Dialog sm) -->
+<div class="dlg dlg--sm" id="kn-rename-dlg" role="dialog" aria-modal="true" aria-labelledby="kn-rename-t" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="kn-rename-t">Rename source</h2><button type="button" class="ibtn dlg-close" data-dialog-close aria-label="Close"><i data-icon="x"></i></button></div>
+  <div class="dlg-body"><div class="field"><label class="field-label" for="kn-rename-in">Title</label><div class="input"><input id="kn-rename-in" maxlength="100" autocomplete="off" aria-describedby="kn-rename-h kn-rename-e" data-autofocus></div><p class="field-hint" id="kn-rename-h">Shown in the sources list and in call reports when the agent quotes it.</p><p class="field-error" id="kn-rename-e" hidden></p></div></div>
+  <div class="dlg-foot"><button type="button" class="btn btn--tertiary" data-dialog-close>Cancel</button><button type="button" class="btn btn--primary" id="kn-rename-ok">Rename</button></div>
+</div>
+
+<!-- Page drop target (enhancement; "Add knowledge" stays the address) -->
+<div class="kn-drop" id="kn-drop" hidden><p class="kn-drop-t"><i data-icon="upload" data-size="lg"></i>Drop files to add them to Knowledge</p></div>
+
+<!-- Prototype-only states menu (not product UI); opened from the header button, or from ⋯ below 1024 -->
+<div class="menu kn-proto-menu" id="kn-proto-menu" role="menu" aria-label="Prototype states (not product UI)" hidden></div>
+</body>
+</html>

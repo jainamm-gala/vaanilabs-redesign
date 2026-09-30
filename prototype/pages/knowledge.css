@@ -1,0 +1,179 @@
+/* Vaani Labs prototype · pages/knowledge.css — Knowledge (03-pages/05 §1). Tokens only.
+   Layout for the data-page frame (list column + docked Test panel or source sheet at ≥1440), responsive column priorities,
+   and page-owned recipes for the components 03-pages/05 §3 lists as new and the shared layer does not carry yet:
+   Meter (.kn-meter), RetrievalResult (.kn-rr), TablePreview rows (.kn-preview), PageDropTarget (.kn-drop).
+   Reported in shared_requests so they can move into assets/components.css. */
+
+/* ---------- frame: list column + dock (≥1024) ---------- */
+.kn-work { flex: 1 1 auto; min-height: 0; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr); }
+.kn-col { position: relative; display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--surface); }
+.kn-list { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+.kn-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; padding-bottom: var(--space-56); }
+.kn-dt-wrap, .kn-props-wrap { overflow: visible; }
+.kn-notice { flex: none; padding: var(--space-12) var(--page-margin) 0; background: var(--surface); }
+.kn-pane { display: none; }
+.kn-pager-size { display: inline-flex; align-items: center; gap: var(--space-8); }
+.kn-test-close { flex: none; }
+.kn-rows { display: none; }
+#kn-pager:empty { display: none; }
+
+/* header actions: "How knowledge works" is a labelled tertiary button at ≥1280, icon-only 1024–1279, in ⋯ below 1024 */
+.kn-how-icon { display: none; }
+@media (min-width: 1024px) and (max-width: 1279.98px) { .kn-how-label { display: none; } .kn-how-icon { display: inline-grid; } }
+.kn-how { width: var(--size-popover-gate); }
+ol.kn-steps { display: grid; gap: var(--space-8); margin: 0; padding-inline-start: var(--space-20); list-style: decimal outside; font: var(--type-body-14); color: var(--text-2); }
+.kn-steps b { font-weight: var(--fw-semibold); color: var(--text); }
+ol.kn-steps--empty { max-width: var(--size-measure); margin-top: var(--space-16); text-align: left; }
+
+/* ---------- table cells and column priorities (P1–P4, §1.6, §1.16) ---------- */
+.kn-src { display: inline-flex; align-items: center; gap: var(--space-8); max-width: 100%; vertical-align: middle; }
+.kn-src-ic { flex: none; color: var(--text-3); }
+.kn-src-name { display: inline-block; min-width: 0; max-width: calc(var(--space-40) * 7); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; vertical-align: middle; }
+.kn-c-status { min-width: calc(var(--space-40) * 5); }
+.kn-row-bar { display: block; width: calc(var(--space-40) * 3); margin-top: var(--space-4); }
+.kn-by { display: inline-flex; align-items: center; gap: var(--space-6); }
+.kn-hide-type .kn-c-type, .kn-hide-by .kn-c-by { display: none; }
+@container (max-width: 999.98px) { .kn-c-type, .kn-c-by { display: none; } }
+.kn-cell-48 { max-width: calc(var(--space-40) * 7); }
+.kn-cell-a { max-width: calc(var(--space-40) * 8); }
+@container (max-width: 1099.98px) { .kn-p-lang, .kn-p-by { display: none; } .kn-cell-48 { max-width: calc(var(--space-40) * 5); } .kn-cell-a { max-width: calc(var(--space-40) * 5); } }
+/* R3D-12: with the review sheet docked the list column is 768 wide; the two text columns give up a step so the priority columns fit without a scrollbar */
+@container (max-width: 859.98px) { .kn-cell-48 { max-width: calc(var(--space-40) * 4); } .kn-cell-a { max-width: calc(var(--space-40) * 4); } }
+.kn-p-acts { display: inline-flex; align-items: center; gap: var(--space-4); }
+.kn-p-empty { padding: var(--space-24) var(--page-margin); }
+.kn-empty { padding-block: var(--space-24); }
+.kn-first { padding-inline: var(--page-margin); }
+.kn-forbidden { padding-inline: var(--page-margin); }
+.kn-load-err { max-width: var(--size-container-narrow); margin: 0 auto; text-align: left; }
+.kn-li-state { padding: var(--space-24) var(--page-margin); }
+
+/* skeleton bars (static, no shimmer) */
+.kn-sk-w0 { width: calc(var(--space-40) * 4); }
+.kn-sk-w1 { width: calc(var(--space-40) * 3); }
+.kn-sk-w2 { width: calc(var(--space-40) * 2); }
+.kn-sk-meta { display: inline-block; width: calc(var(--space-40) * 5); vertical-align: middle; }
+.kn-sk-li { display: grid; gap: var(--space-8); padding: var(--space-12) var(--page-margin); border-bottom: var(--bw-hairline) solid var(--border); }
+
+/* ---------- Test a question (§1.9) ---------- */
+.kn-test-form { display: grid; gap: var(--space-field-gap); }
+.kn-q-row { display: flex; align-items: center; gap: var(--space-8); }
+.kn-q-row > .input { flex: 1 1 auto; }
+.kn-verdict { display: grid; gap: var(--space-4); }
+.kn-verdict:empty { display: none; }
+.kn-verdict p { margin: 0; }
+.kn-verdict .status > span, .kn-caveat > span, .kn-st > span { flex: 1 1 0; min-width: 0; }
+.kn-st { margin: 0; }
+.kn-caveat { margin: 0 0 var(--space-4); }
+.kn-recent { display: grid; gap: var(--space-6); }
+.kn-recent p { margin: 0; }
+.kn-recent-list { display: flex; flex-wrap: wrap; gap: var(--space-4); }
+.kn-recent-q { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+#kn-results:empty { display: none; }
+
+/* Meter: four segments, a neutral magnitude (never Neel or a state colour); word beside it; role="img" with the value */
+.kn-meter { display: inline-flex; align-items: center; gap: var(--space-2); }
+.kn-meter > i { display: block; width: var(--space-8); height: var(--space-4); border-radius: var(--radius-2); background: var(--surface-3); }
+.kn-meter > .kn-meter-on { background: var(--text-2); }
+
+/* RetrievalResult: rank · source link + location + Meter + word · passage (read-15, 4 lines, Show all) */
+.kn-rr-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.kn-rr { display: grid; grid-template-columns: var(--space-16) minmax(0, 1fr); gap: var(--space-8); padding: var(--space-12) 0; border-top: var(--bw-hairline) solid var(--border); }
+.kn-rr-rank { padding-top: var(--space-2); font: var(--type-label-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.kn-rr-main { display: grid; gap: var(--space-4); min-width: 0; }
+.kn-rr-l1 { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4) var(--space-8); margin: 0; font: var(--type-data-13); }
+.kn-rr-src { font-weight: var(--fw-medium); color: var(--accent-text); }
+span.kn-rr-src { color: var(--text); }
+.kn-rr-loc { font: var(--type-meta-12); color: var(--text-3); }
+.kn-rr-word { font: var(--type-meta-12); color: var(--text-2); }
+.kn-rr-text { margin: 0; color: var(--text); overflow-wrap: anywhere; }
+.kn-rr--below .kn-rr-text { color: var(--text-2); }
+.kn-rr-more { justify-self: start; }
+.kn-clamp4, .kn-clamp6 { display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+.kn-clamp4 { -webkit-line-clamp: 4; }
+.kn-clamp6 { -webkit-line-clamp: 6; }
+.kn-below-toggle { display: flex; align-items: center; gap: var(--space-6); width: 100%; min-height: var(--control-h); padding: var(--space-6) 0; border: 0; border-top: var(--bw-hairline) solid var(--border); background: none; font: var(--type-data-13); color: var(--text-2); text-align: left; cursor: pointer; }
+.kn-below-toggle:hover { color: var(--text); }
+.kn-below-ch { transition: transform var(--dur-fast) var(--ease-standard); }
+.kn-below-toggle[aria-expanded="true"] .kn-below-ch { transform: rotate(90deg); }
+
+/* Unanswered on calls (KB5) */
+.kn-unans { display: grid; gap: var(--space-8); padding-top: var(--space-16); border-top: var(--bw-hairline) solid var(--border); }
+.kn-unans h3 { margin: 0; }
+.kn-unans-list { display: grid; margin: 0; padding: 0; list-style: none; }
+.kn-unans-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: var(--space-2) var(--space-12); padding: var(--space-8) 0; border-top: var(--bw-hairline) solid var(--border); }
+.kn-unans-q { grid-column: 1; font: var(--type-data-13); color: var(--text); overflow-wrap: anywhere; }
+.kn-unans-meta { grid-column: 1; display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); font: var(--type-meta-12); color: var(--text-3); }
+.kn-unans-acts { grid-column: 2; grid-row: 1 / span 2; display: flex; flex-direction: column; align-items: flex-end; gap: var(--space-4); }
+.kn-unans-link { justify-self: start; font: var(--type-data-13); }
+
+/* ---------- source sheet (§1.8) ---------- */
+.kn-sh-state { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.kn-sh-sentence { font: var(--type-data-13); color: var(--text-2); }
+.kn-pass { display: grid; gap: var(--space-12); margin: 0; padding: 0; list-style: none; }
+.kn-pass-item { display: grid; gap: var(--space-4); padding-bottom: var(--space-12); border-bottom: var(--bw-hairline) solid var(--border); }
+.kn-pass-loc { margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.kn-pass-text { margin: 0; color: var(--text); }
+.kn-pass-more { justify-self: start; }
+.kn-sh-pager { display: flex; align-items: center; justify-content: space-between; gap: var(--space-8); font: var(--type-meta-12); color: var(--text-3); }
+.kn-used { display: grid; margin: 0; padding: 0; list-style: none; }
+.kn-used-row { display: flex; align-items: center; gap: var(--space-12); padding: var(--space-10) 0; border-bottom: var(--bw-hairline) solid var(--border); }
+.kn-used-main { display: grid; flex: 1 1 auto; gap: var(--space-2); min-width: 0; }
+.kn-used-name { font: var(--type-label-13); color: var(--text); }
+.kn-used-meta { font: var(--type-meta-12); color: var(--text-3); }
+.kn-used-all { display: grid; gap: var(--space-2); }
+.kn-used-all p, .kn-quoted { margin: 0; }
+.kn-quoted { font: var(--type-data-13); color: var(--text-2); }
+
+/* ---------- Add knowledge: table step (TablePreview) ---------- */
+.kn-cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-8) var(--space-16); }
+.kn-prev-h { margin: 0 0 var(--space-6); }
+.kn-preview { display: grid; gap: var(--space-6); margin: 0; padding: 0; list-style: none; }
+.kn-preview-row { padding: var(--space-8) var(--space-12); border-radius: var(--radius-6); background: var(--surface-2); font: var(--type-data-13); color: var(--text); }
+.kn-textarea { min-height: calc(8 * var(--type-body-14-lh) + 2 * var(--space-8)); }
+@media (pointer: coarse) { .kn-dz-drag { display: none; } }
+
+/* ---------- PageDropTarget: accent-soft fill, 1 px solid accent-mark inset border (never dashed) ---------- */
+.kn-drop { position: fixed; z-index: var(--z-float); display: grid; place-items: center; background: var(--accent-soft); box-shadow: inset 0 0 0 var(--bw-hairline) var(--accent-mark); pointer-events: none; }
+.kn-drop-t { display: flex; align-items: center; gap: var(--space-8); margin: 0; font: var(--type-title-16); color: var(--accent-soft-text); }
+
+/* ---------- prototype-only states control (not product UI) ----------
+   A dashed tertiary button in the PageHeader actions (as in Leads, Call reports and Analytics), never floating over content
+   (WCAG 2.4.11); labelled at ≥1440, icon-only (named, with a tooltip) 1024–1439 so the header stays on one line beside the
+   full sidebar; below 1024 it folds into ⋯ (.ph-fold). */
+@media (min-width: 1024px) and (max-width: 1439.98px) { .kn-proto-l { display: none; } }
+.kn-proto-menu { max-height: min(calc(var(--space-96) * 6), calc(100dvh - 2 * var(--space-16))); }
+
+/* ---------- tablet and phone: one scroller (the page), Sources · Test switch ---------- */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  .kn-work { display: block; }
+  .kn-col, .kn-list { display: block; }
+  .kn-scroll { overflow: visible; padding-bottom: 0; }
+  .kn-dt-wrap { overflow: auto; }
+  .kn-pane { display: block; padding: var(--space-12) var(--page-margin) var(--space-4); background: var(--surface); }
+  .kn-test--pane { width: 100%; max-width: none; min-height: calc(var(--space-96) * 4); }
+  .kn-test--pane .kn-test-close { display: none; }
+  .kn-c-sel, .kn-c-upd, .kn-c-type, .kn-c-by, .kn-meta-passages { display: none; }
+  .kn-c-src { padding-left: var(--page-margin); }
+  .kn-list { padding-bottom: var(--space-48); }
+  /* the H1 is in the TopBar here: the meta takes the room the actions leave and wraps between its parts, so "⋯ Add" never
+     drop to a second line ("14 sources · 1 indexing · 1 queued" at 360) */
+  .app-main > .ph > .ph-title { flex-basis: 0; }
+  .kn-meta-part { white-space: nowrap; }
+}
+@media (max-width: 767.98px) {
+  .kn-dt-wrap, .kn-props-wrap { display: none; }
+  .kn-rows { display: block; }
+  .kn-cols3 { grid-template-columns: minmax(0, 1fr); }
+  .kn-q-row { flex-wrap: wrap; }
+  .kn-q-row > .btn { flex: 1 1 100%; }
+  .kn-count { display: none; }
+  .kn-test--pane .sheet-heading { margin-left: calc(var(--page-margin) - var(--space-4)); }
+  .kn-list { padding-bottom: var(--space-56); }
+  .kn-how { width: auto; }
+}
+
+/* forced colours: keep the Meter's empty segments visible */
+@media (forced-colors: active) {
+  .kn-meter > i { border: var(--bw-hairline) solid CanvasText; }
+  .kn-drop { border: var(--bw-strong) solid Highlight; }
+}

@@ -1,0 +1,162 @@
+/* Vaani Labs prototype · pages/billing.css — Billing (03-pages/05 §2). Tokens only.
+   Layout for the overview frame (cards on the page background, a record sheet docked at ≥1440), the 7 + 5 / 6 + 6 /
+   stacked wallet cards, framed tables with column priorities, PlanCards, the Autopay form column, and page-owned recipes
+   for the components 03-pages/05 §3 lists as new: TopUpSheet body, UpiPayment (.bill-upi, .bill-qr on --qr-fg/--qr-bg in
+   both themes), PlanCard (.bill-plan). Reported in shared_requests. */
+
+/* ---------- frame ---------- */
+.bill-work { flex: 1 1 auto; min-height: 0; grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: minmax(0, 1fr); }
+.bill-scroll { min-width: 0; min-height: 0; overflow: auto; overscroll-behavior: contain; background: var(--bg); }
+.bill-page { display: flex; flex-direction: column; gap: var(--space-section-gap); padding-bottom: var(--space-64); }
+.bill-notice + .bill-top, .bill-notice + .bill-form { margin-top: calc(-1 * var(--space-16)); }
+.bill-tab-warn { display: inline-flex; align-items: center; margin-left: var(--space-4); color: var(--warning-text); }
+.bill-sk-meta { display: inline-block; width: calc(var(--space-40) * 6); vertical-align: middle; }
+.bill-sk-w1 { width: calc(var(--space-40) * 2); }
+.bill-sk-w2 { width: calc(var(--space-40) * 3); }
+.bill-sk-w3 { width: calc(var(--space-40) * 4); }
+.bill-sk-w4 { width: calc(var(--space-40) * 6); }
+.bill-sk-num { min-height: var(--type-num-28-lh); }
+.bill-sk-end { justify-content: flex-end; }
+.bill-sk-chart { height: var(--size-chart-lg); }
+
+/* ---------- Wallet: balance + autopay cards (7 + 5 at ≥1280, 6 + 6 at 1024–1279, stacked below) ---------- */
+.bill-top { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: var(--grid-gutter); }
+.bill-bal { grid-column: span 7; display: grid; align-content: start; gap: var(--space-4); }
+.bill-ap { grid-column: span 5; display: flex; flex-direction: column; }
+.bill-bal-v { margin: var(--space-4) 0 0; color: var(--text); }
+.bill-bal-r { margin: 0; font: var(--type-body-14); color: var(--text-2); }
+.bill-bal-m { margin: var(--space-8) 0 0; font: var(--type-meta-12); color: var(--text-3); }
+.bill-bal .notice { margin-top: var(--space-8); }
+.bill-low { margin: var(--space-4) 0 0; }
+.bill-low > span, .bill-form .status > span, .bill-wait > span, .bill-confirm > span { flex: 1 1 0; min-width: 0; }
+.bill-ap-body { flex: 1 1 auto; margin: 0 0 var(--space-12); }
+.bill-ap-act { display: flex; flex-wrap: wrap; gap: var(--space-8); }
+@media (min-width: 1024px) and (max-width: 1279.98px) { .bill-bal, .bill-ap { grid-column: span 6; } }
+@media (max-width: 1023.98px) { .bill-bal, .bill-ap { grid-column: 1 / -1; } }
+
+/* ---------- sections, framed tables, pager ---------- */
+.bill-sec { display: grid; gap: var(--space-12); min-width: 0; container-type: inline-size; }
+.bill-sec-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); }
+.bill-sec-meta { font: var(--type-meta-12); color: var(--text-3); font-variant-numeric: tabular-nums; }
+.bill-sec-tools { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); margin-left: auto; }
+.bill-frame { min-width: 0; background: var(--surface); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-8); overflow: hidden; }
+.bill-frame tbody tr:last-child > td { border-bottom: 0; }
+@media (min-width: 768px) { .bill-total > td { border-top: var(--bw-hairline) solid var(--border-strong); } }
+.bill-pager-size { display: inline-flex; align-items: center; gap: var(--space-8); }
+.bill-rows, .bill-pager-phone { display: none; }
+.bill-li-amt { justify-self: end; font: var(--type-label-13); color: var(--text); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.bill-inv-acts { display: inline-flex; align-items: center; gap: var(--space-4); }
+.bill-foot-note { margin: 0; max-width: var(--size-measure); font: var(--type-data-13); color: var(--text-2); }
+/* Column priorities measured against the section's own width (so a docked record sheet sheds columns too). 05 §2.16
+   shows P1–P3 at 1280–1440+; Method (P4) is added only when the ledger has its full 1280 column (viewports ≈1580+). */
+@container (max-width: 1259.98px) { .bill-c-method { display: none; } }
+/* Ledger Description (P1 key): takes the width the other columns leave and cuts to one line with an ellipsis, so a long
+   roll-up ("… includes batch 'Weekend follow-ups'") never widens the table; full text in the Tooltip and the sheet. */
+.dt td.bill-c-desc { width: 100%; max-width: 0; }
+.bill-desc { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@container (max-width: 919.98px) { .bill-c-ref, .bill-c-tax { display: none; } }
+@container (max-width: 719.98px) { .bill-c-bal, .bill-c-for { display: none; } }
+@container (max-width: 599.98px) { .bill-c-status { display: none; } }
+
+/* ---------- Usage ---------- */
+.bill-usage-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8) var(--space-12); }
+.bill-scope { margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.bill-chart { height: var(--size-chart-lg); }
+.bill-chart-foot { display: flex; justify-content: flex-end; margin-top: var(--space-8); }
+.bill-chart-table { margin-top: var(--space-12); }
+.bill-test-row { display: inline-flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+@media (max-width: 1279.98px) { .bill-chart { height: var(--size-chart-md); } }
+
+/* ---------- Plans: PlanCards 4 across at ≥1280, 2 × 2 at 768–1279, stacked below ---------- */
+.bill-cur { display: grid; gap: var(--space-8); }
+.bill-cur-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.bill-cur-head h3 { margin: 0; }
+.bill-cur-bar { max-width: calc(var(--space-40) * 9); }
+.bill-plans { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-group-gap); }
+.bill-plan { display: flex; flex-direction: column; gap: var(--space-8); }
+.bill-plan h3, .bill-plan p { margin: 0; }
+.bill-plan-price { white-space: nowrap; color: var(--text); }
+.bill-plan-per { font: var(--type-body-14); color: var(--text-3); }
+.bill-plan-inc { color: var(--text); }
+.bill-plan-pts { display: grid; gap: var(--space-4); margin: 0; padding: 0; list-style: none; font: var(--type-data-13); color: var(--text-2); }
+.bill-plan-pts li { display: flex; align-items: baseline; gap: var(--space-6); }
+.bill-pt-ic { flex: none; color: var(--text-3); transform: translateY(var(--space-1)); }
+.bill-plan-act { margin-top: auto; padding-top: var(--space-8); }
+@media (max-width: 1279.98px) { .bill-plans { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 767.98px) { .bill-plans { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- Invoices ---------- */
+.bill-billed .kv { max-width: var(--size-container-form); }
+.bill-billed .notice { margin-top: var(--space-12); }
+
+/* ---------- Autopay: the 720 form column ---------- */
+.bill-form { display: grid; gap: var(--space-16); width: 100%; max-width: var(--size-container-form); }
+.bill-form .form { max-width: none; }
+.bill-ap-head { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.bill-ap-head + .section-desc { margin-top: calc(-1 * var(--space-8)); }
+.bill-limit { display: grid; gap: var(--space-6); width: 100%; }
+.bill-limit-bar { flex: 1 1 100%; width: 100%; max-width: calc(var(--space-40) * 6); }
+.bill-form .gate-note { margin-top: var(--space-12); }
+.bill-ap-off { padding-top: var(--space-16); border-top: var(--bw-hairline) solid var(--border); }
+
+/* ---------- money gates: TopUpSheet, PlanChangeSheet, AutopayGateSheet ---------- */
+.bill-gate-scroll { flex: 1 1 auto; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.bill-sub-low { display: inline-flex; align-items: center; gap: var(--space-4); color: var(--warning-text); font-weight: var(--fw-medium); }
+.bill-amt-field { gap: var(--space-8); }
+.bill-amt-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-8); }
+.bill-amt-input { flex: 1 1 calc(var(--space-40) * 5); min-width: 0; }
+.bill-adds { margin: 0; min-height: var(--type-data-13-lh); font: var(--type-data-13); color: var(--text-2); }
+.bill-quote dd { justify-content: flex-end; text-align: right; font-variant-numeric: tabular-nums; }
+.bill-quote-total dt, .bill-quote-total dd { font-weight: var(--fw-semibold); color: var(--text); }
+.bill-back { justify-self: start; }
+.bill-pay-h { margin: 0; }
+.bill-upi { display: flex; flex-wrap: wrap; align-items: flex-start; gap: var(--space-20); }
+.bill-qr { flex: none; width: calc(var(--space-40) * 5); height: calc(var(--space-40) * 5); padding: var(--space-8); background: var(--qr-bg); border: var(--bw-hairline) solid var(--border-strong); border-radius: var(--radius-8); }
+.bill-qr svg { display: block; width: 100%; height: 100%; }
+.bill-qr rect { fill: var(--qr-fg); }
+.bill-upi-side { display: grid; flex: 1 1 calc(var(--space-40) * 5); gap: var(--space-16); min-width: 0; }
+.bill-steps { display: grid; gap: var(--space-10); margin: 0; padding: 0; list-style: none; font: var(--type-body-14); color: var(--text); }
+.bill-steps li { display: flex; align-items: baseline; gap: var(--space-10); }
+.bill-step-n { flex: none; min-width: var(--space-12); font: var(--type-label-12); color: var(--text-3); }
+.bill-wait { margin: 0; }
+.bill-or { display: flex; align-items: center; gap: var(--space-12); margin: 0; font: var(--type-meta-12); color: var(--text-3); }
+.bill-or::before, .bill-or::after { content: ""; flex: 1 1 auto; height: var(--bw-hairline); background: var(--border); }
+.bill-vpa-row { display: flex; align-items: center; gap: var(--space-8); }
+.bill-vpa-row > .input { flex: 1 1 auto; }
+.bill-showqr { justify-self: start; }
+.bill-proto-box { display: grid; gap: var(--space-8); padding: var(--space-12); background: var(--surface-2); border: var(--bw-hairline) solid var(--border); border-radius: var(--radius-6); color: var(--text-2); }
+.bill-proto-box p { margin: 0; }
+.bill-result { display: grid; justify-items: start; gap: var(--space-4); }
+.bill-result h3, .bill-result p { margin: 0; }
+/* Declined / Expired / No answer: the Notice title is the result heading (h3, focus target) but reads inline like any notice title */
+.bill-res-title { display: inline; margin: 0; font: inherit; font-weight: var(--fw-semibold); }
+
+/* ---------- prototype-only states control (not product UI) ----------
+   The first PageHeader action (as on assistant.html), so it never covers ledger rows, tables or sheets. Tertiary, and
+   icon-only below 1280 (aria-label and tooltip keep the name). */
+.bill-proto-menu { max-height: min(calc(var(--space-96) * 6), calc(100dvh - 2 * var(--space-16))); }
+@media (max-width: 1279.98px) { .bill-proto-l { display: none; } }
+
+/* ---------- tablet and phone: the page is the one scroller ---------- */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) {
+  .bill-work { display: block; }
+  .bill-scroll { overflow: visible; }
+}
+@media (max-width: 767.98px) {
+  .bill-frame:has(+ .bill-rows) { display: none; }
+  .bill-rows { display: block; background: var(--surface); border: var(--bw-hairline) solid var(--border); border-bottom: 0; border-radius: var(--radius-8); overflow: hidden; }
+  .bill-sec-tools { margin-left: 0; width: 100%; }
+  .bill-pager-phone { display: flex; background: transparent; border-top: 0; padding-inline: 0; }
+  .bill-presets { display: flex; width: 100%; }
+  .bill-presets > button { flex: 1 1 0; height: var(--size-hit-touch); }
+  .bill-amt-input { flex-basis: 100%; }
+  .bill-upi { justify-content: center; }
+  .bill-vpa-row { flex-wrap: wrap; }
+  .bill-vpa-row > .btn { flex: 1 1 100%; }
+  .bill-page { padding-bottom: var(--space-80); }
+}
+
+@media (forced-colors: active) {
+  .bill-qr { forced-color-adjust: none; }
+  .bill-frame, .bill-proto-box { border-color: CanvasText; }
+}
