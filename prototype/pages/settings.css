@@ -154,6 +154,12 @@
 .settings-person-name { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-6); font: var(--type-label-13); color: var(--text); }
 .settings-person-meta { font: var(--type-meta-12); color: var(--text-3); font-weight: var(--fw-regular); }
 .settings-list-row > .settings-person { flex: 1 1 auto; }
+/* R2A-08: long addresses on phones. A member's email stays on one line and truncates (the full address is in its title
+   tooltip) instead of breaking mid-word; an invited member's masked email in the name slot wraps inside its own column
+   instead of running over the role text. Key-value labels stack above values via the shared .kv container rule. */
+.settings-person, .settings-person-text, .settings-person-name { max-width: 100%; }
+.settings-person-name { min-width: 0; overflow-wrap: anywhere; }
+.settings-person-meta.u-wrap-anywhere { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; overflow-wrap: normal; }
 .settings-td-when { color: var(--text-2); }
 /* Members table (§7.2, §11): Person · Role · Last active · ⋯ at ≥ 1024 with a fine pointer. Below 1024, and on coarse
    pointers at any width (Touch density grows the role Select to 44 px at 16 px text), Last active folds into the Person

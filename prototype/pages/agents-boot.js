@@ -41,7 +41,8 @@
       if (t.closest('#mt-filter-apply')) { M.applyFilter(); return; }
       if (t.closest('#mt-hear')) { var h = t.closest('#mt-hear'), on = h.getAttribute('aria-pressed') !== 'true'; h.setAttribute('aria-pressed', on); h.setAttribute('aria-label', on ? 'Stop preview of Vikash' : 'Hear Vikash'); h.innerHTML = icon(on ? 'square' : 'play'); if (on) { V.announce('Playing a sample of Vikash'); setTimeout(function () { if (h.getAttribute('aria-pressed') === 'true') h.click(); }, 4000); } }
     });
-    d.addEventListener('vaani:open', function (e) { if (e.target.id === 'mt-filter-pop') M.renderFilter(); });
+    // Capture phase: shell.js dispatches vaani:open without bubbles, so a bubbling document listener never sees it (R3A-01).
+    d.addEventListener('vaani:open', function (e) { if (e.target.id === 'mt-filter-pop') M.renderFilter(); }, true);
     d.addEventListener('input', function (e) { if (e.target.id !== 'mt-search') return; M.f.q = e.target.value; clearTimeout(M._t); M._t = setTimeout(function () { A.url.set({ q: M.f.q.trim() || null }); M.renderPast(); V.announce(M.visible().length + ' meetings', { dedupeKey: 'mtq' }); }, 250); });
     d.addEventListener('submit', function (e) { if (e.target.id === 'mt-search-form') e.preventDefault(); });
     d.addEventListener('vaani:change', function (e) { if (e.target.id === 'mt-date') { M.f.when = e.detail.value; M.renderPast(); var st = $('#mt-past .ag-sec-head .status'); if (st) st.textContent = M.whenLabel(); } });
@@ -93,7 +94,7 @@
     else { if (A.q('meeting') && A.q('full')) { d.body.setAttribute('data-back-href', 'agents.html?view=meetings'); d.body.setAttribute('data-back-label', 'Meetings'); } bootMeetings(); if (A.q('meeting') && A.q('full')) V.shell.render(); if (!A.q('room') && !A.q('meeting')) V.setTitle(null); }
     A.renderProto();
     V.on('breakpoint', function () { A.dock(); });
-    d.addEventListener('vaani:close', function () { setTimeout(A.dock, 0); });
+    d.addEventListener('vaani:close', function () { setTimeout(A.dock, 0); }, true);
     V.on('draweropen', function () { setTimeout(A.dock, 0); });
   }
   V.ready(boot);
