@@ -1,0 +1,160 @@
+/* Vaani Labs · Flow Designer step grammar, shared by every reference mock that draws the canvas:
+   04-flow-designer/01-canvas-and-nodes.html, 02-config-validation-lifecycle.html, 05-responsive-flow.html
+   and 00-direction-specimen.html. Spec: 04-flow-designer/01-canvas-and-nodes.md §4 to §7 and §12.
+   Reads tokens only (tokens.css). Mock-only: the product builds these as React components (FD1 §20.1).
+   Units: everything inside .nl is in flow units and is scaled by --z (the zoom); text roles are clamped
+   so nothing renders under 12 CSS px at rest (FD1 §5.5). */
+
+/* ---------- Glyphs and small primitives used inside steps ---------- */
+.fg-ic,.nl .ic,.pr .ic{fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+.nl .var{font-family:var(--font-mono,ui-monospace,monospace);font-size:var(--f12);background:var(--variable-bg,var(--accent-soft));color:var(--variable-fg,var(--accent-soft-text));border-radius:var(--radius-4);padding:0 4px}
+.nl .tag{display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--radius-4);font:var(--type-label-12);font-size:var(--f12);white-space:nowrap;border:1px solid transparent}
+.nl .tag.neu{background:var(--surface-3);color:var(--text-2)}.nl .tag.inf{background:var(--info-soft);color:var(--info-text)}
+.nl .tag.ok{background:var(--success-soft);color:var(--success-text)}.nl .tag.wn{background:var(--warning-soft);color:var(--warning-text)}
+.nl .tag.bd{background:var(--danger-soft);color:var(--danger-text)}.nl .tag.out{border-color:var(--border-strong);color:var(--text-2)}
+
+/* ---------- Phase ruler: one connected bar, arrow-right between segments (FD1 §4.4) ---------- */
+.pr{display:flex;align-items:center;gap:8px;padding:0 12px;background:var(--surface);border-bottom:1px solid var(--border);min-width:0;white-space:nowrap}
+.pbar{position:relative;display:inline-flex;align-items:center;height:30px;padding:0 1px;border:1px solid var(--border-strong);border-radius:var(--radius-6);background:var(--surface);flex:none}
+.pbar::before{content:"";position:absolute;left:16px;right:16px;top:50%;border-top:1px solid var(--border-strong)}
+.seg{position:relative;z-index:1;display:inline-flex;align-items:center;gap:6px;height:26px;padding:0 10px 0 3px;border-radius:var(--radius-4);font:var(--type-label-13);color:var(--text-2);background:var(--surface);border:1px solid transparent}
+.seg b{font-weight:600;color:var(--text);font-variant-numeric:tabular-nums}
+.seg .gt{width:20px;height:20px;border-radius:var(--radius-4)}.seg .gt .ic{width:12px;height:12px}
+.seg.on{background:var(--accent-soft);border-color:var(--accent-mark);color:var(--accent-soft-text)}
+.pbar .arr{position:relative;z-index:1;display:inline-flex;align-items:center;color:var(--text-3);padding:0 3px}
+.pbar .arr .ic{width:16px;height:16px}
+.pcol{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:var(--radius-6);color:var(--text-2);border:1px solid transparent;flex:none}
+.pcol.on{background:var(--surface-3);color:var(--text);border-color:var(--border-strong)}
+.pcol .ic{width:16px;height:16px}
+.live{display:flex;align-items:center;gap:8px;font:var(--type-data-13);color:var(--text-2);min-width:0;overflow:hidden}
+.live a{color:var(--accent-text);font-weight:500;flex:none}
+.live .lt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- Canvas surface ---------- */
+.cv{position:relative;overflow:hidden;background-color:var(--canvas);background-image:radial-gradient(var(--canvas-dot) 1px,transparent 1.2px);background-size:16px 16px;background-position:8px 8px;min-width:0}
+.edges{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
+.edges path{fill:none;stroke:var(--edge);stroke-width:1.5}
+.edges path.fb{stroke-dasharray:5 4}
+.edges path.con{stroke:var(--edge-hover,var(--text-2))}
+.edges path.hov{stroke:var(--edge-hover,var(--text-2));stroke-width:2}
+.edges path.sel,.edges path.tk{stroke:var(--edge-active);stroke-width:2}
+.edges path.bad{stroke:var(--danger)}
+.edges path.gh{stroke:var(--edge-active);opacity:var(--opacity-drag)}
+.edges path.dim{opacity:var(--opacity-dim)}
+.elb{position:absolute;z-index:2;transform:translate(-50%,-50%);display:inline-flex;align-items:center;gap:4px;height:20px;padding:0 6px;border-radius:var(--radius-4);background:var(--surface);border:1px solid var(--border-strong);font:var(--type-label-12);color:var(--text-2);white-space:nowrap}
+.elb.sel{background:var(--accent-soft);border-color:var(--accent-mark);color:var(--accent-soft-text)}
+.elb.bad{border-color:var(--danger-border);color:var(--danger-text)}
+
+/* ---------- Phase columns view (off by default; FD1 §4.4) ---------- */
+.bands{position:absolute;inset:0;z-index:0;pointer-events:none}
+.band{position:absolute;top:0;bottom:0}
+.band.alt{background:var(--surface-2)}
+.band .bh{position:absolute;left:0;right:0;top:0;height:24px;display:flex;align-items:center;gap:6px;padding:0 8px;font:var(--type-label-12);color:var(--text-2);background:var(--surface);border-bottom:1px solid var(--border);white-space:nowrap;overflow:hidden}
+.band .bh b{font-weight:600;color:var(--text)}
+
+/* ---------- Steps (flow units, scaled by --z) ---------- */
+.nl{position:absolute;left:0;top:0;transform-origin:0 0;transform:scale(var(--z,1));z-index:1;
+  --f12:max(12px,calc(12px / var(--z,1)));--f13:max(13px,calc(12px / var(--z,1)));--f14:max(14px,calc(12px / var(--z,1)))}
+.n{position:absolute;background:var(--surface-raised);border:1px solid var(--border-strong);border-radius:var(--radius-8);box-shadow:var(--e1);color:var(--text)}
+.nb{display:flex;gap:10px;padding:12px 16px 10px 12px;align-items:flex-start}
+.gt{width:var(--size-glyph-tile);height:var(--size-glyph-tile);border-radius:var(--radius-6);display:grid;place-items:center;flex:none}
+.gt .ic{width:14px;height:14px}
+.gt.ink{background:var(--ink-tile);color:var(--ink-tile-fg)}
+.gt.line{background:var(--surface);border:1px solid var(--control);color:var(--text)}
+.gt.tint{background:var(--surface-3);color:var(--text)}
+.gt.ok{background:var(--success-soft);color:var(--success-text)}
+.gt.wn{background:var(--warning-soft);color:var(--warning-text)}
+.gt.nu{background:var(--surface-3);color:var(--text-2)}
+.gt.bdt{background:var(--danger-soft);color:var(--danger-text)}
+.nt{min-width:0;flex:1}
+.pw{display:flex;gap:6px;font-size:var(--f12);line-height:20px;font-weight:600;color:var(--text-3);white-space:nowrap}
+.pw .no{margin-left:auto;padding-left:6px;font-weight:400;font-variant-numeric:tabular-nums;flex:none}
+.pwt{min-width:0;overflow:hidden;text-overflow:ellipsis}
+.tt{font-size:var(--f14);line-height:20px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sm2{font-size:var(--f13);line-height:20px;color:var(--text-2);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-top:2px}
+.mt{font-size:var(--f12);line-height:20px;color:var(--text-3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:4px}
+/* Outcome status line: plain text "Lead → Interested", never a chip (FD1 §4.3, §5.1) */
+.mt.ost .ic{width:12px;height:12px;flex:none}
+.mt.ost b{font-weight:400;color:var(--text-2)}
+/* Logic: answer rows (what the caller says): label-13 + bilingual examples, left-aligned */
+.ans{position:relative;display:flex;align-items:center;gap:8px;height:28px;padding:0 20px 0 12px;border-top:1px solid var(--border)}
+.ans b{font-size:var(--f13);line-height:20px;font-weight:500;color:var(--text);white-space:nowrap}
+.ans .ex{font-size:var(--f12);line-height:20px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* Action: result rows (what the tool did): 12 px check or x in text-3, data-13 label in text-2, no examples, inset rule */
+.res{position:relative;display:flex;align-items:center;gap:6px;height:28px;padding:0 20px 0 12px}
+.res::before{content:"";position:absolute;left:12px;right:12px;top:0;border-top:1px solid var(--border)}
+.res .ic{width:12px;height:12px;flex:none;color:var(--text-3)}
+.res .rl{font-size:var(--f13);line-height:20px;font-weight:400;color:var(--text-2);white-space:nowrap}
+.ans.fbk,.res.fbk{background:var(--surface-2);border-radius:0 0 7px 7px}
+.ans.req .ex{color:var(--warning-text)}
+.n.trig{border-radius:999px var(--radius-8) var(--radius-8) 999px}
+.n.trig .nb{padding-left:16px}
+.n.out{border-radius:var(--radius-8) 999px 999px var(--radius-8)}
+.n.out .nb{padding-right:32px}
+/* sockets */
+.sk{position:absolute;width:var(--size-socket);height:var(--size-socket);border-radius:50%;background:var(--socket);box-shadow:0 0 0 2px var(--surface-raised);right:-5px;top:50%;margin-top:-5px;z-index:2}
+.sk.free{background:var(--surface);border:1.5px solid var(--socket-border);box-shadow:none}
+.sk.req{background:var(--warning-soft);border:1.5px solid var(--warning-border);box-shadow:none}
+.sk.acc{background:var(--accent-mark)}
+.sk.kf{outline:2px solid var(--focus);outline-offset:2px}
+.sk.ip{left:-5px;right:auto;top:42px;margin-top:-5px}
+.stub{position:absolute;left:100%;top:50%;width:20px;border-top:1.5px solid var(--warning-border);margin-left:5px}
+.qa{position:absolute;left:100%;top:50%;margin:-10px 0 0 12px;width:20px;height:20px;border-radius:var(--radius-4);background:var(--surface);border:1px solid var(--border-strong);display:grid;place-items:center;color:var(--text-2);box-shadow:var(--e1)}
+/* states (FD1 §5.4) */
+.n.sel{border-color:var(--accent-mark);box-shadow:var(--e2),inset 0 0 0 1px var(--accent-mark)}
+.n.sel>.nb{background:var(--accent-soft);border-radius:7px 7px 0 0}
+.n.trig.sel>.nb{border-radius:999px 7px 7px 999px}
+.n.out.sel>.nb{border-radius:7px 999px 999px 7px}
+.n.foc{outline:2px solid var(--focus);outline-offset:var(--focus-offset-node)}
+.n.hov{border-color:var(--control)}
+.n.err{border-color:var(--danger-border)}
+.n.wrn{border-color:var(--warning-border)}
+/* Unreachable and dimmed: never opacity on an ancestor of text (foundations §10). The fill changes to
+   surface-2; only the glyph tile and sockets (and, in the edge layer, connectors) are dimmed. */
+.n.unr,.n.dim{background:var(--surface-2);box-shadow:none}
+.n.unr .gt,.n.unr .sk{opacity:var(--opacity-unreachable)}
+.n.dim .gt,.n.dim .sk{opacity:var(--opacity-dim)}
+.n.now{box-shadow:var(--e1),inset 3px 0 0 var(--accent-mark)}
+.nbg{position:absolute;top:0;right:12px;transform:translateY(-50%);z-index:3;display:flex;gap:4px}
+/* level of detail (FD1 §5.5) */
+.n.cmp .nb{padding:8px 16px 8px 10px;align-items:center}
+.n.cmp .pw,.n.cmp .tt{line-height:32px}.n.cmp .ans,.n.cmp .res{height:36px}
+.n.blk{display:flex;align-items:center;gap:8px;padding:8px 12px;min-height:72px}
+.n.blk .gt{width:40px;height:40px}.n.blk .gt .ic{width:28px;height:28px}
+/* Block label: counter-scaled overlay right of the tile, 140 screen px, two lines, #n first */
+.blab{position:absolute;left:60px;top:8px;z-index:3;width:calc(var(--bw,140px) / var(--z,1));padding:calc(2px / var(--z,1)) calc(6px / var(--z,1));background:var(--surface-raised);border:calc(1px / var(--z,1)) solid var(--border);border-radius:calc(4px / var(--z,1));font-size:calc(12px / var(--z,1));line-height:calc(16px / var(--z,1));font-weight:600;color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:break-word}
+.blab i{font-style:normal;font-weight:400;color:var(--text-3);margin-right:calc(4px / var(--z,1))}
+.n.blk.sel .blab{border-color:var(--accent-mark);background:var(--accent-soft)}
+/* frames and notes */
+.frm{position:absolute;border-radius:var(--radius-8);z-index:0}
+.frm.neel{background:var(--frame-neel);border:1px solid var(--frame-neel-border)}
+.frm.teal{background:var(--frame-teal);border:1px solid var(--frame-teal-border)}
+.frm.ochre{background:var(--frame-ochre);border:1px solid var(--frame-ochre-border)}
+.frm.slate{background:var(--frame-slate);border:1px solid var(--frame-slate-border)}
+.frm .fhd{display:flex;align-items:center;gap:6px;height:32px;padding:0 8px;font-size:var(--f13);font-weight:600;color:var(--text)}
+.frm .fhd .t3{font-weight:400}
+.note{position:absolute;background:var(--surface-2);border:1px solid var(--border);border-radius:var(--radius-6);padding:8px 10px;width:220px}
+.note .nth{display:flex;gap:6px;align-items:center;font-size:var(--f12);line-height:16px;color:var(--text-3);margin-bottom:4px}
+.note p{font-size:var(--f13);line-height:20px;color:var(--text)}
+/* canvas chrome */
+.cc{position:absolute;left:12px;bottom:12px;display:flex;gap:8px;z-index:4}
+.bg{display:inline-flex;background:var(--surface-raised);border:1px solid var(--border-strong);border-radius:var(--radius-6);box-shadow:var(--e1);overflow:hidden}
+.bg>span{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:30px;min-width:30px;padding:0 8px;font:var(--type-label-13);color:var(--text-2)}
+.bg>span+span{border-left:1px solid var(--border-strong)}
+.mm{position:absolute;right:12px;bottom:12px;width:176px;height:112px;background:var(--surface-raised);border:1px solid var(--border-strong);border-radius:var(--radius-6);box-shadow:var(--e1);z-index:4;overflow:hidden}
+.mm i{position:absolute;background:var(--border-strong);border-radius:var(--radius-2)}
+.mm i.k{background:var(--ink-tile)} .mm i.w{background:var(--warning)} .mm i.e{background:var(--danger)}
+.mm .vp{position:absolute;border:1.5px solid var(--accent-mark);border-radius:var(--radius-2)}
+.bulk{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);display:flex;align-items:center;gap:6px;padding:6px 6px 6px 12px;background:var(--surface-raised);border:1px solid var(--border-overlay);border-radius:var(--radius-8);box-shadow:var(--e3);z-index:5;white-space:nowrap}
+.bulk .cnt{font:var(--type-label-13);padding-right:8px;border-right:1px solid var(--border);font-variant-numeric:tabular-nums}
+.find{position:absolute;right:12px;top:12px;width:320px;display:flex;align-items:center;gap:4px;padding:4px;background:var(--surface-raised);border:1px solid var(--border-overlay);border-radius:var(--radius-8);box-shadow:var(--e2);z-index:5}
+.find .inp{flex:1;height:28px;border-color:var(--focus);outline:2px solid var(--focus);outline-offset:1px}
+mark{background:var(--text-selection);color:inherit;border-radius:2px}
+/* coarse pointers: answer and result rows grow to the touch target so each socket's 44 x 44 hit fills the row's end (FD1 §6.1) */
+@media (pointer: coarse){.ans,.res{height:var(--size-hit-touch,44px)}}
+/* forced colours (FD1 §16.5) */
+@media (forced-colors: active){
+  .n{border-color:ButtonBorder}.n.sel{border-color:Highlight}
+  .sk,.edges path{forced-color-adjust:none}.edges path{stroke:CanvasText}
+  .pbar::before{border-color:CanvasText}
+}
