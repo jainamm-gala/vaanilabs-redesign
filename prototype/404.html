@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+<title>Page not found · Vaani Labs</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Vaani Labs redesign prototype: Not found, no access and page errors inside the app shell (03-pages/00 §15).">
+<meta name="theme-color" content="">
+<!-- THEME_BOOT (01-foundations §15.3): theme, motion, sidebar and single-key preferences before first paint. Keep verbatim. -->
+<script>(function(){var d=document.documentElement,g=function(k){try{return localStorage.getItem(k)}catch(e){return null}};var t=g('vaani:theme')||'system';if(t!=='light'&&t!=='dark')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(g('vaani:motion')==='reduce')d.setAttribute('data-motion','reduce');if(g('vaani:sidebar')==='collapsed')d.setAttribute('data-sidebar','collapsed');d.setAttribute('data-shortcuts',g('vaani:shortcuts')==='off'?'off':'on');})();</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Tamil:wght@500&family=Noto+Sans+Telugu:wght@500&family=Noto+Sans+Bengali:wght@500&family=Noto+Sans+Gujarati:wght@500&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Malayalam:wght@500&family=Noto+Sans+Gurmukhi:wght@500&family=Noto+Sans+Oriya:wght@500&display=swap&text=%E0%AE%A4%E0%B0%A4%E0%B1%86%E0%A6%AC%E0%AA%97%E0%B2%95%E0%B4%AE%E0%A8%AA%E0%AC%93" rel="stylesheet">
+<link rel="stylesheet" href="assets/tokens.css">
+<link rel="stylesheet" href="assets/base.css">
+<link rel="stylesheet" href="assets/components.css">
+<link rel="stylesheet" href="pages/404.css">
+<script src="assets/icons.js" defer></script>
+<script src="assets/data.js" defer></script>
+<script src="assets/shell.js" defer></script>
+<script src="pages/404.js" defer></script>
+</head>
+<!-- Not found, no access and page errors (03-pages/00 §15, 02-components-overlay-feedback §16). Always inside the shell: the
+     navigation, the Baseline and the palette stay, so the user can go anywhere. No sci-fi copy, no build numbers, no illustration:
+     the largest graphic is a 20 px icon. data-page names no destination, so no nav item is current on an unknown route.
+     The default is NotFound; ?demo=record|forbidden|error show the other page-level variants (prototype only). -->
+<body data-page="not-found">
+<a class="skip-link" href="#main">Skip to main content</a>
+<div class="app">
+  <nav class="sb" aria-label="Main" data-vaani="sidebar"></nav>
+  <nav class="rail" aria-label="Main" data-vaani="rail"></nav>
+  <div class="topbar topbar--auto" role="region" aria-label="Page title and status" data-vaani="topbar"></div>
+  <div class="app-col">
+    <main id="main" class="app-main" tabindex="-1" data-focus-target>
+      <div class="ph nf-ph">
+        <div class="ph-title">
+          <nav class="crumbs" id="nf-crumbs" aria-label="Breadcrumb" hidden></nav>
+          <h1 id="page-title">Page not found</h1>
+        </div>
+      </div>
+
+      <!-- ================================ PAGE CONTENT ================================ -->
+      <section class="l-container nf" id="nf-region" aria-labelledby="nf-t">
+        <div class="empty empty--page nf-block" id="nf-block">
+          <i data-icon="search-x" data-size="lg"></i>
+          <h2 class="empty-title" id="nf-t">This page doesn’t exist.</h2>
+          <p id="nf-body">The link may be old, or the page was moved.</p>
+          <div class="empty-actions" id="nf-actions">
+            <a class="btn btn--primary" href="index.html" id="nf-landing">Go to Home</a>
+            <button class="btn" type="button" data-vaani-action="palette" aria-haspopup="dialog"><i data-icon="search"></i>Search</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Prototype-only control (not part of the design): the other page-level error variants of the same pattern. -->
+      <div class="l-container nf-proto-wrap">
+        <section class="card" aria-labelledby="nf-proto-h">
+          <div class="card-head">
+            <h2 class="card-title" id="nf-proto-h">Prototype states</h2>
+            <span class="tag tag--outline"><i data-icon="info"></i>Prototype only, not part of the design</span>
+          </div>
+          <p class="card-body">The same pattern for every page-level failure (03‑pages/00 §15.1). Each link reloads this page as that route would render.</p>
+          <ul class="nf-proto-list" id="nf-proto-list"></ul>
+        </section>
+      </div>
+      <!-- ================================ /PAGE CONTENT ================================ -->
+    </main>
+    <div class="bl" role="region" aria-label="Workspace status" data-baseline data-vaani="baseline"></div>
+  </div>
+  <nav class="bbar" aria-label="Main" data-vaani="bottombar"></nav>
+</div>
+<div class="toast-region" role="region" aria-label="Notifications" data-vaani="toasts"></div>
+<div class="sr-only" role="status" aria-live="polite" data-vaani="announcer"></div>
+<div class="portal" data-vaani="portal"></div>
+
+<!-- ================================ PAGE OVERLAYS ================================ -->
+<!-- SessionExpired (overlay §16.1): only on an explicit 401 from a background request, never on a timeout. Dialog sm. -->
+<div class="dlg dlg--sm" id="nf-session" role="dialog" aria-modal="true" aria-labelledby="nf-session-t" aria-describedby="nf-session-d" hidden>
+  <div class="dlg-head"><h2 class="dlg-title" id="nf-session-t">Your session expired.</h2></div>
+  <div class="dlg-body"><p id="nf-session-d">Sign in again to keep working. Edits on this page stay on this device.</p></div>
+  <div class="dlg-foot">
+    <button class="btn btn--primary" type="button" id="nf-signin"><i data-icon="log-in"></i>Sign in</button>
+  </div>
+</div>
+</body>
+</html>

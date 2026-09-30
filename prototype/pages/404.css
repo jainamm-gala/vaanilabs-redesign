@@ -1,0 +1,13 @@
+/* Not found, no access and page errors (404.html) · layout only; visuals come from the EmptyState classes (overlay §15.2).
+   03-pages/00 §15.2: centred, 48 px top padding (.empty--page); on phones every action is a full-width button. */
+.nf { padding-block: var(--space-24); }
+.nf-retry { margin: var(--space-8) 0 0; }
+.nf-proto-wrap { padding-block: var(--space-48) var(--space-40); }
+ul.nf-proto-list { display: flex; flex-wrap: wrap; gap: var(--space-8); margin: var(--space-12) 0 0; padding: 0; list-style: none; }
+@media (max-width: 767.98px) {
+  .nf-block .empty-actions { width: 100%; }
+  .nf-block .empty-actions > .btn { width: 100%; }
+}
+/* Below 1024 the H1 moves into the TopBar (with the Back link on sub-pages); this page has no header actions, so the empty
+   header row is dropped rather than left as a blank strip. */
+@media (max-width: 1023.98px), (min-width: 768px) and (max-height: 599.98px) { .nf-ph { display: none; } }
