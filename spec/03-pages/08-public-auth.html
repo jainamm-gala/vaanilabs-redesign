@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Public and auth reference</title>
+<meta name="description" content="Vaani Labs (Sutradhar) reference mock for spec/03-pages/08-public-auth.md: sign in, errors, create account, check email, two-factor code, reset password, the marketing header and hero with the recorded-call player, pricing rates and estimate, the footer band, and phone frames.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<script>try{var t=new URLSearchParams(location.search).get('theme');if(t==='light'||t==='dark')document.documentElement.setAttribute('data-theme',t);}catch(e){}</script>
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="../components/components.css">
+<style>
+/* Page layout only. Button, IconButton, Tag, Notice, Checkbox, SegmentedControl, LanguageMark, TurnRow and the mark
+   come from ../components/components.css, unmodified. AuthLayout, MarketingLayout, the pricing table and the footer band
+   are page-local and drawn with tokens only. */
+:root{--font-hanken:"Hanken Grotesk","Noto Sans";}
+body{background:var(--bg);color:var(--text)}
+*,*::before,*::after{box-sizing:border-box}
+h1,h2,h3,h4,p,ul,ol{margin:0} ul,ol{padding:0;list-style:none}
+button{cursor:pointer;font:inherit;color:inherit}
+a{text-decoration:none}
+.t2{color:var(--text-2)} .t3{color:var(--text-3)}
+
+/* ---------- Document chrome (not product UI) ---------- */
+.doc-h{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;padding:40px 40px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.doc-h h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking)}
+.doc-h p{margin-top:6px;color:var(--text-2);max-width:var(--size-measure)}
+.doc-h .ids{font:var(--type-meta-12);color:var(--text-3)}
+.sec{padding:40px;border-bottom:1px solid var(--border)}
+.sec-h{margin-bottom:20px;max-width:1360px}
+.sec-h h2{font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking)}
+.sec-h p{color:var(--text-2);margin-top:4px;max-width:var(--size-measure)}
+.frames{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.fl{font:var(--type-label-12);color:var(--text-3);margin-bottom:8px} .fl b{color:var(--text-2);font-weight:500}
+.dev{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:var(--radius-12);background:var(--bg);box-shadow:var(--e2)}
+
+/* ---------- Page-local primitives ---------- */
+.lnk{color:var(--accent-text);text-decoration:underline;text-underline-offset:3px;font:var(--type-label-13);display:inline-flex;align-items:center;min-height:24px}
+.lnk--dis{color:var(--text-dis);text-decoration:none}
+.field{display:grid;gap:var(--space-label-gap)}
+.field>label,.field>.lbl{font:var(--type-label-13);color:var(--text)}
+.box{display:flex;align-items:center;gap:8px;height:max(var(--space-40),var(--control-h));border:1px solid var(--control);border-radius:var(--radius-6);background:var(--surface);padding:0 3px 0 var(--space-10);font-size:var(--field-font);line-height:var(--type-body-14-lh);color:var(--text)}
+.box .v{flex:1;min-width:0;white-space:nowrap;overflow:hidden}
+.box--err{border-color:var(--danger-border)}
+.box--ro{background:var(--surface-2);border-color:var(--border)}
+.box--focus{outline:var(--focus-width) solid var(--focus);outline-offset:var(--focus-offset)}
+.dots{letter-spacing:0;font-size:18px;line-height:1}
+.tgl{display:grid;place-items:center;width:calc(max(var(--space-40),var(--control-h)) - 8px);height:calc(max(var(--space-40),var(--control-h)) - 8px);border-radius:var(--radius-4);color:var(--text-2);flex:none}
+.hint{font:var(--type-meta-12);color:var(--text-3)}
+.err{display:flex;gap:6px;align-items:flex-start;font:var(--type-meta-12);color:var(--danger-text)}
+.notice b{font-weight:600}
+.ierr{display:flex;gap:8px;align-items:flex-start;color:var(--danger-text);font:var(--type-data-13)}
+.ierr .lnk{color:var(--danger-text);min-height:0}
+.divider{display:flex;align-items:center;gap:12px;font:var(--type-meta-12);color:var(--text-3);margin:4px 0}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+.chk{display:flex;gap:8px;align-items:center;font:var(--type-body-14)}
+.otp{width:var(--size-menu-min)} .otp .v{font:var(--type-mono-20);font-variant-numeric:tabular-nums}
+.rules{display:grid;gap:4px} .rules li{display:flex;gap:6px;align-items:center;font:var(--type-meta-12);color:var(--text-3)} .rules .ok{color:var(--success-text)}
+/* Provider marks in the OAuth buttons: one colour (currentColor), no brand fills in the mock */
+.brand{width:16px;height:16px;flex:none;fill:currentColor}
+
+/* ---------- AuthLayout ---------- */
+.auth{display:grid;justify-items:center;align-content:start;gap:var(--space-24);padding:var(--space-48) var(--space-24)}
+.lockup{display:inline-flex;align-items:center;gap:8px;font:var(--type-title-16);color:var(--text)}
+.panel{width:calc(var(--size-container-narrow) + 2 * var(--space-32));background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-12);padding:var(--space-32);display:grid;gap:var(--space-16);align-content:start}
+.panel h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking);text-wrap:balance}
+.panel .sub{color:var(--text-2);margin-top:-8px;display:flex;flex-wrap:wrap;gap:0 4px;align-items:center}
+.stack8{display:grid;gap:var(--space-8)}
+.legal{display:flex;flex-wrap:wrap;justify-content:center;gap:0 14px;font:var(--type-meta-12);color:var(--text-2)}
+.legal span{min-height:24px;display:inline-flex;align-items:center}
+.pair{display:grid;grid-template-columns:auto 320px;gap:var(--space-40);align-items:start}
+.aside h2{font:var(--type-title-16)} .aside ol{display:grid;gap:14px;margin-top:14px}
+.aside li{display:grid;grid-template-columns:20px 1fr;gap:4px 10px}
+.aside .n{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--control);display:grid;place-items:center;font:var(--type-label-12);color:var(--text-2)}
+.aside li b{font:var(--type-title-14)} .aside li p{grid-column:2;color:var(--text-2)}
+.aside .facts2{margin-top:20px;padding-top:16px;border-top:1px solid var(--border);display:grid;gap:8px;color:var(--text-2)}
+.row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+/* ---------- Marketing ---------- */
+.mk-h{height:var(--size-header);background:var(--surface);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:var(--space-24);padding:0 var(--page-margin)}
+.mk-h .in{max-width:var(--size-container-page);margin:0 auto;width:100%;display:flex;align-items:center;gap:var(--space-32)}
+.mk-nav{display:flex;gap:var(--space-20)} .mk-nav span{font:var(--type-label-13);color:var(--text-2);height:var(--size-header);display:flex;align-items:center;border-bottom:2px solid transparent;white-space:nowrap}
+.mk-nav .cur{color:var(--text);border-bottom-color:var(--accent-mark)}
+.mk-r{margin-left:auto;display:flex;align-items:center;gap:var(--space-8)}
+.wrap{max-width:var(--size-container-page);margin:0 auto;padding:0 var(--page-margin)}
+.hero{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);column-gap:var(--space-64);row-gap:var(--space-32);padding:var(--space-64) 0 var(--space-64);align-items:start}
+.hero>h1{grid-column:1/-1;max-width:28ch}
+.hero .lead{margin-top:0}
+.hero h1{font:var(--type-display-56);letter-spacing:var(--type-display-56-tracking);text-wrap:balance}
+.lead{font:var(--type-lead-16);color:var(--text-2);margin-top:var(--space-20);max-width:30em}
+.cta{display:flex;gap:var(--space-12);margin-top:var(--space-32);flex-wrap:wrap}
+.reassure{margin-top:var(--space-12);font:var(--type-meta-12);color:var(--text-3)}
+.player{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-8);overflow:hidden}
+.pl-h{padding:var(--space-12) var(--space-16);border-bottom:1px solid var(--border);display:grid;gap:10px}
+.pl-h .ttl{font:var(--type-title-14)} .pl-h .meta{font:var(--type-meta-12);color:var(--text-3)}
+.scrub{display:flex;align-items:center;gap:12px}
+.scrub .tm{font:var(--type-meta-12);font-variant-numeric:tabular-nums;color:var(--text-3)}
+.track{flex:1;height:4px;border-radius:var(--radius-2);background:var(--surface-3);position:relative}
+.track b{position:absolute;left:0;top:0;bottom:0;width:13%;background:var(--accent-mark);border-radius:var(--radius-2)}
+.track s{position:absolute;top:50%;left:13%;width:14px;height:14px;border-radius:50%;background:var(--surface);border:2px solid var(--accent-mark);transform:translate(-50%,-50%)}
+.pl-more{padding:var(--space-10) var(--space-16)}
+.pl-f{display:flex;flex-wrap:wrap;gap:12px 16px;align-items:end;padding:var(--space-12) var(--space-16);border-top:1px solid var(--border);background:var(--surface)}
+.pl-f .field>.lbl{font:var(--type-label-12);color:var(--text-3)}
+.sel{display:inline-flex;align-items:center;justify-content:space-between;gap:8px;min-width:150px;height:var(--control-h);border:1px solid var(--control);border-radius:var(--radius-6);padding:0 8px 0 10px;background:var(--surface);font:var(--type-data-13);color:var(--text)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.facts li{display:flex;gap:10px;padding:var(--space-16) var(--space-16) var(--space-16) 0;color:var(--text-2)}
+.hero .facts{grid-template-columns:1fr;margin-top:var(--space-40);border-bottom:0}
+.hero .facts li{padding:var(--space-12) 0;border-bottom:1px solid var(--border)}
+.facts b{display:block;font:var(--type-label-13);color:var(--text)} .facts span{font:var(--type-meta-12);color:var(--text-3)}
+.p-h{padding:var(--space-64) 0 var(--space-40)}
+.p-h h1{font:var(--type-display-40);letter-spacing:var(--type-display-40-tracking)}
+.pgrid{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:var(--space-40);align-items:start;padding-bottom:var(--space-64)}
+.pgrid h2{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking);margin-bottom:var(--space-16)}
+table.rates{width:100%;border-collapse:separate;border-spacing:0;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-8);overflow:hidden}
+.rates caption{text-align:left}
+.rates th{font:var(--type-label-12);color:var(--text-3);text-align:left;height:var(--size-table-head);padding:0 var(--space-12);border-bottom:1px solid var(--border);background:var(--surface)}
+.rates td{font:var(--type-data-13);height:var(--row-h);padding:0 var(--space-12);border-bottom:1px solid var(--border);color:var(--text)}
+.rates tr:last-child td{border-bottom:0}
+.rates .r{text-align:right;font-variant-numeric:tabular-nums}
+.rates .u{color:var(--text-2)} .rates .big{font:var(--type-num-20)}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-8);padding:var(--space-panel-pad-lg);display:grid;gap:var(--space-16)}
+.card h2{font:var(--type-title-16);margin:0}
+.estv{font:var(--type-num-28);letter-spacing:var(--type-num-28-tracking)}
+/* MarketingFooter: an inverse band. data-surface="inverse" remaps the text tokens; the Baseline's own tokens stay reserved
+   for the Baseline (see scratchpad request). */
+.mk-f{background:var(--surface-inverse);color:var(--text-2)}
+.mk-f .cols{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:var(--space-24);padding:var(--space-40) 0 var(--space-24)}
+.mk-f h3{font:var(--type-label-13);color:var(--text);margin-bottom:8px}
+.mk-f li{font:var(--type-data-13);min-height:32px;display:flex;align-items:center;gap:6px}
+.mk-f .bot{display:flex;align-items:center;gap:12px;padding:var(--space-16) 0 var(--space-24);border-top:1px solid var(--text-3);font:var(--type-meta-12)}
+
+/* ---------- Phone frames: touch density on the frame (the media query cannot fire in a wide viewport) ---------- */
+.pp{--control-h:44px;--control-h-sm:36px;--row-h:48px;--tag-h:24px;--field-font:1rem;--page-margin:16px;
+  --btn-px-sm:var(--space-12);--btn-px-md:var(--space-16);--btn-font-md:var(--type-button-14);--hit:var(--size-hit-touch);
+  --type-display-56-size:2.5rem;--type-display-56-lh:2.75rem;--type-display-56:var(--type-display-56-weight) var(--type-display-56-size)/var(--type-display-56-lh) var(--font-sans);
+  --type-title-24-size:1.25rem;--type-title-24-lh:1.75rem;--type-title-24:var(--type-title-24-weight) var(--type-title-24-size)/var(--type-title-24-lh) var(--font-sans);
+  width:390px;height:844px;background:var(--surface)}
+.pp .auth{padding:var(--space-24) var(--page-margin);justify-items:stretch;gap:var(--space-20)}
+.pp .panel{width:auto;border:0;padding:0;border-radius:0;background:transparent}
+.pp .legal{justify-content:flex-start}
+.pp .mk-h{padding:0 var(--page-margin);gap:8px}
+.pp .hero{grid-template-columns:1fr;gap:var(--space-20);padding:var(--space-32) 0}
+.pp .hero>h1{max-width:none}
+.pp .cta{flex-direction:column;margin-top:var(--space-24)} .pp .cta .btn{width:100%}
+.pp .lead{font:var(--type-body-16);color:var(--text-2)}
+.sheet{position:absolute;inset:0;background:var(--surface-overlay);display:grid;grid-template-rows:auto 1fr auto}
+.sheet .sh-h{display:flex;align-items:center;justify-content:space-between;height:var(--size-header);padding:0 var(--page-margin);border-bottom:1px solid var(--border)}
+.sheet li{height:48px;display:flex;align-items:center;padding:0 var(--page-margin);border-bottom:1px solid var(--border);font:var(--type-body-16)}
+.sheet .sh-f{padding:var(--space-16) var(--page-margin) var(--space-24);display:grid;gap:var(--space-12);border-top:1px solid var(--border)}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vl-i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="vl-i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol><symbol id="vl-i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol><symbol id="vl-i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="vl-i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol><symbol id="vl-i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol><symbol id="vl-i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol><symbol id="vl-i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol><symbol id="vl-i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol><symbol id="vl-i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol><symbol id="vl-i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="vl-i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="vl-i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="vl-i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="vl-i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="vl-i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="vl-i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol><symbol id="vl-i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="vl-i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol><symbol id="vl-i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol><symbol id="vl-i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="vl-i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol><symbol id="vl-i-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.06 12.35a1 1 0 0 1 0-.7 10.75 10.75 0 0 1 19.88 0 1 1 0 0 1 0 .7 10.75 10.75 0 0 1-19.88 0"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-circle-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></symbol>
+<symbol id="i-monitor" viewBox="0 0 24 24"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8M12 17v4"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+<symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-languages" viewBox="0 0 24 24"><path d="m5 8 6 6M4 14l6-6 2-3M2 5h12M7 2h1M22 22l-5-10-5 10M14 18h6"/></symbol>
+<symbol id="i-map-pin" viewBox="0 0 24 24"><path d="M20 10c0 5-5.5 10.2-7.4 11.8a1 1 0 0 1-1.2 0C9.5 20.2 4 15 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+<symbol id="i-external" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-corner" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5"/><path d="M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+<symbol id="b-google" viewBox="0 0 24 24"><path d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></symbol>
+<symbol id="b-fb" viewBox="0 0 24 24"><clipPath id="b-fb-clip"><circle cx="12" cy="12" r="12"/></clipPath><path clip-path="url(#b-fb-clip)" fill-rule="evenodd" d="M0 12a12 12 0 1 0 24 0a12 12 0 1 0-24 0zM16.6 15.5l.5-3.4h-3.3V9.9c0-.9.5-1.9 2-1.9h1.5V5.2s-1.4-.2-2.7-.2c-2.7 0-4.5 1.6-4.5 4.6v2.5H7.1v3.4h3v8.4c.6.1 1.2.1 1.9.1s1.2 0 1.8-.1v-8.4z"/></symbol>
+</svg>
+
+<header class="doc-h">
+  <div>
+    <h1>Public site and auth</h1>
+    <p>Reference mock for <b>spec/03-pages/08-public-auth.md</b>. The same tokens, type and Neel accent as the app; every value comes from <code>tokens.css</code>. Light and dark follow the OS, or add <code>?theme=dark</code>.</p>
+    <p class="ids">F-QA-010 · F-QA-011 · F-QA-012 · F-QA-013 · F-QA-030 · F-QA-039 · F-A11Y-025 · F-VIS-025 · F-VIS-026. People, workspaces and addresses are made up.</p>
+  </div>
+</header>
+
+<section class="sec" id="sec-auth">
+  <div class="sec-h"><h2>A · Auth screens (AuthLayout, bare shell)</h2><p>One 400 px column in a 464 px surface panel on <code>--bg</code>. No grid texture, no gradient, one Neel button per screen. Fields and buttons are size lg (40 px).</p></div>
+  <div class="frames">    <div>
+      <p class="fl"><b>A0 · /login at 1440 × 900</b> · fine pointer, so Email is focused on load · "Last used" marks the previous method</p>
+      <div class="dev" id="f-a0" style="width:1360px;height:820px">
+        <div class="auth">
+          <span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span>
+          <div class="panel">
+            <h1>Sign in</h1>
+            <p class="sub">New to Vaani Labs? <a href="#" class="lnk">Create an account</a></p>
+            <div class="stack8">
+              <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-google"/></svg>Continue with Google <span class="tag tag--outline">Last used</span></button>
+              <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-fb"/></svg>Continue with Facebook</button>
+            </div>
+            <div class="divider">or</div>
+            <div class="field"><label>Email</label><div class="box box--focus"><span class="v"></span></div></div>
+            <div class="field"><label>Password</label><div class="box"><span class="v"></span><span class="tgl" aria-label="Show password"><svg class="ic"><use href="#i-eye"/></svg></span></div><a href="#" class="lnk" style="justify-self:start">Forgot password?</a></div>
+            <button type="button" class="btn btn--primary btn--lg btn--full" style="margin-top:8px">Sign in</button>
+            <a href="#" class="lnk" style="justify-self:center">Email me a sign-in link instead</a>
+          </div>
+          <nav class="legal" aria-label="Legal"><span>Privacy</span><span>Terms</span><span>Security</span><span>Status</span></nav>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A1 · Arrived with reason=expired, then a wrong password</b> · the password is cleared and focused · InlineError above the button</p>
+      <div class="panel">
+        <h1>Sign in</h1>
+        <p class="sub">New to Vaani Labs? <a href="#" class="lnk">Create an account</a></p>
+        <div class="notice notice--info" role="status"><svg class="ic"><use href="#i-info"/></svg><div class="notice-body"><b>Your session expired.</b> Sign in again to go back to where you were.</div></div>
+        <div class="stack8">
+          <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-google"/></svg>Continue with Google</button>
+          <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-fb"/></svg>Continue with Facebook</button>
+        </div>
+        <div class="divider">or</div>
+        <div class="field"><label>Email</label><div class="box"><span class="v">a.rao@company.com</span></div></div>
+        <div class="field"><label>Password</label><div class="box box--focus"><span class="v"></span><span class="tgl"><svg class="ic"><use href="#i-eye"/></svg></span></div><a href="#" class="lnk" style="justify-self:start">Forgot password?</a></div>
+        <div class="ierr" role="alert"><svg class="ic"><use href="#i-circle-alert"/></svg><div>That email and password don't match. If you signed up with Google or Facebook, use that button instead. <a href="#" class="lnk">Reset your password</a></div></div>
+        <button type="button" class="btn btn--primary btn--lg btn--full">Sign in</button>
+        <a href="#" class="lnk" style="justify-self:center">Email me a sign-in link instead</a>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A3 · /login/check-email</b> · the email carries a link and a code · resend cools down silently</p>
+      <div class="panel">
+        <h1>Check your email</h1>
+        <p class="sub">We sent a sign-in link to a.rao@company.com. It works for 15 minutes.</p>
+        <div class="field"><label>Or enter the code from the email</label><div class="box otp box--focus"><span class="v">4820</span></div><p class="hint">We'll check it as soon as you enter 6 digits.</p></div>
+        <button type="button" class="btn btn--primary btn--lg btn--full">Sign in</button>
+        <div class="row" style="justify-content:space-between"><a href="#" class="lnk lnk--dis" aria-disabled="true">Resend email in 0:24</a><a href="#" class="lnk">Use a different email</a></div>
+        <p class="hint">Can't find it? Check spam, or search your inbox for Vaani Labs.</p>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A2 · /signup, self-serve, ≥1024</b> · no phone field · live password rules · the Terms sentence · "What happens next" aside</p>
+      <div class="pair">
+        <div class="panel">
+          <h1>Create your account</h1>
+          <p class="sub">Already have an account? <a href="#" class="lnk">Sign in</a></p>
+          <div class="stack8">
+            <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-google"/></svg>Continue with Google</button>
+            <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-fb"/></svg>Continue with Facebook</button>
+            <p class="hint">By continuing, you agree to the Terms and the Privacy policy.</p>
+          </div>
+          <div class="divider">or</div>
+          <div class="field"><label>Full name</label><div class="box"><span class="v">Anika Rao</span></div></div>
+          <div class="field"><label>Work email</label><div class="box"><span class="v">a.rao@company.com</span></div></div>
+          <div class="field"><label>Password</label><div class="box box--focus"><span class="v dots">••••••••••••</span><span class="tgl"><svg class="ic"><use href="#i-eye"/></svg></span></div>
+            <ul class="rules"><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>At least 10 characters</li><li><svg class="ic ic--sm"><use href="#i-circle"/></svg>Not a commonly used password</li></ul></div>
+          <button type="button" class="btn btn--primary btn--lg btn--full" style="margin-top:8px">Create account</button>
+          <p class="hint">By creating an account, you agree to the <u>Terms</u> and the <u>Privacy policy</u>.</p>
+        </div>
+        <aside class="aside">
+          <h2>What happens next</h2>
+          <ol>
+            <li><span class="n">1</span><b>Confirm your email</b><p>We send a link and a code. It takes a minute.</p></li>
+            <li><span class="n">2</span><b>Name your workspace</b><p>Teammates, numbers and billing live there. You'll be its admin.</p></li>
+            <li><span class="n">3</span><b>Get your first call live</b><p>Publish a flow, verify your number, add money and call yourself. Home walks you through it.</p></li>
+          </ol>
+          <div class="facts2"><p>Prepaid in rupees, per-second rates. <a href="#" class="lnk">See pricing</a></p><p>Data stored in India (AWS Mumbai)</p></div>
+        </aside>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A6 · /reset-password, expired link</b></p>
+      <div class="panel">
+        <h1>This link has expired</h1>
+        <p class="sub">Reset links work for 60 minutes.</p>
+        <button type="button" class="btn btn--primary btn--lg btn--full">Send a new link</button>
+        <a href="#" class="lnk" style="justify-self:center">Back to sign in</a>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A4 · /login/code (two-factor)</b> · a wrong code keeps the field and says why</p>
+      <div class="panel">
+        <h1>Enter your code</h1>
+        <p class="sub">Open your authenticator app and enter the 6-digit code for Vaani Labs.</p>
+        <div class="field"><label>Two-factor code</label><div class="box otp box--err"><span class="v">193 507</span></div><p class="err"><svg class="ic ic--sm"><use href="#i-circle-alert"/></svg>That code didn't work. Codes change every 30 seconds, so use the newest one.</p></div>
+        <label class="chk"><input type="checkbox" class="cb" checked>Trust this browser for 30 days</label>
+        <button type="button" class="btn btn--primary btn--lg btn--full">Verify</button>
+        <div class="row" style="justify-content:space-between"><a href="#" class="lnk">Use a recovery code instead</a><a href="#" class="lnk">Sign in as someone else</a></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>A5 · /reset-password, valid link</b> · a read-only username helps password managers</p>
+      <div class="panel">
+        <h1>Set a new password</h1>
+        <div class="field"><label>Email</label><div class="box box--ro"><span class="v">a.rao@company.com</span></div></div>
+        <div class="field"><label>New password</label><div class="box"><span class="v dots">•••••••••••••</span><span class="tgl"><svg class="ic"><use href="#i-eye"/></svg></span></div>
+          <ul class="rules"><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>At least 10 characters</li><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>Not a commonly used password</li><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>Different from your email</li></ul></div>
+        <label class="chk"><input type="checkbox" class="cb" checked>Sign out of other devices</label>
+        <button type="button" class="btn btn--primary btn--lg btn--full">Save new password</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="sec-mk">
+  <div class="sec-h"><h2>B · Marketing: header, hero, key facts, pricing and the footer band</h2><p>The hero visual is the product's own transcript: a real recorded call as TurnRows, a Devanagari turn, the flow step each line came from, and the outcome it wrote. No gradient, orb, eyebrow or pill strip.</p></div>
+  <div class="frames">
+    <div>
+      <p class="fl"><b>B1 · / at 1440 (hero grid 5 / 7)</b> · one Neel button in the header and one in the hero</p>
+      <div class="dev" id="f-b1" style="width:1360px">
+        <div class="mk-h"><div class="in">
+          <span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span>
+          <nav class="mk-nav" aria-label="Main"><span>Try it live</span><span>Pricing</span><span>Enterprise</span><span>Security</span><span>Docs</span></nav>
+          <div class="mk-r"><button type="button" class="ibtn" aria-label="Theme: System"><svg class="ic"><use href="#i-monitor"/></svg></button><button type="button" class="btn btn--tertiary">Sign in</button><button type="button" class="btn btn--primary">Get started</button></div>
+        </div></div>
+        <div class="wrap">
+          <div class="hero">
+            <h1>Phone agents that speak your customers' language.</h1>
+            <div>
+              <p class="lead">Vaani calls leads, answers inbound calls and books visits in Hindi, English, Hinglish and more. You design every step.</p>
+              <div class="cta"><button type="button" class="btn btn--primary btn--lg">Get started</button><button type="button" class="btn btn--lg">Try it live</button></div>
+              <p class="reassure">Prepaid in rupees · no card to sign up</p>
+              <ul class="facts" aria-label="Key facts">
+                <li><svg class="ic"><use href="#i-languages"/></svg><div><b>Hindi, English, Hinglish</b><span>and more Indian languages</span></div></li>
+                <li><svg class="ic"><use href="#i-map-pin"/></svg><div><b>Data stored in India</b><span>AWS Mumbai</span></div></li>
+                <li><svg class="ic"><use href="#i-wallet"/></svg><div><b>Prepaid in rupees</b><span>Per-second rates, top up with UPI</span></div></li>
+                <li><svg class="ic"><use href="#i-workflow"/></svg><div><b>Nothing goes live by accident</b><span>Callers hear a flow only after you publish</span></div></li>
+              </ul>
+            </div>
+            <div class="player" role="region" aria-label="Recorded call: Real estate, site visit">
+              <div class="pl-h">
+                <div class="row" style="justify-content:space-between"><span class="ttl">Recorded call · Real estate · Site visit</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Visit booked</span></div>
+                <div class="row"><span class="lm"><span class="lm-g" lang="hi" aria-hidden="true">अ</span>Hindi</span><span class="t3">·</span><span class="lm"><span class="lm-g" aria-hidden="true">A</span>English</span><span class="meta" style="margin-left:auto">Recorded with a test customer, shared with permission</span></div>
+                <div class="scrub"><button type="button" class="btn has-lead"><svg class="ic ic--sm"><use href="#i-play"/></svg>Play</button><span class="tm num">00:14</span><span class="track"><b></b><s></s></span><span class="tm num">01:52</span></div>
+              </div>
+              <ol>
+                <li class="turn" lang="en-IN"><span class="turn-tc">00:00</span><div class="turn-h"><span class="turn-who" translate="no">Vaani</span><span class="lm-g" role="img" aria-label="English">A</span><a href="#">Step · Greet</a></div><p class="turn-u">Hello, this is Vaani from Sample Realty. Is this a good time to talk about the 2 BHK you asked about?</p></li>
+                <li class="turn turn--caller" lang="hi"><span class="turn-tc">00:06</span><div class="turn-h"><span class="turn-who" translate="no">Caller</span><span class="lm-g" lang="hi" role="img" aria-label="Hindi">अ</span></div><p class="turn-u" lang="hi">हाँ, बोलिए। मेट्रो के पास वाला फ़्लैट?</p></li>
+                <li class="turn turn--active" lang="hi-Latn"><span class="turn-tc">00:11</span><div class="turn-h"><span class="turn-who" translate="no">Vaani</span><span class="lm-g" role="img" aria-label="Hinglish">अA</span><a href="#">Step · Ask about a site visit</a></div><p class="turn-u">Haan ji. Is weekend site visit ke liye free hain? Saturday 11 am ya Sunday 4 pm?</p></li>
+                <li class="turn turn--caller" lang="hi-Latn"><span class="turn-tc">00:19</span><div class="turn-h"><span class="turn-who" translate="no">Caller</span><span class="lm-g" role="img" aria-label="Hinglish">अA</span></div><p class="turn-u">Saturday 11 baje theek hai.</p></li>
+                <li class="turn--sys"><svg class="ic ic--sm" aria-hidden="true"><use href="#i-corner"/></svg>Moved to step · Book site visit</li>
+              </ol>
+              <div class="pl-more"><button type="button" class="btn btn--tertiary">Show full transcript</button></div>
+              <div class="pl-f">
+                <div class="field"><span class="lbl">Industry</span><span class="sel">Real estate<svg class="ic ic--sm"><use href="#i-chevron-down"/></svg></span></div>
+                <div class="field"><span class="lbl">Call</span><span class="sel">Site visit<svg class="ic ic--sm"><use href="#i-chevron-down"/></svg></span></div>
+                <div class="field"><span class="lbl">Recording</span><div class="seg" role="radiogroup" aria-label="Recording language"><button type="button" role="radio" aria-checked="true"><span lang="hi">अ</span> Hindi</button><button type="button" role="radio" aria-checked="false">A English</button></div></div>
+              </div>
+            </div>
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>B2 · /pricing at 1440</b> · rates from the public rates endpoint (example values) · the estimator does honest maths · the footer is the Baseline's ink band</p>
+      <div class="dev" id="f-b2" style="width:1360px">
+        <div class="mk-h"><div class="in">
+          <span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span>
+          <nav class="mk-nav" aria-label="Main"><span>Try it live</span><span class="cur" aria-current="page">Pricing</span><span>Enterprise</span><span>Security</span><span>Docs</span></nav>
+          <div class="mk-r"><button type="button" class="ibtn" aria-label="Theme: System"><svg class="ic"><use href="#i-monitor"/></svg></button><button type="button" class="btn btn--tertiary">Sign in</button><button type="button" class="btn btn--primary">Get started</button></div>
+        </div></div>
+        <div class="wrap">
+          <div class="p-h">
+            <h1>Pricing</h1>
+            <p class="lead">Top up a wallet in rupees with UPI. Calls are charged per second of talk time.</p>
+            <div class="cta" style="margin-top:24px"><button type="button" class="btn btn--lg">Talk to sales</button></div>
+          </div>
+          <div class="pgrid">
+            <div>
+              <h2>Rates</h2>
+              <table class="rates">
+                <caption class="sr-only">Rates</caption>
+                <thead><tr><th scope="col">Product</th><th scope="col" class="r">Rate</th><th scope="col" class="r">Per minute</th><th scope="col">Billing unit</th></tr></thead>
+                <tbody>
+                  <tr><td><b style="font-weight:500">Phone calls</b></td><td class="r big">₹0.04/s</td><td class="r">₹2.40</td><td class="u">Per second</td></tr>
+                  <tr><td>Browser and API voice</td><td class="r">₹0.04/s</td><td class="r">₹2.40</td><td class="u">Per second</td></tr>
+                  <tr><td>Meeting agent</td><td class="r">₹0.08/s</td><td class="r">₹4.80</td><td class="u">Per second</td></tr>
+                  <tr><td>Meeting rooms</td><td class="r">₹0.01/s</td><td class="r">₹0.60</td><td class="u">After 30 free minutes a month</td></tr>
+                </tbody>
+              </table>
+              <p class="hint" style="margin-top:10px">Prices exclude GST. Rates as of 1 Sep 2026. Top-ups from ₹100 to ₹1,00,000 with any UPI app.</p>
+            </div>
+            <div class="card">
+              <h2>Estimate your month</h2>
+              <div class="field"><span class="lbl">Product</span><span class="sel" style="height:40px">Phone calls<svg class="ic ic--sm"><use href="#i-chevron-down"/></svg></span></div>
+              <div class="field"><span class="lbl">Calls a month</span><div class="box" style="width:var(--size-menu-min)"><span class="v num">1,000</span></div><p class="hint">Up to 10,00,000</p></div>
+              <div class="field"><span class="lbl">Average call length</span><div class="box" style="width:var(--size-menu-min)"><span class="v num">2</span><span class="t2" style="padding-right:8px">min</span></div></div>
+              <div style="border-top:1px solid var(--border);padding-top:16px" role="status"><p class="estv num">About ₹4,800 a month</p><p class="t2" style="margin-top:4px">2,000 min of phone calls at ₹0.04/s. Real cost depends on how long calls last.</p></div>
+              <button type="button" class="btn btn--primary btn--lg btn--full">Get started</button>
+            </div>
+          </div>
+        </div>
+        <footer class="mk-f" data-surface="inverse"><div class="wrap">
+          <div class="cols">
+            <div><h3>Product</h3><ul><li>Try it live</li><li>Pricing</li><li>Docs</li><li>Changelog</li></ul></div>
+            <div><h3>Company</h3><ul><li>About</li><li>Contact</li></ul></div>
+            <div><h3>Trust</h3><ul><li>Security</li><li>Status</li><li>Privacy</li><li>Terms</li><li>Refund policy</li><li>Cookie settings</li></ul></div>
+            <div><h3>Talk to us</h3><ul><li>sales@vaanilabs.in</li><li>support@vaanilabs.in</li><li>Book a call <svg class="ic ic--sm"><use href="#i-external"/></svg></li><li>Mumbai</li></ul></div>
+          </div>
+          <div class="bot"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span>© 2026 Vaani Labs. Vaani Labs is a product of &lt;legal entity&gt;.</span></div>
+        </div></footer>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="sec" id="sec-ph">
+  <div class="sec-h"><h2>C · Phone (390 × 844): touch density, 44 px targets, 16 px field text</h2><p>No panel frame on phones. Errors sit under their fields; the menu is a modal sheet that holds the theme choice.</p></div>
+  <div class="frames">
+    <div>
+      <p class="fl"><b>C1 · /login, empty submit</b> · first invalid field focused</p>
+      <div class="dev pp" data-density="touch">
+        <div class="auth">
+          <span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span>
+          <div class="panel">
+            <h1>Sign in</h1>
+            <p class="sub">New to Vaani Labs? <a href="#" class="lnk">Create an account</a></p>
+            <div class="stack8">
+              <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-google"/></svg>Continue with Google</button>
+              <button type="button" class="btn btn--lg btn--full has-lead"><svg class="brand"><use href="#b-fb"/></svg>Continue with Facebook</button>
+            </div>
+            <div class="divider">or</div>
+            <div class="field"><label>Email</label><div class="box box--err box--focus"><span class="v"></span></div><p class="err"><svg class="ic ic--sm"><use href="#i-circle-alert"/></svg>Enter your email.</p></div>
+            <div class="field"><label>Password</label><div class="box box--err"><span class="v"></span><span class="tgl"><svg class="ic"><use href="#i-eye"/></svg></span></div><p class="err"><svg class="ic ic--sm"><use href="#i-circle-alert"/></svg>Enter your password.</p><a href="#" class="lnk" style="justify-self:start">Forgot password?</a></div>
+            <button type="button" class="btn btn--primary btn--lg btn--full">Sign in</button>
+            <a href="#" class="lnk" style="justify-self:start">Email me a sign-in link instead</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>C2 · /signup in approval mode</b> · "Request access" · the aside becomes one line</p>
+      <div class="dev pp" data-density="touch">
+        <div class="auth">
+          <span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span>
+          <div class="panel">
+            <h1>Request access</h1>
+            <p class="sub">Already have an account? <a href="#" class="lnk">Sign in</a></p>
+            <div class="field"><label>Full name</label><div class="box"><span class="v">Anika Rao</span></div></div>
+            <div class="field"><label>Work email</label><div class="box"><span class="v">a.rao@company.com</span></div></div>
+            <div class="field"><label>Company</label><div class="box box--focus"><span class="v">Sample Realty</span></div></div>
+            <div class="field"><label>Password</label><div class="box"><span class="v dots">•••••••••••</span><span class="tgl"><svg class="ic"><use href="#i-eye"/></svg></span></div>
+              <ul class="rules"><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>At least 10 characters</li><li class="ok"><svg class="ic ic--sm"><use href="#i-check"/></svg>Not a commonly used password</li></ul></div>
+            <button type="button" class="btn btn--primary btn--lg btn--full">Request access</button>
+            <p class="hint">By creating an account, you agree to the Terms and the Privacy policy.</p>
+            <p class="hint">Next: confirm your email. We review requests within one working day.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>C3 · / on a phone</b> · H1 40/44 · stacked CTAs · the player follows</p>
+      <div class="dev pp" data-density="touch" style="background:var(--bg)">
+        <div class="mk-h"><span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span><button type="button" class="btn btn--primary btn--sm" style="margin-left:auto">Get started</button><button type="button" class="ibtn ibtn--lg" aria-label="Menu"><svg class="ic ic--lg"><use href="#i-menu"/></svg></button></div>
+        <div class="wrap"><div class="hero">
+          <h1>Phone agents that speak your customers' language.</h1>
+          <div>
+            <p class="lead">Vaani calls leads, answers inbound calls and books visits in Hindi, English, Hinglish and more. You design every step.</p>
+            <div class="cta"><button type="button" class="btn btn--primary btn--lg">Get started</button><button type="button" class="btn btn--lg">Try it live</button></div>
+          </div>
+          <div class="player">
+            <div class="pl-h">
+              <div class="row" style="justify-content:space-between"><span class="ttl">Real estate · Site visit</span><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Visit booked</span></div>
+              <div class="scrub"><button type="button" class="btn has-lead"><svg class="ic ic--sm"><use href="#i-play"/></svg>Play</button><span class="track"><b></b><s></s></span><span class="tm num">01:52</span></div>
+            </div>
+            <ol><li class="turn" lang="en-IN"><span class="turn-tc">00:00</span><div class="turn-h"><span class="turn-who" translate="no">Vaani</span><span class="lm-g" role="img" aria-label="English">A</span><a href="#">Step · Greet</a></div><p class="turn-u">Hello, this is Vaani from Sample Realty…</p></li></ol>
+          </div>
+        </div></div>
+      </div>
+    </div>
+
+    <div>
+      <p class="fl"><b>C4 · Menu open</b> · a modal sheet · Esc and × return focus to the menu button</p>
+      <div class="dev pp" data-density="touch">
+        <div class="sheet" role="dialog" aria-label="Menu">
+          <div class="sh-h"><span class="lockup"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg>Vaani Labs</span><button type="button" class="ibtn ibtn--lg is-focus" aria-label="Close menu"><svg class="ic ic--lg"><use href="#i-x"/></svg></button></div>
+          <div>
+            <ul><li>Try it live</li><li>Pricing</li><li>Enterprise</li><li>Security</li><li>Docs</li></ul>
+            <div style="padding:16px var(--page-margin)"><p class="hint" style="margin-bottom:8px">Theme</p><div class="seg seg--full" role="radiogroup" aria-label="Theme"><button type="button" role="radio" aria-checked="true">System</button><button type="button" role="radio" aria-checked="false">Light</button><button type="button" role="radio" aria-checked="false">Dark</button></div></div>
+          </div>
+          <div class="sh-f"><button type="button" class="btn btn--lg btn--full">Sign in</button><button type="button" class="btn btn--primary btn--lg btn--full">Get started</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+</body>
+</html>

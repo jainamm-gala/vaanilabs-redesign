@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Settings reference</title>
+<meta name="description" content="Vaani Labs (Sutradhar) reference mock for spec/03-pages/06-settings.md: the Settings frame, Phone setup, Integrations with disabled and empty states, Organization with the Danger zone and a typed confirmation, and tablet and phone index-and-drill layouts.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;600&display=swap&text=%E2%82%B9" rel="stylesheet">
+<link rel="stylesheet" href="../tokens/tokens.css">
+<link rel="stylesheet" href="../tokens/base.css">
+<link rel="stylesheet" href="../components/components.css">
+<script src="../components/shell-partials.js"></script>
+<style>
+/* Page layout only. Sidebar, PageHeader, Breadcrumbs, Button, IconButton, Tag, Notice, SegmentedControl, DataTable,
+   Avatar, TopBar, BottomBar and Baseline come from ../components/components.css, unmodified.
+   Page-local (not in components.css): SettingsNav (§3.2, the raised key), StageProgress, RadioCard, Switch, ServiceMark,
+   the SettingsIndex rows, the Danger zone box, the ConfirmDialog and the UnsavedChangesBar. */
+:root{--font-hanken:"Hanken Grotesk","Noto Sans";}
+body{background:var(--bg);color:var(--text)}
+*,*::before,*::after{box-sizing:border-box}
+h1,h2,h3,h4,p,ul,ol,dl,dd{margin:0} ul,ol{padding:0;list-style:none}
+button{cursor:pointer;font:inherit;color:inherit}
+a{text-decoration:none}
+.mono12{font:var(--type-mono-12)}
+.t2{color:var(--text-2)} .t3{color:var(--text-3)}
+.meta{font:var(--type-meta-12);color:var(--text-3)}
+
+/* ---------- Document chrome (not product UI) ---------- */
+.doc-h{padding:40px 40px 24px;border-bottom:1px solid var(--border);background:var(--surface)}
+.doc-h h1{font:var(--type-title-24);letter-spacing:var(--type-title-24-tracking)}
+.doc-h p{margin-top:6px;color:var(--text-2);max-width:var(--size-measure)}
+.sec{padding:40px;border-bottom:1px solid var(--border)}
+.sec-h{margin-bottom:20px;max-width:1100px}
+.sec-h h2{font:var(--type-title-20);letter-spacing:var(--type-title-20-tracking)}
+.sec-h p{color:var(--text-2);margin-top:4px}
+.sec-h .ids{font:var(--type-meta-12);color:var(--text-3);margin-top:4px}
+.frames{display:flex;flex-wrap:wrap;gap:32px;align-items:flex-start}
+.fl{font:var(--type-label-12);color:var(--text-3);margin-bottom:8px}
+.dev{position:relative;overflow:hidden;border:1px solid var(--border-strong);border-radius:var(--radius-12);background:var(--bg);color:var(--text);box-shadow:var(--e2)}
+.cap{font:var(--type-meta-12);color:var(--text-3);margin-top:8px;max-width:1440px}
+
+/* ---------- Page-local primitives ---------- */
+.lnk{color:var(--accent-text);font:inherit;background:none;border:0;padding:0;text-decoration:underline;text-underline-offset:3px}
+.st{display:inline-flex;align-items:center;gap:var(--space-inline-sm);font:var(--type-meta-12)}
+.st--s{color:var(--success-text)} .st--w{color:var(--warning-text)} .st--d{color:var(--danger-text)} .st--n{color:var(--text-3)}
+.field{display:flex;flex-direction:column;gap:var(--space-label-gap);margin-top:var(--space-field-gap)}
+.field>label,.flabel{font:var(--type-label-13);color:var(--text)}
+.opt{font:var(--type-data-13);color:var(--text-3);font-weight:400}
+.box{display:flex;align-items:center;height:var(--control-h);border:1px solid var(--control);border-radius:var(--radius-6);background:var(--surface);color:var(--text);font:var(--type-body-14);padding:0 var(--space-10);max-width:100%}
+.box--ro{background:var(--surface-2);border-color:var(--border)}
+.box .pre{color:var(--text-2);font:var(--type-data-13);padding-right:var(--space-10);margin-right:var(--space-10);border-right:1px solid var(--border);height:100%;display:flex;align-items:center}
+.box .suf{color:var(--text-2);font:var(--type-data-13);margin-left:auto;padding-left:var(--space-8)}
+.hint{font:var(--type-meta-12);color:var(--text-3)}
+.w320{width:var(--size-inspector)} .w180{width:var(--size-menu-min)}
+/* Switch (core §6.4) */
+.sw{position:relative;display:inline-block;width:32px;height:20px;border-radius:var(--radius-full);background:var(--control);flex:none}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:var(--radius-full);background:var(--on-accent)}
+.sw--on{background:var(--accent);box-shadow:inset 0 0 0 1px var(--accent-mark)} .sw--on::after{left:14px}
+.notice b{font-weight:600}
+.notice a{font-weight:500;text-decoration:underline;text-underline-offset:3px}
+.notice p + p{margin-top:4px}
+
+/* ---------- Desktop frame: Sidebar spans both rows; the Baseline sits under the content column ---------- */
+.shell{display:grid;grid-template-columns:var(--size-sidebar) minmax(0,1fr);grid-template-rows:minmax(0,1fr) var(--size-baseline);height:100%}
+.shell > .sb{grid-row:1 / 3}
+/* ---------- Settings frame (§3) ---------- */
+.set{display:grid;grid-template-columns:var(--size-settings-nav) minmax(0,1fr);min-height:0;background:var(--surface)}
+.snav{border-right:1px solid var(--border);padding:var(--space-12) var(--space-8);overflow:hidden}
+.snav .g{padding-top:var(--space-12)} .snav .g>p{font:var(--type-label-12);color:var(--text-3);padding:var(--space-4) var(--space-8)}
+.si{display:flex;align-items:center;gap:var(--space-6);height:var(--control-h);padding:0 var(--space-8);border-radius:var(--radius-6);border:1px solid transparent;font:var(--type-label-13);color:var(--text-2);margin-bottom:2px;white-space:nowrap}
+.si.cur{background:var(--nav-active-bg);border-color:var(--nav-active-border);box-shadow:var(--e1);color:var(--text)}
+.si .bd{margin-left:auto;font:var(--type-meta-12);color:var(--warning-text);display:inline-flex;align-items:center;gap:4px}
+.si--danger{color:var(--danger-text)}
+.pg{min-width:0;overflow:hidden;display:flex;flex-direction:column}
+.ph-in{display:flex;align-items:center;gap:var(--space-12);width:100%;max-width:var(--size-container-form);flex-wrap:wrap}
+.col{padding:0 var(--page-margin) var(--space-48);max-width:calc(var(--size-container-form) + 2 * var(--page-margin));overflow:hidden}
+.ss{padding-top:var(--space-24);margin-top:var(--space-16);border-top:1px solid var(--border)}
+.ss:first-child{border-top:0;margin-top:0}
+.ss-h{display:flex;align-items:center;gap:var(--space-6)}
+.ss-h h2{font:var(--type-title-16)}
+.ss-h .stt{margin-left:auto}
+.ss .desc{font:var(--type-body-14);color:var(--text-2);margin-top:2px;max-width:var(--size-measure)}
+.kv{margin-top:var(--space-12)}
+.kv>div{display:grid;grid-template-columns:140px minmax(0,1fr) auto;gap:var(--space-16);align-items:center;padding:var(--space-10) 0;border-bottom:1px solid var(--border);font:var(--type-data-13)}
+.kv>div:first-child{border-top:1px solid var(--border)}
+.kv dt{color:var(--text-3)} .kv dd{display:flex;align-items:center;gap:var(--space-8);flex-wrap:wrap;min-width:0}
+.sfoot{display:flex;align-items:center;justify-content:space-between;gap:var(--space-12);margin-top:var(--space-24)}
+.sfoot .acts{display:flex;gap:var(--space-8)}
+/* StageProgress (overlay §14.3) */
+.stages{margin-top:var(--space-12);display:flex;flex-direction:column}
+.stg{display:grid;grid-template-columns:20px minmax(0,1fr);column-gap:var(--space-10);padding:var(--space-8) 0}
+.stg-mk{width:20px;height:20px;border-radius:var(--radius-full);display:grid;place-items:center;border:1.5px solid var(--control);background:var(--surface)}
+.stg-mk--done{background:var(--success-soft);border-color:transparent;color:var(--success-text)}
+.stg-mk--cur{border:2px solid var(--accent-mark);color:var(--accent-text)}
+.stg b{font:var(--type-label-13)} .stg p{font:var(--type-meta-12);color:var(--text-3);margin-top:2px}
+/* RadioCard (core §6.2) */
+.rcards{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-12);margin-top:var(--space-12)}
+.rc{display:flex;gap:var(--space-10);padding:var(--space-12) var(--space-16);border:1px solid var(--border-strong);border-radius:var(--radius-8);background:var(--surface)}
+.rc.on{background:var(--accent-soft);border-color:var(--accent-mark)}
+.rc b{font:var(--type-title-14);display:block} .rc p{font:var(--type-meta-12);color:var(--text-3);margin-top:2px}
+.rad{width:16px;height:16px;border-radius:var(--radius-full);border:1px solid var(--control);background:var(--surface);flex:none;margin-top:2px;display:grid;place-items:center}
+.rad.on{background:var(--accent);border-color:var(--accent-mark)} .rad.on::after{content:"";width:6px;height:6px;border-radius:50%;background:var(--on-accent)}
+/* Calling hours rows */
+.hrs{margin-top:var(--space-12)}
+.hr{display:grid;grid-template-columns:48px 56px 150px 24px 150px minmax(0,1fr);align-items:center;gap:var(--space-8);padding:var(--space-6) 0;font:var(--type-data-13)}
+.tf{display:flex;align-items:center;justify-content:space-between;height:var(--control-h);border:1px solid var(--control);border-radius:var(--radius-6);padding:0 var(--space-10);background:var(--surface);font:var(--type-body-14)}
+.tf small{font:var(--type-data-13);color:var(--text-2)}
+/* Setting rows */
+.srow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-16);align-items:center;min-height:40px;padding:var(--space-10) 0;border-bottom:1px solid var(--border)}
+.srow b{font:var(--type-body-14);display:block} .srow p{font:var(--type-meta-12);color:var(--text-3);margin-top:2px}
+/* Integration rows (§7.4) */
+.irow{display:grid;grid-template-columns:28px minmax(0,1fr) auto auto;gap:var(--space-12);align-items:center;min-height:64px;padding:var(--space-10) 0;border-bottom:1px solid var(--border)}
+/* ServiceMark md (spec §7.4, §14): the vendor's single-colour mark in --text on a neutral tile. No letters, no brand fills. */
+.svc{width:28px;height:28px;box-sizing:border-box;border-radius:var(--radius-6);background:var(--surface-2);border:1px solid var(--border);display:grid;place-items:center;color:var(--text)}
+.svc .bm{width:var(--icon-md);height:var(--icon-md);fill:currentColor;stroke:none}
+.irow b{font:var(--type-title-14);display:block} .irow p{font:var(--type-body-14);color:var(--text-2);margin-top:2px}
+.irow .stc{display:flex;flex-direction:column;align-items:flex-end;gap:2px;text-align:right}
+.irow .act{min-width:104px;display:flex;justify-content:flex-end}
+/* Members table: a DataTable in a framed box */
+.framed{margin-top:var(--space-12);border:1px solid var(--border);border-radius:var(--radius-8);overflow:hidden;background:var(--surface)}
+.framed .dt tr:last-child td{border-bottom:0}
+.person{display:flex;align-items:center;gap:var(--space-8);color:var(--text)} .person b{font:var(--type-label-13)} .person small{display:block;font:var(--type-meta-12);color:var(--text-3)}
+.sel{display:inline-flex;align-items:center;gap:6px;height:var(--control-h-sm);padding:0 var(--space-8);border:1px solid var(--control);border-radius:var(--radius-6);background:var(--surface);color:var(--text);font:var(--type-label-13)}
+/* Danger zone (§5.1) */
+.dz{border:1px solid var(--border);border-radius:var(--radius-8);margin-top:var(--space-24)}
+.dz>h2{font:var(--type-title-16);padding:var(--space-16) var(--space-16) 0}
+.dza{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--space-16);align-items:center;padding:var(--space-16)}
+.dza+.dza{border-top:1px solid var(--border)}
+.dza b{font:var(--type-title-14)} .dza p{font:var(--type-body-14);color:var(--text-2);margin-top:2px;max-width:60ch}
+/* ConfirmDialog (overlay §2, §3), centred over the Scrim */
+.dlg-wrap{position:absolute;inset:0;display:grid;place-items:center}
+.dlg{width:var(--size-dialog-sm);background:var(--surface-overlay);border:1px solid var(--border-overlay);border-radius:var(--radius-12);box-shadow:var(--e3)}
+.dlg-h{padding:var(--space-20) var(--space-20) var(--space-12);display:flex;gap:var(--space-8);align-items:flex-start}
+.dlg-h h2{font:var(--type-title-16);margin-right:auto}
+.dlg-b{padding:0 var(--space-20) var(--space-16);font:var(--type-body-14);color:var(--text-2)}
+.imp{margin:var(--space-12) 0;display:flex;flex-direction:column;gap:var(--space-6)} .imp li{display:flex;gap:var(--space-8);align-items:center;font:var(--type-data-13);color:var(--text)}
+.dlg-f{display:flex;align-items:center;gap:var(--space-8);padding:var(--space-12) var(--space-20);border-top:1px solid var(--border);background:var(--surface-2);border-radius:0 0 var(--radius-12) var(--radius-12)}
+.dlg-f .why{font:var(--type-meta-12);color:var(--text-3);margin-right:auto}
+/* Small screens: SettingsIndex rows, save bar (Shell §3.4) */
+.small{display:flex;flex-direction:column;height:100%;background:var(--surface)}
+.scroll{flex:1;overflow:hidden;padding:0 var(--page-margin)}
+.idx-g{font:var(--type-label-12);color:var(--text-3);padding:var(--space-16) 0 var(--space-4)}
+.idx{color:var(--text);display:grid;grid-template-columns:20px minmax(0,1fr) auto 16px;gap:var(--space-12);align-items:center;min-height:56px;border-bottom:1px solid var(--border)}
+.idx b{font:var(--type-label-13);display:block} .idx p{font:var(--type-meta-12);color:var(--text-3)} .idx .s{font:var(--type-meta-12);color:var(--text-2);text-align:right} .idx .s.w{color:var(--warning-text);display:inline-flex;gap:4px;align-items:center}
+.idx .w{color:var(--warning-text);display:flex;gap:4px;align-items:center}
+.ucb{margin:0 var(--page-margin) var(--space-8);padding:var(--space-8);background:var(--surface-overlay);border:1px solid var(--border-overlay);border-radius:var(--radius-8);box-shadow:var(--e3);flex:none}
+.ucb p{font:var(--type-data-13);color:var(--text-2);padding:0 var(--space-4) var(--space-8)}
+.ucb .two{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8)}
+/* Touch density applied to a phone frame in a wide viewport (the media query cannot fire here) */
+[data-density="touch"]{--control-h:44px;--control-h-sm:36px;--row-h:48px;--tag-h:24px;--field-font:16px;--btn-px-md:var(--space-16);--btn-font-md:var(--type-button-14);--hit:var(--size-hit-touch)}
+[data-density="touch"] .box{font-size:16px}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="vl-mark" viewBox="0 0 32 32"><mask id="vl-mark-a" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M18.9 13.56L21.1 18.44" stroke="black" stroke-width="4.85"/></mask><mask id="vl-mark-b" maskUnits="userSpaceOnUse" x="0" y="0" width="32" height="32"><rect width="32" height="32" fill="white"/><path d="M10.9 13.56L13.1 18.44" stroke="black" stroke-width="4.85"/></mask><rect width="32" height="32" rx="7" style="fill:var(--mark-bg)"/><g fill="none" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round" style="stroke:var(--mark-fg)"><path mask="url(#vl-mark-a)" d="M3.5 16C6.8 16 8.45 8.1 12 16C15.6 24 16.4 24 20 16C23.55 8.1 25.2 16 28.5 16"/><path mask="url(#vl-mark-b)" d="M3.5 16C6.8 16 8.45 23.9 12 16C15.6 8 16.4 8 20 16C23.55 23.9 25.2 16 28.5 16"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><symbol id="vl-i-home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol><symbol id="vl-i-activity" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></symbol><symbol id="vl-i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol><symbol id="vl-i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol><symbol id="vl-i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol><symbol id="vl-i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol><symbol id="vl-i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol><symbol id="vl-i-book-open" viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2zM22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></symbol><symbol id="vl-i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9M16 3.1a4 4 0 0 1 0 7.8"/></symbol><symbol id="vl-i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol><symbol id="vl-i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol><symbol id="vl-i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol><symbol id="vl-i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol><symbol id="vl-i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol><symbol id="vl-i-chevron-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol><symbol id="vl-i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol><symbol id="vl-i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol><symbol id="vl-i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol><symbol id="vl-i-panel" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M9 3v18"/></symbol><symbol id="vl-i-alert" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.5 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3M12 9v4M12 17h.01"/></symbol><symbol id="vl-i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol><symbol id="vl-i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></symbol><symbol id="vl-i-filter" viewBox="0 0 24 24"><path d="M3 6h18M7 12h10M10 18h4"/></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-activity" viewBox="0 0 24 24"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></symbol>
+<symbol id="i-bot" viewBox="0 0 24 24"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2M20 14h2M15 13v2M9 13v2"/></symbol>
+<symbol id="i-headphones" viewBox="0 0 24 24"><path d="M3 14h3a2 2 0 0 1 2 2v3a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-7a9 9 0 0 1 18 0v7a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3"/></symbol>
+<symbol id="i-video" viewBox="0 0 24 24"><path d="m16 13 5.2 3.5a.5.5 0 0 0 .8-.4V7.9a.5.5 0 0 0-.8-.4L16 10.5"/><rect x="2" y="6" width="14" height="12" rx="2"/></symbol>
+<symbol id="i-list-checks" viewBox="0 0 24 24"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8"/></symbol>
+<symbol id="i-workflow" viewBox="0 0 24 24"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></symbol>
+<symbol id="i-book-open" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-file-text" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+<symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16M18 17V9M13 17V5M8 17v-3"/></symbol>
+<symbol id="i-wallet" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M21 4h-7M10 4H3M21 12h-9M8 12H3M21 20h-5M12 20H3M14 2v4M8 10v4M16 18v4"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-updown" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5M7 9l5-5 5 5"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4M12 17h.01"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect width="14" height="14" x="8" y="8" rx="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></symbol>
+<symbol id="i-right" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-left" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect width="18" height="11" x="3" y="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-loader" viewBox="0 0 24 24"><path d="M21 12a9 9 0 1 1-6.219-8.56"/></symbol>
+<symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+<symbol id="i-building" viewBox="0 0 24 24"><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18ZM6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2M10 6h4M10 10h4M10 14h4M10 18h4"/></symbol>
+<symbol id="i-plug" viewBox="0 0 24 24"><path d="M12 22v-5M9 8V2M15 8V2M18 8v5a4 4 0 0 1-4 4h-4a4 4 0 0 1-4-4V8Z"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5"/></symbol>
+<symbol id="i-webhook" viewBox="0 0 24 24"><path d="M18 16.98h-5.99c-1.1 0-1.95.94-2.48 1.9A4 4 0 0 1 2 17c.01-.7.2-1.4.57-2M6 17l3.13-5.78c.53-.97.1-2.18-.5-3.1a4 4 0 1 1 6.89-4.06M12 6l3.13 5.73C15.66 12.7 16.9 13 18 13a4 4 0 0 1 0 8"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m18 16 4-4-4-4M6 8l-4 4 4 4M14.5 4l-5 16"/></symbol>
+<symbol id="i-history" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8M3 3v5h5M12 7v5l4 2"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2M10 11v6M14 11v6"/></symbol>
+<symbol id="i-list" viewBox="0 0 24 24"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><path d="M14 4h7M14 9h7M14 15h7M14 20h7"/></symbol>
+<symbol id="i-ext" viewBox="0 0 24 24"><path d="M15 3h6v6M10 14 21 3M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></symbol>
+<symbol id="i-upload" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></symbol>
+<symbol id="i-house" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></symbol>
+<symbol id="m-google" viewBox="0 0 24 24"><path d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.4h6.5a5.6 5.6 0 0 1-2.4 3.7v3h3.9c2.3-2.1 3.5-5.2 3.5-8.8z"/><path d="M12 24c3.2 0 6-1.1 8-2.9l-3.9-3c-1.1.7-2.5 1.2-4.1 1.2-3.1 0-5.8-2.1-6.7-5H1.3v3.1A12 12 0 0 0 12 24z"/><path d="M5.3 14.3a7.2 7.2 0 0 1 0-4.6V6.6H1.3a12 12 0 0 0 0 10.8z"/><path d="M12 4.8c1.8 0 3.3.6 4.6 1.8l3.4-3.4A12 12 0 0 0 1.3 6.6l4 3.1c.9-2.9 3.6-4.9 6.7-4.9z"/></symbol>
+<symbol id="m-microsoft" viewBox="0 0 24 24"><rect x="1" y="1" width="10.5" height="10.5"/><rect x="12.5" y="1" width="10.5" height="10.5"/><rect x="1" y="12.5" width="10.5" height="10.5"/><rect x="12.5" y="12.5" width="10.5" height="10.5"/></symbol>
+<symbol id="m-instagram" viewBox="0 0 24 24"><path fill-rule="evenodd" d="M7.2 1.5h9.6a5.7 5.7 0 0 1 5.7 5.7v9.6a5.7 5.7 0 0 1-5.7 5.7H7.2a5.7 5.7 0 0 1-5.7-5.7V7.2a5.7 5.7 0 0 1 5.7-5.7zm0 2.1a3.6 3.6 0 0 0-3.6 3.6v9.6a3.6 3.6 0 0 0 3.6 3.6h9.6a3.6 3.6 0 0 0 3.6-3.6V7.2a3.6 3.6 0 0 0-3.6-3.6zM12 6.7a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 2.1a3.2 3.2 0 1 0 0 6.4 3.2 3.2 0 0 0 0-6.4z"/><circle cx="17.6" cy="6.4" r="1.3"/></symbol>
+<symbol id="m-facebook" viewBox="0 0 24 24"><clipPath id="m-fb-clip"><circle cx="12" cy="12" r="11.5"/></clipPath><path clip-path="url(#m-fb-clip)" fill-rule="evenodd" d="M.5 12a11.5 11.5 0 1 0 23 0a11.5 11.5 0 1 0-23 0zM16.6 15.5l.5-3.4h-3.3V9.9c0-.9.5-1.9 2-1.9h1.5V5.2s-1.4-.2-2.7-.2c-2.7 0-4.5 1.6-4.5 4.6v2.5H7.1v3.4h3v8.6h3.7v-8.6z"/></symbol>
+<symbol id="i-mail" viewBox="0 0 24 24"><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></symbol>
+<symbol id="i-calendar-clock" viewBox="0 0 24 24"><path d="M21 7.5V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h3.5M16 2v4M8 2v4M3 10h5"/><path d="M17.5 17.5 16 16.3V14"/><circle cx="16" cy="16" r="6"/></symbol>
+<symbol id="i-message-circle" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+<symbol id="i-database" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></symbol>
+</svg>
+<header class="doc-h">
+  <h1>Settings reference</h1>
+  <p>Reference mock for <code>spec/03-pages/06-settings.md</code>. Every value comes from <code>spec/tokens/tokens.css</code>. People, numbers and emails are fictional. Integrations show ServiceMarks: single-colour marks in <code>--text</code> on a neutral tile, never letters or brand fills.</p>
+</header>
+
+<!-- ============ Frame A: desktop 1440, Phone setup ============ -->
+<section class="sec" id="sec-a">
+  <div class="sec-h">
+    <h2>Desktop 1440 · Phone setup</h2>
+    <p>Sidebar 232 + SettingsNav 200 + a 720 column. Each section declares its save model: Inbound number and Caller ID are Actions, Transfers is a Section form shown dirty with its own footer, Calling hours is a Section form at rest. No page-level Save.</p>
+    <p class="ids">§3.2, §3.4, §4.2, §7.6 · F-UX-012, F-UX-015, F-UX-027, F-VIS-005, F-A11Y-017</p>
+  </div>
+  <div class="dev" id="frame-a" style="width:1440px;height:900px">
+    <div class="shell">
+      <nav class="sb" aria-label="Main"><button class="ws" type="button" aria-haspopup="menu" aria-label="Workspace: Sample Realty, Admin. Switch workspace"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name" translate="no">Sample Realty</span><span class="ws-role">Workspace · Admin</span></span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button><div class="sb-scroll"><div class="nav-g"><span class="nav-g-label" id="nav-saoperate">Operate</span><ul class="nav-list" aria-labelledby="nav-saoperate"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-activity"/></svg><span>Cockpit</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-bot"/></svg><span>Assistant</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-headphones"/></svg><span>Rep console</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-video"/></svg><span>Meetings</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-list-checks"/></svg><span>Personal agents</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-sabuild">Build</span><ul class="nav-list" aria-labelledby="nav-sabuild"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-workflow"/></svg><span>Flows</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-book-open"/></svg><span>Knowledge</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-sadata">Data</span><ul class="nav-list" aria-labelledby="nav-sadata"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-users"/></svg><span>Leads</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-file-text"/></svg><span>Call reports</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-chart"/></svg><span>Analytics</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-saaccount">Account</span><ul class="nav-list" aria-labelledby="nav-saaccount"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-wallet"/></svg><span>Billing</span></a></li><li><a class="nav-item" href="#" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#vl-i-sliders"/></svg><span>Settings</span><span class="nav-badge nav-badge--warn"><svg class="ic ic--xs" aria-hidden="true"><use href="#vl-i-alert"/></svg>Verify</span></a></li></ul></div></div><button class="acct" type="button" aria-haspopup="menu"><span class="av" aria-hidden="true">AR</span><span>Anika R.</span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button></nav>
+      <div class="set">
+        <nav class="snav" aria-label="Settings" data-snav="phone"></nav>
+        <main class="pg">
+          <div class="ph" style="position:relative;z-index:2"><div class="ph-in">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Settings</a><svg class="ic ic--sm" aria-hidden="true"><use href="#i-right"/></svg></nav>
+            <div class="ph-title"><h1>Phone setup</h1><span class="ph-meta">Inbound ready · Caller ID verifying (2 of 3)</span></div>
+          </div></div>
+          <div class="col" style="margin-top:-150px">
+            <section class="ss">
+              <div class="ss-h"><h2>Inbound number</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Inbound number"><svg class="ic ic--sm"><use href="#i-link"/></svg></button></div>
+              <p class="desc">Callers who ring this number reach your agent.</p>
+              <dl class="kv">
+                <div><dt>Number</dt><dd><span class="phone-text" translate="no">+91 80 •••• 2210</span><button type="button" class="ibtn ibtn--sm" aria-label="Copy number"><svg class="ic ic--sm"><use href="#i-copy"/></svg></button></dd><span class="st st--s"><svg class="ic ic--sm"><use href="#i-check"/></svg>Ready</span></div>
+                <div><dt>Answers with</dt><dd>Site-visit qualifier <span class="tag tag--success"><span class="live-dot"></span>Live v7</span></dd><button class="lnk">Change flow…</button></div>
+                <div><dt>Since</dt><dd class="num">12 Sep 2026</dd><span></span></div>
+              </dl>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Caller ID</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Caller ID"><svg class="ic ic--sm"><use href="#i-link"/></svg></button></div>
+              <p class="desc">The number customers see when your agent calls them.</p>
+              <div class="notice notice--warning" role="status" style="margin-top:12px"><svg class="ic"><use href="#i-alert"/></svg><span class="notice-body"><b>Phone calls can't be placed until this is verified.</b> The compliance check is running. We'll email you when it's done.</span></div>
+              <ol class="stages">
+                <li class="stg"><span class="stg-mk stg-mk--done"><svg class="ic ic--xs"><use href="#i-check"/></svg></span><div><b>Owned</b><p><span class="phone-text phone-text--sm" translate="no">+91 98765 43210</span> · code confirmed 21 Sep 2026</p></div></li>
+                <li class="stg"><span class="stg-mk stg-mk--cur"><svg class="ic ic--xs"><use href="#i-loader"/></svg></span><div><b>Compliance</b> <span class="meta">In progress</span><p>Checking the number is registered to your business.</p></div></li>
+                <li class="stg"><span class="stg-mk"></span><div><b>Authorized</b><p>The carrier approves it as your caller ID.</p></div></li>
+              </ol>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Transfers</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Transfers"><svg class="ic ic--sm"><use href="#i-link"/></svg></button></div>
+              <p class="desc">When a caller asks for a person, the agent transfers the call to:</p>
+              <div class="rcards" role="radiogroup" aria-label="Transfer route">
+                <div class="rc on" role="radio" aria-checked="true"><span class="rad on"></span><div><b>A phone number</b><p>Rings the transfer number below.</p></div></div>
+                <div class="rc" role="radio" aria-checked="false"><span class="rad"></span><div><b>Rep console, then a phone number</b><p>Reps online in Rep console get it first. After 20 s it rings the number.</p></div></div>
+              </div>
+              <div class="field"><label>Transfer number</label>
+                <div style="display:flex;align-items:center;gap:12px"><div class="box w320"><span class="pre">+91</span><span class="num">98765 43210</span></div><button class="lnk" style="font:var(--type-data-13)">Use my mobile number</button></div>
+                <span class="hint">Any Indian number, or an overseas office with its country code.</span></div>
+              <div class="sfoot"><span class="st st--n" style="font:var(--type-data-13)">Unsaved changes · 1 field</span><span class="acts"><button class="btn btn--tertiary" type="button">Discard</button><button class="btn btn--primary" type="button">Save changes</button></span></div>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Calling hours · IST</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Calling hours"><svg class="ic ic--sm"><use href="#i-link"/></svg></button><span class="stt st st--s"><svg class="ic ic--sm"><use href="#i-check"/></svg>Saved 11:24 am</span></div>
+              <p class="desc">Outbound calls and batches start only inside these hours. The Call gate blocks a start outside them.</p>
+              <div class="hrs">
+                <div class="hr"><b style="font:var(--type-label-13)">Mon</b><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Monday open"></span><span class="tf">10:00 am <small>IST</small></span><span class="t3">to</span><span class="tf">7:00 pm <small>IST</small></span><button class="lnk" style="font:var(--type-data-13);justify-self:start">Copy to weekdays</button></div>
+                <div class="hr"><b style="font:var(--type-label-13)">Tue</b><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Tuesday open"></span><span class="tf">10:00 am <small>IST</small></span><span class="t3">to</span><span class="tf">7:00 pm <small>IST</small></span><span></span></div>
+                <div class="hr"><b style="font:var(--type-label-13)">Wed</b><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Wednesday open"></span><span class="tf">10:00 am <small>IST</small></span><span class="t3">to</span><span class="tf">7:00 pm <small>IST</small></span><span></span></div>
+                <div class="hr"><b style="font:var(--type-label-13)">Sun</b><span class="sw" role="switch" aria-checked="false" aria-label="Sunday open"></span><span class="t3" style="grid-column:span 3">Closed</span><span></span></div>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+      <div data-vl="baseline" data-vl-state="default" style="grid-column:2"></div>
+    </div>
+  </div>
+  <p class="cap">Shown scrolled 150 px: the page header stays; the dirty Transfers section shows its own footer, so the UnsavedChangesBar stays hidden (§4.3). Hierarchy: the H1 meta says whether calling works; the unfinished section (Caller ID) carries the only warning; the dirty section shows its own footer. The sidebar badge and SettingsNav badge both read "Verify" from one state.</p>
+</section>
+<!-- ============ Frame B: Integrations, member view ============ -->
+<section class="sec" id="sec-b">
+  <div class="sec-h">
+    <h2>Desktop 1440 · Integrations as a member</h2>
+    <p>Two groups by who can act. Your connections always work for you; workspace connections show status, one sentence naming the admins and an "Admins only" tag instead of five disabled buttons. Unavailable apps say "Coming soon". A broken connection used by live flows gets one section notice.</p>
+    <p class="ids">§7.4 · F-UX-001, F-UX-016, F-UX-041, F-VIS-031, F-FLOW-030</p>
+  </div>
+  <div class="dev" id="frame-b" style="width:1440px;height:900px">
+    <div class="shell">
+      <nav class="sb" aria-label="Main"><button class="ws" type="button" aria-haspopup="menu" aria-label="Workspace: Sample Realty, Member. Switch workspace"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name" translate="no">Sample Realty</span><span class="ws-role">Workspace · Member</span></span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button><div class="sb-scroll"><div class="nav-g"><span class="nav-g-label" id="nav-smoperate">Operate</span><ul class="nav-list" aria-labelledby="nav-smoperate"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-activity"/></svg><span>Cockpit</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-bot"/></svg><span>Assistant</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-headphones"/></svg><span>Rep console</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-video"/></svg><span>Meetings</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-list-checks"/></svg><span>Personal agents</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-smbuild">Build</span><ul class="nav-list" aria-labelledby="nav-smbuild"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-workflow"/></svg><span>Flows</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-book-open"/></svg><span>Knowledge</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-smdata">Data</span><ul class="nav-list" aria-labelledby="nav-smdata"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-users"/></svg><span>Leads</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-file-text"/></svg><span>Call reports</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-chart"/></svg><span>Analytics</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-smaccount">Account</span><ul class="nav-list" aria-labelledby="nav-smaccount"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-wallet"/></svg><span>Billing</span></a></li><li><a class="nav-item" href="#" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#vl-i-sliders"/></svg><span>Settings</span></a></li></ul></div></div><button class="acct" type="button" aria-haspopup="menu"><span class="av" aria-hidden="true">MK</span><span>Meera K.</span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button></nav>
+      <div class="set">
+        <nav class="snav" aria-label="Settings" data-snav="integrations"></nav>
+        <main class="pg">
+          <div class="ph"><div class="ph-in">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Settings</a><svg class="ic ic--sm" aria-hidden="true"><use href="#i-right"/></svg></nav>
+            <div class="ph-title"><h1>Integrations</h1><span class="ph-meta">3 connected · 1 needs you</span></div>
+          </div></div>
+          <div class="col">
+            <section class="ss">
+              <div class="ss-h"><h2>Your connections</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Your connections"><svg class="ic ic--sm"><use href="#i-link"/></svg></button></div>
+              <p class="desc">Your own accounts. Only you can use them, for example to book on your calendar.</p>
+              <div class="notice notice--warning" role="status" style="margin-top:12px"><svg class="ic"><use href="#i-alert"/></svg><span class="notice-body"><b>Google needs you to sign in again.</b> 2 live flows can't book meetings on your calendar until you do. <a href="#">Reconnect</a></span></div>
+              <div style="margin-top:4px">
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="bm"><use href="#m-google"/></svg></span><div><b>Google</b><p>Send email from Gmail and add meetings to your Google Calendar.</p></div><div class="stc"><span class="tag tag--warning"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Reconnect needed</span><span class="meta">since 21 Sep 2026</span></div><div class="act"><button class="btn btn--sm" type="button">Reconnect…</button></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="ic"><use href="#i-calendar-clock"/></svg></span><div><b>Calendly</b><p>Let your agent book on your Calendly event types.</p></div><div class="stc"><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Connected</span><span class="meta">as meera@sample.in</span></div><div class="act"><button class="btn btn--tertiary btn--sm" type="button">Manage</button></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="bm"><use href="#m-microsoft"/></svg></span><div><b>Microsoft</b><p>Send email from Outlook and add meetings to your Outlook calendar.</p></div><div class="stc"><span class="meta">Not connected</span></div><div class="act"><button class="btn btn--sm" type="button">Connect…</button></div></div>
+              </div>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Workspace connections</h2><button type="button" class="ibtn ibtn--sm" aria-label="Copy link to Workspace connections"><svg class="ic ic--sm"><use href="#i-link"/></svg></button></div>
+              <p class="desc">Shared by everyone in Sample Realty. Only admins can connect or remove them.</p>
+              <div class="notice" style="margin-top:12px"><svg class="ic"><use href="#i-lock"/></svg><span class="notice-body">Only admins can connect workspace apps. Ask an admin: Anika R. or Dev S.</span></div>
+              <div style="margin-top:4px">
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="ic"><use href="#i-message-circle"/></svg></span><div><b>WhatsApp Business</b><p>Send and receive messages as your business, and capture click-to-WhatsApp leads.</p></div><div class="stc"><span class="tag tag--success"><svg class="ic ic--xs"><use href="#i-check"/></svg>Connected</span><span class="meta">since 12 Sep 2026</span></div><div class="act"><span class="tag tag--outline"><svg class="ic ic--xs"><use href="#i-lock"/></svg>Admins only</span></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="ic"><use href="#i-database"/></svg></span><div><b>HubSpot</b><p>Send call outcomes and new leads to HubSpot. One way for now.</p></div><div class="stc"><span class="meta">Not connected</span></div><div class="act"><span class="tag tag--outline"><svg class="ic ic--xs"><use href="#i-lock"/></svg>Admins only</span></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="ic"><use href="#i-database"/></svg></span><div><b>Salesforce</b><p>Let your agent look up Salesforce contacts during calls.</p></div><div class="stc"><span class="meta">Not connected</span></div><div class="act"><span class="tag tag--outline"><svg class="ic ic--xs"><use href="#i-lock"/></svg>Admins only</span></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="bm"><use href="#m-instagram"/></svg></span><div><b>Instagram</b><p>Capture leads from Instagram lead ads and messages.</p></div><div class="stc"><span class="tag tag--outline">Coming soon</span></div><div class="act"></div></div>
+                <div class="irow"><span class="svc" aria-hidden="true"><svg class="bm"><use href="#m-facebook"/></svg></span><div><b>Facebook</b><p>Capture leads from Facebook lead forms and Messenger.</p></div><div class="stc"><span class="tag tag--outline">Coming soon</span></div><div class="act"></div></div>
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+      <div data-vl="baseline" data-vl-state="default" style="grid-column:2"></div>
+    </div>
+  </div>
+  <p class="cap">ServiceMarks (§7.4, §14): each vendor's single-colour mark in <code>--text</code> on a 28 px <code>--surface-2</code> tile with a 1 px border; no letters and no brand fills. Google, Microsoft, Instagram and Facebook show their one-colour glyphs; Calendly, WhatsApp, HubSpot and Salesforce show the Lucide category fallback (<code>calendar-clock</code>, <code>message-circle</code>, <code>database</code>), which is what renders until each official mono SVG is added to <code>components/brand/service-marks.ts</code>. Sort order within a group: needs attention, connected, available, coming soon.</p>
+</section>
+
+<!-- ============ Frame C: Organization, dark, Danger zone + typed confirmation ============ -->
+<section class="sec" id="sec-c">
+  <div class="sec-h">
+    <h2>Desktop 1440 · Organization and team, dark theme, Delete workspace</h2>
+    <p>Invite… is the page's one primary. Role changes confirm. The Danger zone is the last section and the only boxed one; its consequences are computed. Delete workspace is tier 3: a typed name keeps the outline confirm button unavailable until it matches.</p>
+    <p class="ids">§5.1, §5.2, §7.2 · F-UX-001, F-UX-035, F-UX-041, O §3</p>
+  </div>
+  <div class="frames" id="frames-c">
+  <div class="dev" id="frame-c" data-theme="dark" style="width:1440px;height:900px">
+    <div class="shell">
+      <nav class="sb" aria-label="Main"><button class="ws" type="button" aria-haspopup="menu" aria-label="Workspace: Sample Realty, Admin. Switch workspace"><svg class="mark" aria-hidden="true"><use href="#vl-mark"/></svg><span class="ws-text"><span class="ws-name" translate="no">Sample Realty</span><span class="ws-role">Workspace · Admin</span></span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button><div class="sb-scroll"><div class="nav-g"><span class="nav-g-label" id="nav-saoperate">Operate</span><ul class="nav-list" aria-labelledby="nav-saoperate"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-activity"/></svg><span>Cockpit</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-bot"/></svg><span>Assistant</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-headphones"/></svg><span>Rep console</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-video"/></svg><span>Meetings</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-list-checks"/></svg><span>Personal agents</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-sabuild">Build</span><ul class="nav-list" aria-labelledby="nav-sabuild"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-workflow"/></svg><span>Flows</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-book-open"/></svg><span>Knowledge</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-sadata">Data</span><ul class="nav-list" aria-labelledby="nav-sadata"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-users"/></svg><span>Leads</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-file-text"/></svg><span>Call reports</span></a></li><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-chart"/></svg><span>Analytics</span></a></li></ul></div><div class="nav-g"><span class="nav-g-label" id="nav-saaccount">Account</span><ul class="nav-list" aria-labelledby="nav-saaccount"><li><a class="nav-item" href="#"><svg class="ic" aria-hidden="true"><use href="#vl-i-wallet"/></svg><span>Billing</span></a></li><li><a class="nav-item" href="#" aria-current="page"><svg class="ic" aria-hidden="true"><use href="#vl-i-sliders"/></svg><span>Settings</span><span class="nav-badge nav-badge--warn"><svg class="ic ic--xs" aria-hidden="true"><use href="#vl-i-alert"/></svg>Verify</span></a></li></ul></div></div><button class="acct" type="button" aria-haspopup="menu"><span class="av" aria-hidden="true">AR</span><span>Anika R.</span><svg class="ic ic--sm" aria-hidden="true"><use href="#vl-i-chevron-down"/></svg></button></nav>
+      <div class="set">
+        <nav class="snav" aria-label="Settings" data-snav="organization"></nav>
+        <main class="pg">
+          <div class="ph"><div class="ph-in">
+            <nav class="crumbs" aria-label="Breadcrumb"><a href="#">Settings</a><svg class="ic ic--sm" aria-hidden="true"><use href="#i-right"/></svg></nav>
+            <div class="ph-title"><h1>Organization and team</h1><span class="ph-meta">Sample Realty · 4 people · 1 invite pending</span></div>
+            <div class="ph-actions"><button class="btn btn--primary" type="button">Invite…</button></div>
+          </div></div>
+          <div class="col">
+            <section class="ss">
+              <div class="ss-h"><h2>Workspace</h2></div>
+              <div class="field"><label>Workspace name</label><div class="box">Sample Realty</div></div>
+              <div class="field"><label>Workspace address</label><div class="box" style="max-width:480px">sample-realty<span class="suf">.vaanilabs.in</span></div></div>
+              <p class="hint" style="margin-top:6px">Used in links you share. You can change it 2 more times. Old links keep working.</p>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Members</h2></div>
+              <div class="framed"><table class="dt" aria-label="Members"><thead><tr><th>Person</th><th>Role</th><th>Last active</th><th class="c-act"><span class="sr-only">Actions</span></th></tr></thead><tbody>
+                <tr><td><span class="person"><span class="av">AR</span><span><b>Anika R.</b> <span class="tag tag--outline">You</span><small>anika@sample.in</small></span></span></td><td><span class="sel">Admin <svg class="ic ic--sm"><use href="#i-down"/></svg></span></td><td class="num">Today 10:42 am</td><td class="c-act"><button type="button" class="ibtn ibtn--sm" aria-label="More actions for Anika R."><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+                <tr><td><span class="person"><span class="av">DS</span><span><b>Dev S.</b><small>dev@sample.in</small></span></span></td><td><span class="sel">Admin <svg class="ic ic--sm"><use href="#i-down"/></svg></span></td><td>Yesterday</td><td class="c-act"><button type="button" class="ibtn ibtn--sm" aria-label="More actions for Dev S."><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+                <tr><td><span class="person"><span class="av">MK</span><span><b>Meera K.</b><small>meera@sample.in</small></span></span></td><td><span class="sel">Member <svg class="ic ic--sm"><use href="#i-down"/></svg></span></td><td>3 days ago</td><td class="c-act"><button type="button" class="ibtn ibtn--sm" aria-label="More actions for Meera K."><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+                <tr><td><span class="person"><span class="av">R</span><span><b style="font-weight:400" class="t2">r•••@sample.in</b></span></span></td><td>Member</td><td><span class="tag tag--outline">Invited</span> <span class="meta">expires in 6 days</span></td><td class="c-act"><button type="button" class="ibtn ibtn--sm" aria-label="More actions for the invite to r•••@sample.in"><svg class="ic"><use href="#i-more"/></svg></button></td></tr>
+              </tbody></table></div>
+            </section>
+            <section class="dz" aria-labelledby="dz-h">
+              <h2 id="dz-h">Danger zone</h2>
+              <div class="dza"><div><b>Leave Sample Realty</b><p>You lose access to its flows, leads and call reports. An admin can invite you again.</p></div><button class="btn btn--danger" type="button">Leave workspace…</button></div>
+              <div class="dza"><div><b>Delete workspace</b><p>Deletes 16 flows, 1,284 leads and 121 call reports after 7 days, releases +91 80 •••• 2210 and cancels 2 scheduled batches.</p></div><button class="btn btn--danger" type="button">Delete workspace…</button></div>
+            </section>
+          </div>
+        </main>
+      </div>
+      <div data-vl="baseline" data-vl-state="default" style="grid-column:2"></div>
+    </div>
+  </div>
+  <div>
+    <p class="fl">Tier 3 ConfirmDialog opened from Delete workspace… (dark, over the same page)</p>
+    <div class="dev" data-theme="dark" style="width:720px;height:520px">
+    <div class="scrim"></div>
+    <div class="dlg-wrap">
+      <div class="dlg" role="alertdialog" aria-modal="true" aria-labelledby="dlg-t" style="width:var(--size-dialog-md)">
+        <div class="dlg-h"><h2 id="dlg-t">Delete 'Sample Realty'?</h2><button type="button" class="ibtn" aria-label="Close"><svg class="ic"><use href="#i-x"/></svg></button></div>
+        <div class="dlg-b">
+          <p>Calls stop now. After 7 days we delete everything below. Any wallet balance is handled under the <a href="#">refund policy</a>. Admins can restore the workspace until then.</p>
+          <ul class="imp">
+            <li><svg class="ic"><use href="#i-workflow"/></svg>16 flows and their versions</li>
+            <li><svg class="ic"><use href="#i-users"/></svg>1,284 leads and 121 call reports with recordings</li>
+            <li><svg class="ic"><use href="#i-phone"/></svg>Inbound number +91 80 •••• 2210 is released</li>
+            <li><svg class="ic"><use href="#i-list-checks"/></svg>2 scheduled batches are cancelled</li>
+          </ul>
+          <div class="field" style="margin-top:8px"><label>Type <b style="font-weight:600">Sample Realty</b> to confirm</label><div class="box" style="outline:2px solid var(--focus);outline-offset:2px">Sample Real</div></div>
+        </div>
+        <div class="dlg-f"><span class="why">Type the workspace name to delete it</span><button class="btn btn--tertiary" type="button">Cancel</button><button class="btn" type="button" aria-disabled="true">Delete workspace</button></div>
+      </div>
+    </div>
+    </div>
+  </div>
+  </div>
+  <p class="cap">Dark theme uses the plane ladder and the overlay border; the confirm button stays in its unavailable state (text-dis, border) until the typed name matches. "Confirm it's you" runs after this dialog (§5.3).</p>
+</section>
+<!-- ============ Frame D: tablet and phones ============ -->
+<section class="sec" id="sec-d">
+  <div class="sec-h">
+    <h2>Tablet 768 and phone 390 · index and drill</h2>
+    <p>Below 1024 the SettingsNav becomes the Overview index: grouped 56 px rows with computed status. Each page has one back link. On phones the section footer hides and one save bar docks above the bottom bar. Notifications shows one channel at a time.</p>
+    <p class="ids">§3.5, §4.3, §7.0, §7.1, §7.3 · F-RWD-001, F-UX-027, F-UX-041, F-A11Y-023</p>
+  </div>
+  <div class="frames" id="frames-d">
+    <div>
+      <p class="fl">Tablet 768 · /settings</p>
+      <div class="dev" style="width:768px;height:860px">
+        <div class="small">
+          <div data-vl="topbar" data-vl-mode="tablet" data-vl-title="Settings" data-vl-chips="wallet"></div>
+          <div class="scroll" style="padding:0 24px"><div style="max-width:720px;margin:0 auto">
+            <p class="meta" style="padding-top:16px;font:var(--type-data-13)">Sample Realty · You're an admin</p>
+            <div class="notice notice--warning" role="status" style="margin-top:12px"><svg class="ic"><use href="#i-alert"/></svg><div class="notice-body"><b>2 things need attention</b><p style="margin-top:6px">Caller ID isn't verified. Customers see an unknown number. <a href="#">Verify</a></p><p style="margin-top:4px">Google needs you to sign in again. <a href="#">Reconnect</a></p></div></div>
+            <p class="idx-g">Your account</p>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-user"/></svg><span><b>Profile</b><p>Your name, mobile and WhatsApp number, and preferences</p></span><span class="s">Anika R.</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-bell"/></svg><span><b>Notifications</b><p>What we email or WhatsApp you about</p></span><span class="s">Email on · WhatsApp off</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-shield"/></svg><span><b>Security</b><p>Email address, password, two-factor and sessions</p></span><span class="s">Two-factor on</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <p class="idx-g">Workspace</p>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-building"/></svg><span><b>Organization and team</b><p>Name and address, teammates and roles, shared files</p></span><span class="s">4 people</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-plug"/></svg><span><b>Integrations</b><p>Calendars, CRMs and WhatsApp Business</p></span><span class="s w"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Reconnect</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-bot"/></svg><span><b>Assistant</b><p>What the Assistant may do without asking</p></span><span class="s">Asks before changes</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <p class="idx-g">Calling</p>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-phone"/></svg><span><b>Phone setup</b><p>Inbound number, caller ID, transfers and calling hours</p></span><span class="s w"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Verify</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <p class="idx-g">Developer</p>
+            <a class="idx" href="#"><svg class="ic t3" aria-hidden="true"><use href="#i-key"/></svg><span><b>API keys</b><p>Keys for calling the Vaani Labs API</p></span><span class="s">2 keys</span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+          </div></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="fl">Phone 390 · /settings</p>
+      <div class="dev" data-density="touch" style="width:390px;height:844px">
+        <div class="small">
+          <div data-vl="topbar" data-vl-title="Settings" data-vl-chips="wallet"></div>
+          <div class="scroll" style="padding:0 16px">
+            <div class="notice notice--warning" role="status" style="margin-top:12px"><svg class="ic"><use href="#i-alert"/></svg><span class="notice-body"><b>Caller ID isn't verified.</b> <a href="#">Verify</a> · and 1 more</span></div>
+            <p class="idx-g">Your account</p>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-user"/></svg><span><b>Profile</b><p>Anika R.</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-bell"/></svg><span><b>Notifications</b><p>Email on · WhatsApp off</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-shield"/></svg><span><b>Security</b><p>Two-factor on</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <p class="idx-g">Workspace</p>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-building"/></svg><span><b>Organization and team</b><p>4 people</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-plug"/></svg><span><b>Integrations</b><p class="w"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Reconnect needed</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+            <p class="idx-g">Calling</p>
+            <a class="idx" href="#"><svg class="ic ic--lg t3" aria-hidden="true"><use href="#i-phone"/></svg><span><b>Phone setup</b><p class="w"><svg class="ic ic--xs"><use href="#i-alert"/></svg>Caller ID not verified</p></span><span></span><svg class="ic t3" aria-hidden="true"><use href="#i-right"/></svg></a>
+          </div>
+          <div data-vl="bottombar" data-vl-current="settings"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="fl">Phone 390 · /settings/profile, dirty</p>
+      <div class="dev" data-density="touch" style="width:390px;height:844px">
+        <div class="small">
+          <div data-vl="topbar" data-vl-back="Settings" data-vl-title="Profile" data-vl-chips="wallet"></div>
+          <div class="scroll" style="padding:0 16px">
+            <section class="ss" style="padding-top:16px">
+              <div class="ss-h"><h2>Personal details</h2></div>
+              <div class="field"><label>Full name</label><div class="box">Anika R.</div></div>
+              <div class="field"><label>Mobile number <span class="opt">(optional)</span></label><div class="box" style="border-color:var(--danger-border)"><span class="pre">+91</span>98765 4321</div><span class="st st--d"><svg class="ic ic--sm"><use href="#i-info"/></svg>This number has 9 digits. Mobile numbers have 10.</span></div>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>WhatsApp number</h2></div>
+              <p class="hint" style="margin-top:2px">Get alerts on WhatsApp. We send a code to check the number.</p>
+              <div class="srow" style="border-top:1px solid var(--border);margin-top:8px"><div><b>Not added</b></div><button class="btn btn--sm" type="button">Add number…</button></div>
+            </section>
+            <section class="ss">
+              <div class="ss-h"><h2>Preferences</h2></div>
+              <div class="srow"><div><b>Theme</b></div><span class="st st--s"><svg class="ic ic--sm"><use href="#i-check"/></svg>Saved</span></div>
+              <div class="seg seg--full" role="radiogroup" aria-label="Theme"><button type="button" role="radio" aria-checked="true">System</button><button type="button" role="radio" aria-checked="false">Light</button><button type="button" role="radio" aria-checked="false">Dark</button></div>
+            </section>
+          </div>
+          <div class="ucb" role="region" aria-label="Unsaved changes"><p>Unsaved changes · Personal details</p><div class="two"><button class="btn" type="button">Discard</button><button class="btn btn--primary" type="button">Save</button></div></div>
+          <div data-vl="bottombar" data-vl-current="settings"></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <p class="fl">Phone 390 · /settings/notifications?channel=email</p>
+      <div class="dev" data-density="touch" style="width:390px;height:844px">
+        <div class="small">
+          <div data-vl="topbar" data-vl-back="Settings" data-vl-title="Notifications" data-vl-chips="wallet"></div>
+          <div class="scroll" style="padding:0 16px">
+            <p class="meta" style="padding-top:12px">Changes save automatically</p>
+            <div class="seg seg--full" role="radiogroup" aria-label="Channel" style="margin-top:12px"><button type="button" role="radio" aria-checked="true">Email</button><button type="button" role="radio" aria-checked="false">WhatsApp</button></div>
+            <p class="idx-g">Calls and leads</p>
+            <div class="srow"><div><b>Call summaries</b><p>After each call: the outcome and a short summary.</p></div><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Email for Call summaries"></span></div>
+            <div class="srow"><div><b>Batch finished</b></div><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Email for Batch finished"></span></div>
+            <div class="srow"><div><b>Callbacks due today</b><p>A digest at 9:00 am IST.</p></div><span class="sw" role="switch" aria-checked="false" aria-label="Email for Callbacks due today"></span></div>
+            <p class="idx-g">Money</p>
+            <div class="srow"><div><b>Wallet low or empty</b><p>When about an hour of calls is left, and when it reaches ₹0.</p></div><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Email for Wallet low or empty"></span></div>
+            <div class="srow"><div><b>Autopay couldn't top up</b></div><span class="sw sw--on" role="switch" aria-checked="true" aria-label="Email for Autopay couldn't top up"></span></div>
+            <p class="idx-g">Security</p>
+            <div class="srow"><div><b>New sign-ins, password or email changes</b><p>Security alerts can't be turned off.</p></div><span class="sw sw--on" role="switch" aria-checked="true" aria-disabled="true" aria-label="Email for security alerts"></span></div>
+          </div>
+          <div data-vl="bottombar" data-vl-current="settings"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  var I=function(id,cls){return '<svg class="ic'+(cls?' '+cls:'')+'" aria-hidden="true"><use href="#i-'+id+'"/></svg>';};
+  var sg=[[null,[['overview','Overview']]],['Your account',[['profile','Profile'],['notifications','Notifications'],['security','Security']]],['Workspace',[['organization','Organization and team'],['integrations','Integrations'],['assistant','Assistant']]],['Calling',[['phone','Phone setup']]],['Developer',[['api-keys','API keys'],['webhooks','Webhooks'],['embed','Embed']]],['Data',[['activity','Activity'],['export','Export data'],['delete','Delete account']]]];
+  document.querySelectorAll('[data-snav]').forEach(function(el){
+    var cur=el.getAttribute('data-snav'); var member=el.closest('#frame-b');
+    var h='';
+    sg.forEach(function(g,gi){
+      h+='<div class="g"'+(gi===0?' style="padding-top:0"':'')+'>'+(g[0]?'<p id="sg'+gi+'">'+g[0]+'</p>':'')+'<ul'+(g[0]?' role="group" aria-labelledby="sg'+gi+'"':'')+'>';
+      g[1].forEach(function(it){
+        var c=it[0]===cur, bd='';
+        if(it[0]==='phone'&&!member)bd='<span class="bd">'+I('alert','ic--xs')+'Verify</span>';
+        if(it[0]==='integrations'&&member)bd='<span class="bd">'+I('alert','ic--xs')+'Reconnect</span>';
+        h+='<li><a href="#" class="si'+(c?' cur':'')+(it[0]==='delete'?' si--danger':'')+'"'+(c?' aria-current="page"':'')+'>'+it[1]+bd+'</a></li>';
+      });
+      h+='</ul></div>';
+    });
+    el.innerHTML=h;
+  });
+})();
+</script>
+</body>
+</html>
